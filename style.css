@@ -1,7 +1,8 @@
+
 body {
   background-color: #000;
   color: red;
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   text-align: center;
   padding: 20px;
 }
@@ -42,12 +43,6 @@ button:hover {
   color: #000;
 }
 
-.output textarea {
-  height: 80px;
-}
-
-footer {
-  margin-top: 20px;
-  font-size: 0.9em;
-  color: #ff4444;
+.output {
+  margin-top: 2em;
 }
