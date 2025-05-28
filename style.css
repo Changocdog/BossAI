@@ -1,7 +1,7 @@
 body {
   background-color: #000;
   color: red;
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   text-align: center;
   padding: 20px;
 }
@@ -26,7 +26,11 @@ input, textarea, button {
 }
 
 input, textarea {
-  width: 260px;
+  width: 250px;
+}
+
+textarea {
+  height: 100px;
 }
 
 button {
@@ -40,12 +44,4 @@ button {
 button:hover {
   background-color: red;
   color: black;
-}
-
-section.buttons {
-  margin: 20px 0;
-}
-
-section.output {
-  margin-top: 30px;
 }
