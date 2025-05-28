@@ -1,26 +1,44 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const inputField = document.querySelector("textarea");
+document.addEventListener("DOMContentLoaded", () => {
+  const inputField = document.getElementById("promptInput");
   const outputField = document.getElementById("output");
   const generateBtn = document.getElementById("generateBtn");
 
   generateBtn.addEventListener("click", () => {
     const prompt = inputField.value.trim();
 
-    if (prompt === "") {
-      outputField.innerText = "Please enter a prompt.";
+    if (!prompt) {
+      outputField.innerText = "⚠️ Please enter a prompt.";
       return;
     }
 
-    // Simulate each AI step
-    const simulatedWorkflow = `
-📥 Manager AI: Received task "${prompt}"
-✍️ Script AI: Writing script...
-🎙️ Voiceover AI: Converting script to audio...
-🎞️ Clipper AI: Selecting dynamic visuals...
-📜 Legal AI: Checking for copyright issues...
-⬆️ Upload AI: Preparing for post...
-✅ Final Output: Video generated on "${prompt}"`;
+    outputField.innerText = "⚙️ Running Boss AI sequence...\n";
 
-    outputField.innerText = simulatedWorkflow;
+    setTimeout(() => {
+      outputField.innerText += `📥 Manager AI: Received "${prompt}"\n`;
+    }, 500);
+
+    setTimeout(() => {
+      outputField.innerText += `✍️ Script AI: Writing script...\n`;
+    }, 1000);
+
+    setTimeout(() => {
+      outputField.innerText += `🎙️ Voiceover AI: Generating narration...\n`;
+    }, 1500);
+
+    setTimeout(() => {
+      outputField.innerText += `🎞️ Clipper AI: Selecting visuals...\n`;
+    }, 2000);
+
+    setTimeout(() => {
+      outputField.innerText += `📜 Legal AI: Reviewing for compliance...\n`;
+    }, 2500);
+
+    setTimeout(() => {
+      outputField.innerText += `⬆️ Upload AI: Preparing for posting...\n`;
+    }, 3000);
+
+    setTimeout(() => {
+      outputField.innerText += `✅ Success: Final video generated for "${prompt}"`;
+    }, 3500);
   });
 });
