@@ -1,21 +1,26 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const inputField = document.getElementById("prompt");
+  const inputField = document.querySelector("textarea");
+  const outputField = document.getElementById("output");
   const generateBtn = document.getElementById("generateBtn");
-  const outputArea = document.getElementById("output");
 
   generateBtn.addEventListener("click", () => {
     const prompt = inputField.value.trim();
-    if (!prompt) {
-      outputArea.innerText = "⚠️ Please enter a prompt.";
+
+    if (prompt === "") {
+      outputField.innerText = "Please enter a prompt.";
       return;
     }
 
-    outputArea.innerText = "🧠 Manager AI is analyzing...";
+    // Simulate each AI step
+    const simulatedWorkflow = `
+📥 Manager AI: Received task "${prompt}"
+✍️ Script AI: Writing script...
+🎙️ Voiceover AI: Converting script to audio...
+🎞️ Clipper AI: Selecting dynamic visuals...
+📜 Legal AI: Checking for copyright issues...
+⬆️ Upload AI: Preparing for post...
+✅ Final Output: Video generated on "${prompt}"`;
 
-    // Simulate flow of AI modules
-    setTimeout(() => {
-      outputArea.innerText =
-        "✅ Script AI has written a video script.\n🎤 Voiceover AI is generating voice.\n✂️ Clipper AI is assembling video...\n\n🎬 Final video output ready for preview!";
-    }, 2000);
+    outputField.innerText = simulatedWorkflow;
   });
 });
