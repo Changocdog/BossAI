@@ -1,31 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const inputField = document.querySelector("#input");
-  const outputField = document.querySelector("#output");
-  const playBtn = document.querySelector(".play-btn");
+  const inputField = document.getElementById("prompt");
+  const generateBtn = document.getElementById("generateBtn");
+  const outputArea = document.getElementById("output");
 
-  const buttons = {
-    "🧠 Task AI": "Task AI is analyzing your input...",
-    "✍️ Script AI": "Script AI is writing your script...",
-    "🎙️ Voiceover AI": "Voiceover AI is generating audio...",
-    "🎬 Clipper AI": "Clipper AI is assembling your video...",
-    "📤 Upload AI": "Upload AI is preparing your content...",
-    "⚖️ Legal AI": "Legal AI is checking compliance...",
-    "📊 Manager AI": "Manager AI is optimizing your brand...",
-    "🔍 Research AI": "Research AI is finding trends...",
-  };
+  generateBtn.addEventListener("click", () => {
+    const prompt = inputField.value.trim();
+    if (!prompt) {
+      outputArea.innerText = "⚠️ Please enter a prompt.";
+      return;
+    }
 
-  document.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const inputText = inputField.value.trim();
-      const aiName = btn.innerText.trim();
+    outputArea.innerText = "🧠 Manager AI is analyzing...";
 
-      if (buttons[aiName]) {
-        outputField.value = buttons[aiName] + (inputText ? `
-
-Query: ${inputText}` : "");
-      } else if (aiName === "▶️ Play Voiceover") {
-        outputField.value = "🔊 Playing generated voiceover audio...";
-      }
-    });
+    // Simulate flow of AI modules
+    setTimeout(() => {
+      outputArea.innerText =
+        "✅ Script AI has written a video script.\n🎤 Voiceover AI is generating voice.\n✂️ Clipper AI is assembling video...\n\n🎬 Final video output ready for preview!";
+    }, 2000);
   });
 });
