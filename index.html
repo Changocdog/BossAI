@@ -1,31 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #111;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 2;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 24px;
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .sidebar h2 {
+      margin-top: 40px;
+      font-size: 22px;
+    }
+
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    .sidebar li:hover {
+      text-decoration: underline;
+    }
+
+    .main-content {
+      margin-left: 0;
+      padding: 60px 20px 20px 20px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .sidebar.open ~ .main-content {
+      margin-left: 220px;
+    }
+
+    h1 {
+      color: red;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border-radius: 5px;
+      background-color: black;
+      border: 2px solid red;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: red;
+      color: black;
+    }
+  </style>
 </head>
 <body>
-  <div class="sidebar">
+
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <div class="sidebar" id="sidebar">
     <h2>📁 Modules</h2>
     <ul>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Scripts</a></li>
-      <li><a href="#">Voiceovers</a></li>
-      <li><a href="#">Uploads</a></li>
-      <li><a href="#">Settings</a></li>
+      <li onclick="loadModule('Dashboard')">Dashboard</li>
+      <li onclick="loadModule('Scripts')">Scripts</li>
+      <li onclick="loadModule('Voiceovers')">Voiceovers</li>
+      <li onclick="loadModule('Uploads')">Uploads</li>
+      <li onclick="loadModule('Settings')">Settings</li>
     </ul>
   </div>
 
-  <div class="main">
+  <div class="main-content" id="main">
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
-    <input type="text" id="prompt" placeholder="Enter your prompt here...">
+    <input type="text" placeholder="Enter your prompt here..." />
     <button onclick="generate()">Generate Video</button>
-    <div id="output">Awaiting input...</div>
+    <p id="output">Awaiting input...</p>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    function loadModule(name) {
+      document.getElementById('main').innerHTML = `<h1>${name} Module</h1><p>Loading ${name.toLowerCase()} tools...</p>`;
+    }
+
+    function generate() {
+      document.getElementById('output').textContent = "Generating video...";
+    }
+  </script>
+
 </body>
 </html>
