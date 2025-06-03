@@ -1,39 +1,33 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="logo">🧠 Boss AI Dashboard</div>
-    <nav class="navbar">
-      <button onclick="switchModule('dashboard')" id="btn-dashboard" class="nav-button active">Dashboard</button>
-      <button onclick="switchModule('script')" id="btn-script" class="nav-button">Script Writer</button>
-      <button onclick="switchModule('voice')" id="btn-voice" class="nav-button">Voiceover AI</button>
-      <button onclick="switchModule('clipper')" id="btn-clipper" class="nav-button">Video Clipper</button>
-      <button onclick="switchModule('legal')" id="btn-legal" class="nav-button">Legal Checker</button>
-      <button onclick="switchModule('upload')" id="btn-upload" class="nav-button">Uploader</button>
-    </nav>
-  </header>
+  <div class="sidebar" id="sidebar">
+    <h2>Boss AI</h2>
+    <button class="tab" onclick="showModule('manager')">Manager AI</button>
+    <button class="tab" onclick="showModule('script')">Script Writer AI</button>
+    <button class="tab" onclick="showModule('voice')">Voiceover AI</button>
+    <button class="tab" onclick="showModule('clip')">Video Clipper AI</button>
+    <button class="tab" onclick="showModule('upload')">Upload Strategy AI</button>
+    <button class="tab" onclick="showModule('legal')">Legal Checker AI</button>
+    <button class="tab" onclick="showModule('research')">Research AI</button>
+  </div>
 
-  <main class="main-content">
-    <section id="dashboard" class="module active">
-      <h1>Dashboard</h1>
-      <p>Welcome to Boss AI. Select a module from the top menu to begin.</p>
-      <input type="text" id="prompt" placeholder="Enter your command or video topic..." />
-      <button onclick="generate()" class="generate-btn">Generate Video</button>
-      <div class="output" id="output">Awaiting input...</div>
-    </section>
-
-    <section id="script" class="module"><h1>Script Writer</h1><p>[Script AI Coming Soon]</p></section>
-    <section id="voice" class="module"><h1>Voiceover AI</h1><p>[Voiceover Tools Here]</p></section>
-    <section id="clipper" class="module"><h1>Video Clipper</h1><p>[Clipper AI Features]</p></section>
-    <section id="legal" class="module"><h1>Legal Checker</h1><p>[Compliance Checker]</p></section>
-    <section id="upload" class="module"><h1>Uploader</h1><p>[Upload Options]</p></section>
-  </main>
+  <div class="main">
+    <div id="manager" class="module">👔 <strong>Manager AI:</strong> Oversees the whole workflow.</div>
+    <div id="script" class="module hidden">📝 <strong>Script Writer AI:</strong> Creates content scripts.</div>
+    <div id="voice" class="module hidden">🎙️ <strong>Voiceover AI:</strong> Adds narration to videos.</div>
+    <div id="clip" class="module hidden">✂️ <strong>Video Clipper AI:</strong> Edits video clips.</div>
+    <div id="upload" class="module hidden">📤 <strong>Upload Strategy AI:</strong> Handles platform publishing.</div>
+    <div id="legal" class="module hidden">⚖️ <strong>Legal Checker AI:</strong> Reviews content for compliance.</div>
+    <div id="research" class="module hidden">🔍 <strong>Research AI:</strong> Identifies trends and growth strategies.</div>
+  </div>
 
   <script src="script.js"></script>
 </body>
