@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Boss AI Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
+  <div class="sidebar">
     <h2>📁 Modules</h2>
     <ul>
       <li><a href="#">Dashboard</a></li>
@@ -19,10 +19,9 @@
   </div>
 
   <div class="main">
-    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
-    <input type="text" id="prompt" placeholder="Enter your prompt here..." />
+    <input type="text" id="prompt" placeholder="Enter your prompt here...">
     <button onclick="generate()">Generate Video</button>
     <div id="output">Awaiting input...</div>
   </div>
