@@ -3,112 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard</title>
+  <title>Boss AI</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       display: flex;
-      height: 100vh;
     }
 
     .sidebar {
-      width: 240px;
-      background-color: #1e1e1e;
+      width: 220px;
+      background-color: #1f1f1f;
       color: white;
-      display: flex;
-      flex-direction: column;
-      padding-top: 20px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 60px;
+      transition: transform 0.3s ease;
     }
 
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 20px;
+    .sidebar.hidden {
+      transform: translateX(-100%);
     }
 
-    .module {
+    .sidebar button {
+      display: block;
+      width: 100%;
       padding: 15px 20px;
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
       cursor: pointer;
-      border-bottom: 1px solid #333;
-      transition: background 0.2s;
     }
 
-    .module:hover {
+    .sidebar button:hover {
       background-color: #333;
     }
 
-    .module.active {
-      background-color: #555;
-      font-weight: bold;
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #141414;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+
+    .topbar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      margin-right: 15px;
+      cursor: pointer;
     }
 
     .content {
-      flex-grow: 1;
-      padding: 30px;
-      background-color: #f4f4f4;
-      overflow-y: auto;
+      margin-left: 220px;
+      padding: 70px 20px 20px 20px;
+      width: 100%;
+      transition: margin-left 0.3s ease;
     }
 
-    #main-output h2 {
-      margin-top: 0;
+    .sidebar.hidden + .content {
+      margin-left: 0;
     }
 
-    @media screen and (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
+    .module {
+      display: none;
+    }
 
-      .sidebar {
-        flex-direction: row;
-        width: 100%;
-        overflow-x: auto;
-      }
-
-      .module {
-        flex: 1;
-        text-align: center;
-        border-bottom: none;
-        border-right: 1px solid #333;
-      }
+    .module.active {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>Boss AI</h2>
-    <div class="module active">Dashboard</div>
-    <div class="module">Script Writer</div>
-    <div class="module">Voiceover AI</div>
-    <div class="module">Video Clipper</div>
-    <div class="module">Legal Checker</div>
-    <div class="module">Uploader</div>
-    <div class="module">Settings</div>
+
+  <div class="topbar">
+    <button onclick="toggleSidebar()">☰</button>
+    <span>Boss AI Dashboard</span>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <button onclick="showModule('dashboard')">Dashboard</button>
+    <button onclick="showModule('scripts')">Scripts</button>
+    <button onclick="showModule('voiceovers')">Voiceovers</button>
+    <button onclick="showModule('uploads')">Uploads</button>
+    <button onclick="showModule('settings')">Settings</button>
   </div>
 
   <div class="content">
-    <div id="main-output">
-      <h2>Dashboard</h2>
-      <p>Welcome to Boss AI. Select a module from the sidebar to begin.</p>
+    <div id="dashboard" class="module active">
+      <h2>📊 Dashboard</h2>
+      <p>System stats, performance graphs, and insights will show here.</p>
+    </div>
+    <div id="scripts" class="module">
+      <h2>📝 Scripts</h2>
+      <p>Generate and manage your content scripts.</p>
+    </div>
+    <div id="voiceovers" class="module">
+      <h2>🎤 Voiceovers</h2>
+      <p>Generate audio files for your videos.</p>
+    </div>
+    <div id="uploads" class="module">
+      <h2>📤 Uploads</h2>
+      <p>Post content directly to social media platforms.</p>
+    </div>
+    <div id="settings" class="module">
+      <h2>⚙️ Settings</h2>
+      <p>Customize AI behavior and manage integrations.</p>
     </div>
   </div>
 
   <script>
-    const modules = document.querySelectorAll(".module");
-    const output = document.getElementById("main-output");
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("hidden");
+    }
 
-    modules.forEach((module) => {
-      module.addEventListener("click", () => {
-        const name = module.textContent.trim();
-        output.innerHTML = `
-          <h2>${name}</h2>
-          <p>This is the active panel for <strong>${name}</strong>. More interactive features coming next.</p>
-        `;
-
-        modules.forEach(m => m.classList.remove("active"));
-        module.classList.add("active");
-      });
-    });
+    function showModule(moduleId) {
+      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+      document.getElementById(moduleId).classList.add('active');
+    }
   </script>
 </body>
 </html>
