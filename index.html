@@ -7,12 +7,11 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #000;
+      font-family: Arial, sans-serif;
+      background-color: black;
       color: white;
     }
 
-    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
@@ -36,7 +35,6 @@
       background-color: #575757;
     }
 
-    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
@@ -50,7 +48,6 @@
       padding: 5px 10px;
     }
 
-    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
@@ -61,12 +58,11 @@
       color: red;
     }
 
-    .prompt-box,
-    #script-module {
+    .prompt-box {
       margin-top: 20px;
     }
 
-    input[type="text"] {
+    input[type="text"], textarea {
       padding: 10px;
       width: 60%;
       border: none;
@@ -86,7 +82,12 @@
     .output {
       margin-top: 20px;
       font-style: italic;
-      white-space: pre-wrap;
+    }
+
+    .section-divider {
+      margin-top: 40px;
+      border-top: 1px solid #333;
+      padding-top: 20px;
     }
   </style>
 </head>
@@ -97,7 +98,7 @@
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
     <a href="#">Dashboard</a>
-    <a href="#script-module">Scripts</a>
+    <a href="#">Scripts</a>
     <a href="#">Voiceovers</a>
     <a href="#">Uploads</a>
     <a href="#">Settings</a>
@@ -107,13 +108,19 @@
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
-    <!-- Script Writer AI Module -->
-    <div id="script-module">
-      <h2>✍️ Script Writer AI</h2>
-      <p>Enter a prompt and get a full video script instantly:</p>
-      <input type="text" id="script-input" placeholder="e.g., How to start a side hustle" />
+    <!-- Script Generator -->
+    <div class="prompt-box">
+      <input type="text" id="scriptPrompt" placeholder="Enter your prompt here..." />
       <button onclick="generateScript()">Generate Script</button>
-      <div class="output" id="script-output">Awaiting script...</div>
+    </div>
+
+    <div class="output" id="scriptOutput">Awaiting script input...</div>
+
+    <!-- Voiceover Generator -->
+    <div class="section-divider">
+      <h2>🎙️ Voiceover Text Generator</h2>
+      <button onclick="generateVoiceover()">Generate Voiceover</button>
+      <div class="output" id="voiceoverOutput">Awaiting voiceover generation...</div>
     </div>
   </div>
 
@@ -124,14 +131,15 @@
     }
 
     function generateScript() {
-      const prompt = document.getElementById('script-input').value;
-      const output = document.getElementById('script-output');
-      output.textContent = 'Generating script...';
+      const prompt = document.getElementById('scriptPrompt').value;
+      const output = document.getElementById('scriptOutput');
+      output.textContent = "Here's your generated script based on: " + prompt;
+    }
 
-      // Simulated AI output
-      setTimeout(() => {
-        output.textContent = `🎬 Script AI: Based on your prompt "${prompt}", here is your video script:\n\n[Scene opens with a narrator speaking directly to the camera...]`;
-      }, 1000);
+    function generateVoiceover() {
+      const script = document.getElementById('scriptOutput').textContent;
+      const voiceOutput = document.getElementById('voiceoverOutput');
+      voiceOutput.textContent = "Voiceover version: '" + script.replace("Here's your generated script based on: ", "") + "' — narrated style.";
     }
   </script>
 
