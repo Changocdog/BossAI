@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #000;
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
     }
 
+    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
@@ -20,7 +21,7 @@
       left: -250px;
       background-color: #111;
       padding-top: 60px;
-      transition: 0.3s ease;
+      transition: 0.3s;
       z-index: 1000;
     }
 
@@ -29,12 +30,14 @@
       display: block;
       color: white;
       text-decoration: none;
+      cursor: pointer;
     }
 
     .sidebar a:hover {
       background-color: #575757;
     }
 
+    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
@@ -48,6 +51,7 @@
       padding: 5px 10px;
     }
 
+    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
@@ -59,34 +63,29 @@
     }
 
     .prompt-box {
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
     input[type="text"] {
-      padding: 12px;
+      padding: 10px;
       width: 60%;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
     }
 
     button {
-      padding: 12px 20px;
+      padding: 10px;
       margin-left: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
       border-radius: 5px;
-      font-size: 16px;
       cursor: pointer;
     }
 
     .output {
-      margin-top: 30px;
+      margin-top: 20px;
       font-style: italic;
-      font-size: 16px;
-      border-left: 4px solid red;
-      padding-left: 15px;
     }
   </style>
 </head>
@@ -96,19 +95,19 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Scripts</a>
-    <a href="#">Voiceovers</a>
-    <a href="#">Uploads</a>
-    <a href="#">Settings</a>
+    <a onclick="showModule('dashboard')">Dashboard</a>
+    <a onclick="showModule('scripts')">Scripts</a>
+    <a onclick="showModule('voiceovers')">Voiceovers</a>
+    <a onclick="showModule('uploads')">Uploads</a>
+    <a onclick="showModule('settings')">Settings</a>
   </div>
 
   <div class="main-content" id="main">
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
-    <div class="prompt-box">
-      <input id="promptInput" type="text" placeholder="Enter your prompt here..." />
+    <div class="prompt-box" id="promptBox">
+      <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
       <button onclick="generate()">Generate Video</button>
     </div>
 
@@ -122,24 +121,25 @@
     }
 
     function generate() {
-      const prompt = document.getElementById('promptInput').value.trim();
+      const input = document.getElementById('promptInput').value;
       const output = document.getElementById('output');
+      output.textContent = `Generating video from prompt: "${input}"... (simulated)`;
+    }
 
-      if (!prompt) {
-        output.textContent = "Please enter a prompt to generate video content.";
-        return;
+    function showModule(module) {
+      const output = document.getElementById('output');
+      const promptBox = document.getElementById('promptBox');
+
+      if (module === 'dashboard') {
+        output.textContent = 'Welcome to the Boss AI Dashboard!';
+        promptBox.style.display = 'block';
+      } else if (module === 'scripts') {
+        output.textContent = 'Sample Script:\n\n"Are you tired of wasting time and money? In this short video, we’ll show you how to fix that in 3 simple steps!"';
+        promptBox.style.display = 'none';
+      } else {
+        output.textContent = `Module "${module}" is coming soon...`;
+        promptBox.style.display = 'none';
       }
-
-      output.textContent = "Generating your video script...";
-
-      setTimeout(() => {
-        output.innerHTML = `
-          <strong>AI Output:</strong><br>
-          Here's a high-impact short based on your prompt:<br><br>
-          <em>"In a world where passive income is king, here's how you can start with just $100..."</em><br><br>
-          Want the full video + voiceover? (coming soon)
-        `;
-      }, 1500);
     }
   </script>
 
