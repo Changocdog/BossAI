@@ -1,48 +1,96 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f4f4;
-  color: #111;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: #111;
+  color: #eee;
 }
 
-.top-nav {
+.topbar {
+  background-color: #1e1e1e;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #000;
-  padding: 10px 20px;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid #333;
 }
 
 .logo {
-  color: red;
-  font-size: 24px;
+  font-size: 1.3rem;
   font-weight: bold;
+  color: #4fc3f7;
+  flex: 1;
 }
 
-.nav-links {
-  list-style: none;
+.navbar {
   display: flex;
-  gap: 15px;
+  gap: 0.5rem;
 }
 
-.nav-links li {
-  color: #fff;
+.nav-button {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 5px;
-  transition: background 0.2s ease;
+  border-radius: 4px;
+  transition: background 0.2s;
 }
 
-.nav-links li:hover,
-.nav-links li.active {
-  background: red;
+.nav-button:hover {
+  background-color: #333;
+}
+
+.nav-button.active {
+  background-color: #4fc3f7;
+  color: #000;
+}
+
+.main-content {
+  padding: 2rem;
+}
+
+h1 {
   color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
 }
 
-main {
-  padding: 30px;
-  background: white;
-  min-height: 90vh;
+p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  background: #222;
+  color: #eee;
+}
+
+.generate-btn {
+  padding: 0.6rem 1.2rem;
+  background-color: transparent;
+  color: #4fc3f7;
+  border: 1px solid #4fc3f7;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.generate-btn:hover {
+  background-color: #4fc3f7;
+  color: #000;
+}
+
+.output {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #aaa;
 }
 
 .module {
