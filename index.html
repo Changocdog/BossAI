@@ -12,6 +12,7 @@
       color: white;
     }
 
+    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
@@ -35,6 +36,7 @@
       background-color: #575757;
     }
 
+    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
@@ -48,6 +50,7 @@
       padding: 5px 10px;
     }
 
+    /* Main content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
@@ -62,7 +65,7 @@
       margin-top: 20px;
     }
 
-    input[type="text"], textarea {
+    input[type="text"] {
       padding: 10px;
       width: 60%;
       border: none;
@@ -84,10 +87,20 @@
       font-style: italic;
     }
 
-    .section-divider {
-      margin-top: 40px;
+    .module-section {
+      margin-top: 30px;
       border-top: 1px solid #333;
       padding-top: 20px;
+    }
+
+    .module-section h2 {
+      color: #ff4444;
+    }
+
+    .module-output {
+      margin-top: 10px;
+      font-style: italic;
+      color: lightgray;
     }
   </style>
 </head>
@@ -108,19 +121,19 @@
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
-    <!-- Script Generator -->
     <div class="prompt-box">
-      <input type="text" id="scriptPrompt" placeholder="Enter your prompt here..." />
-      <button onclick="generateScript()">Generate Script</button>
+      <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Video</button>
     </div>
 
-    <div class="output" id="scriptOutput">Awaiting script input...</div>
+    <div class="output" id="output">Awaiting input...</div>
 
-    <!-- Voiceover Generator -->
-    <div class="section-divider">
-      <h2>🎙️ Voiceover Text Generator</h2>
+    <!-- Uploads Module -->
+    <div class="module-section">
+      <h2>📤 Uploads Module</h2>
       <button onclick="generateVoiceover()">Generate Voiceover</button>
-      <div class="output" id="voiceoverOutput">Awaiting voiceover generation...</div>
+      <button onclick="clipAndUpload()">Clip & Upload Video</button>
+      <div class="module-output" id="uploadOutput">Module idle...</div>
     </div>
   </div>
 
@@ -130,16 +143,18 @@
       sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
     }
 
-    function generateScript() {
-      const prompt = document.getElementById('scriptPrompt').value;
-      const output = document.getElementById('scriptOutput');
-      output.textContent = "Here's your generated script based on: " + prompt;
+    function generate() {
+      const prompt = document.getElementById('promptInput').value;
+      const output = document.getElementById('output');
+      output.textContent = prompt ? `Generating video for: "${prompt}"` : "Please enter a prompt.";
     }
 
     function generateVoiceover() {
-      const script = document.getElementById('scriptOutput').textContent;
-      const voiceOutput = document.getElementById('voiceoverOutput');
-      voiceOutput.textContent = "Voiceover version: '" + script.replace("Here's your generated script based on: ", "") + "' — narrated style.";
+      document.getElementById('uploadOutput').textContent = "🎙️ Generating voiceover...";
+    }
+
+    function clipAndUpload() {
+      document.getElementById('uploadOutput').textContent = "🎬 Clipping and uploading video...";
     }
   </script>
 
