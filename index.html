@@ -100,7 +100,7 @@
     <a href="#" onclick="showDashboard()">Dashboard</a>
     <a href="#" onclick="showScriptWriter()">Scripts</a>
     <a href="#" onclick="showVoiceover()">Voiceovers</a>
-    <a href="#">Uploads</a>
+    <a href="#" onclick="showClipper()">Clipper</a>
     <a href="#">Settings</a>
   </div>
 
@@ -123,12 +123,20 @@
       <div class="output" id="scriptOutput">Waiting for input...</div>
     </div>
 
-    <!-- ✅ Voiceover AI -->
+    <!-- Voiceover AI -->
     <div id="voiceover-box" style="display: none;">
       <h2 class="module-title">Voiceover AI</h2>
       <input id="voicePrompt" type="text" placeholder="Enter your voiceover script..." />
       <button onclick="generateVoice()">Generate Voiceover</button>
       <div class="output" id="voiceOutput">Voiceover preview loading...</div>
+    </div>
+
+    <!-- 🎞️ Video Clipper AI -->
+    <div id="clipper-box" style="display: none;">
+      <h2 class="module-title">Video Clipper AI</h2>
+      <input id="clipPrompt" type="text" placeholder="Describe your clip idea..." />
+      <button onclick="generateClip()">Generate Clip</button>
+      <div class="output" id="clipOutput">Clip preview coming soon...</div>
     </div>
   </div>
 
@@ -153,10 +161,16 @@
       document.getElementById("voiceover-box").style.display = "block";
     }
 
+    function showClipper() {
+      hideAll();
+      document.getElementById("clipper-box").style.display = "block";
+    }
+
     function hideAll() {
       document.getElementById("dashboard-box").style.display = "none";
       document.getElementById("script-box").style.display = "none";
       document.getElementById("voiceover-box").style.display = "none";
+      document.getElementById("clipper-box").style.display = "none";
     }
 
     function generate() {
@@ -173,6 +187,12 @@
       const input = document.getElementById('voicePrompt').value;
       const output = document.getElementById('voiceOutput');
       output.textContent = input.trim() ? `Synthesizing voice for: "${input}"...` : 'Please enter a voiceover prompt.';
+    }
+
+    function generateClip() {
+      const input = document.getElementById('clipPrompt').value;
+      const output = document.getElementById('clipOutput');
+      output.textContent = input.trim() ? `Editing clip for: "${input}"...` : 'Please enter a clip prompt.';
     }
   </script>
 
