@@ -32,8 +32,10 @@
       text-decoration: none;
     }
 
-    .sidebar a:hover {
-      background-color: #575757;
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #ff0000;
+      color: white;
     }
 
     /* Toggle button */
@@ -54,6 +56,7 @@
     .main-content {
       margin-left: 30px;
       padding: 20px;
+      margin-top: 50px;
       transition: margin-left 0.3s;
     }
 
@@ -86,6 +89,14 @@
       margin-top: 20px;
       font-style: italic;
     }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -94,38 +105,63 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Scripts</a>
-    <a href="#">Voiceovers</a>
-    <a href="#">Uploads</a>
-    <a href="#">Settings</a>
+    <a href="#" class="active" onclick="showPanel(event, 'dashboard')">Dashboard</a>
+    <a href="#" onclick="showPanel(event, 'scripts')">Scripts</a>
+    <a href="#" onclick="showPanel(event, 'voiceovers')">Voiceovers</a>
+    <a href="#" onclick="showPanel(event, 'uploads')">Uploads</a>
+    <a href="#" onclick="showPanel(event, 'settings')">Settings</a>
   </div>
 
   <div class="main-content" id="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
-
-    <div class="prompt-box">
-      <input type="text" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+    <div id="dashboard" class="panel active">
+      <h1>🚀 Boss AI Dashboard</h1>
+      <p>Your AI-Powered Content Studio</p>
+      <div class="prompt-box">
+        <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+        <button onclick="generate()">Generate Video</button>
+      </div>
+      <div class="output" id="output">Awaiting input...</div>
     </div>
 
-    <div class="output" id="output">Awaiting input...</div>
+    <div id="scripts" class="panel">
+      <h1>📜 Script Writer AI</h1>
+      <p>Generate high-quality scripts based on your topic.</p>
+    </div>
+
+    <div id="voiceovers" class="panel">
+      <h1>🎤 Voiceover AI</h1>
+      <p>Convert your script into voice with AI.</p>
+    </div>
+
+    <div id="uploads" class="panel">
+      <h1>📤 Upload Manager</h1>
+      <p>Upload and manage video files here.</p>
+    </div>
+
+    <div id="settings" class="panel">
+      <h1>⚙️ Settings</h1>
+      <p>Configure your dashboard preferences.</p>
+    </div>
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      if (sidebar.style.left === '0px') {
-        sidebar.style.left = '-250px';
-      } else {
-        sidebar.style.left = '0px';
-      }
+      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
     }
 
     function generate() {
+      const prompt = document.getElementById('promptInput').value;
       const output = document.getElementById('output');
-      output.textContent = 'Generating... (this is a placeholder)';
+      output.textContent = `Generating video for: "${prompt}" (this is a placeholder)`;
+    }
+
+    function showPanel(e, panelId) {
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+
+      document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+      e.target.classList.add('active');
     }
   </script>
 
