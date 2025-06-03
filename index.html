@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
   <style>
     body {
@@ -50,7 +50,7 @@
       padding: 5px 10px;
     }
 
-    /* Main content */
+    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
@@ -87,20 +87,22 @@
       font-style: italic;
     }
 
-    .module-section {
-      margin-top: 30px;
-      border-top: 1px solid #333;
-      padding-top: 20px;
-    }
-
-    .module-section h2 {
-      color: #ff4444;
-    }
-
-    .module-output {
+    #scripts-module input[type="text"] {
+      padding: 10px;
+      width: 60%;
       margin-top: 10px;
-      font-style: italic;
-      color: lightgray;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #scripts-module button {
+      padding: 10px;
+      margin-left: 10px;
+      background-color: black;
+      color: red;
+      border: 2px solid red;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -122,39 +124,56 @@
     <p>Your AI-Powered Content Studio</p>
 
     <div class="prompt-box">
-      <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+      <input type="text" placeholder="Enter your prompt here..." />
       <button onclick="generate()">Generate Video</button>
     </div>
 
     <div class="output" id="output">Awaiting input...</div>
 
-    <!-- Uploads Module -->
-    <div class="module-section">
-      <h2>📤 Uploads Module</h2>
-      <button onclick="generateVoiceover()">Generate Voiceover</button>
-      <button onclick="clipAndUpload()">Clip & Upload Video</button>
-      <div class="module-output" id="uploadOutput">Module idle...</div>
+    <!-- Scripts Module -->
+    <div id="scripts-module" style="margin-top: 40px;">
+      <h2>📝 Script Generator</h2>
+      <p>Enter a topic below to generate a content script:</p>
+      <input type="text" id="script-topic" placeholder="Enter topic (e.g., passive income ideas)">
+      <button onclick="generateScript()">Generate Script</button>
+      <div class="output" id="script-output">Script will appear here...</div>
     </div>
+
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
+      if (sidebar.style.left === '0px') {
+        sidebar.style.left = '-250px';
+      } else {
+        sidebar.style.left = '0px';
+      }
     }
 
     function generate() {
-      const prompt = document.getElementById('promptInput').value;
       const output = document.getElementById('output');
-      output.textContent = prompt ? `Generating video for: "${prompt}"` : "Please enter a prompt.";
+      output.textContent = 'Generating... (this is a placeholder)';
     }
 
-    function generateVoiceover() {
-      document.getElementById('uploadOutput').textContent = "🎙️ Generating voiceover...";
-    }
+    function generateScript() {
+      const topic = document.getElementById('script-topic').value;
+      const output = document.getElementById('script-output');
 
-    function clipAndUpload() {
-      document.getElementById('uploadOutput').textContent = "🎬 Clipping and uploading video...";
+      if (!topic.trim()) {
+        output.textContent = 'Please enter a topic first.';
+        return;
+      }
+
+      output.innerHTML = `
+        <strong>Title:</strong> Unlocking ${topic}<br><br>
+        <strong>Hook:</strong> What if you could master ${topic} in just 60 seconds?<br><br>
+        <strong>Body:</strong> Here's how you do it...<br>
+        1. Research key methods.<br>
+        2. Apply strategies daily.<br>
+        3. Track performance and scale.<br><br>
+        <strong>Call to Action:</strong> Follow Boss AI for more daily growth tips!
+      `;
     }
   </script>
 
