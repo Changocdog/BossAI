@@ -3,136 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 220px;
-      background-color: #1f1f1f;
-      color: white;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding-top: 60px;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
-    .sidebar button {
-      display: block;
-      width: 100%;
-      padding: 15px 20px;
-      background: none;
-      border: none;
-      color: white;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .sidebar button:hover {
-      background-color: #333;
-    }
-
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 50px;
-      background-color: #141414;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 0 15px;
-      box-sizing: border-box;
-      z-index: 1000;
-    }
-
-    .topbar button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 20px;
-      margin-right: 15px;
-      cursor: pointer;
-    }
-
-    .content {
-      margin-left: 220px;
-      padding: 70px 20px 20px 20px;
-      width: 100%;
-      transition: margin-left 0.3s ease;
-    }
-
-    .sidebar.hidden + .content {
-      margin-left: 0;
-    }
-
-    .module {
-      display: none;
-    }
-
-    .module.active {
-      display: block;
-    }
-  </style>
+  <title>Boss AI Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <nav class="top-nav">
+    <div class="logo">🚀 Boss AI</div>
+    <ul class="nav-links">
+      <li class="active" onclick="showModule('dashboard')">Dashboard</li>
+      <li onclick="showModule('script')">Script Writer</li>
+      <li onclick="showModule('voiceover')">Voiceover AI</li>
+      <li onclick="showModule('clipper')">Video Clipper</li>
+      <li onclick="showModule('legal')">Legal Checker</li>
+      <li onclick="showModule('upload')">Uploader</li>
+    </ul>
+  </nav>
 
-  <div class="topbar">
-    <button onclick="toggleSidebar()">☰</button>
-    <span>Boss AI Dashboard</span>
-  </div>
+  <main>
+    <section id="dashboard" class="module active">
+      <h2>Dashboard</h2>
+      <p>Welcome to Boss AI. Select a module from the top to begin.</p>
+    </section>
 
-  <div id="sidebar" class="sidebar">
-    <button onclick="showModule('dashboard')">Dashboard</button>
-    <button onclick="showModule('scripts')">Scripts</button>
-    <button onclick="showModule('voiceovers')">Voiceovers</button>
-    <button onclick="showModule('uploads')">Uploads</button>
-    <button onclick="showModule('settings')">Settings</button>
-  </div>
+    <section id="script" class="module">
+      <h2>Script Writer</h2>
+      <p>Script writing tools will go here.</p>
+    </section>
 
-  <div class="content">
-    <div id="dashboard" class="module active">
-      <h2>📊 Dashboard</h2>
-      <p>System stats, performance graphs, and insights will show here.</p>
-    </div>
-    <div id="scripts" class="module">
-      <h2>📝 Scripts</h2>
-      <p>Generate and manage your content scripts.</p>
-    </div>
-    <div id="voiceovers" class="module">
-      <h2>🎤 Voiceovers</h2>
-      <p>Generate audio files for your videos.</p>
-    </div>
-    <div id="uploads" class="module">
-      <h2>📤 Uploads</h2>
-      <p>Post content directly to social media platforms.</p>
-    </div>
-    <div id="settings" class="module">
-      <h2>⚙️ Settings</h2>
-      <p>Customize AI behavior and manage integrations.</p>
-    </div>
-  </div>
+    <section id="voiceover" class="module">
+      <h2>Voiceover AI</h2>
+      <p>Voiceover module goes here.</p>
+    </section>
+
+    <section id="clipper" class="module">
+      <h2>Video Clipper</h2>
+      <p>Clipper module goes here.</p>
+    </section>
+
+    <section id="legal" class="module">
+      <h2>Legal Checker</h2>
+      <p>Compliance tools and scans here.</p>
+    </section>
+
+    <section id="upload" class="module">
+      <h2>Uploader</h2>
+      <p>Upload and manage your content.</p>
+    </section>
+  </main>
 
   <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.classList.toggle("hidden");
-    }
-
-    function showModule(moduleId) {
-      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-      document.getElementById(moduleId).classList.add('active');
+    function showModule(id) {
+      document.querySelectorAll('.module').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+      document.querySelector(`.nav-links li[onclick="showModule('${id}')"]`).classList.add('active');
     }
   </script>
 </body>
