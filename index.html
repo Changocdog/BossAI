@@ -8,18 +8,17 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #111;
+      background-color: black;
       color: white;
     }
 
-    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
       position: fixed;
       top: 0;
       left: -250px;
-      background-color: #000;
+      background-color: #111;
       padding-top: 60px;
       transition: 0.3s;
       z-index: 1000;
@@ -33,30 +32,30 @@
     }
 
     .sidebar a:hover {
-      background-color: #333;
+      background-color: #575757;
     }
 
-    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
       top: 10px;
-      font-size: 24px;
+      font-size: 30px;
       cursor: pointer;
       z-index: 1100;
-      background-color: #000;
+      background-color: #111;
       border: none;
       color: white;
-      padding: 8px 12px;
-      border-radius: 4px;
+      padding: 5px 10px;
     }
 
-    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
-      margin-top: 60px;
       transition: margin-left 0.3s;
+    }
+
+    h1 {
+      color: red;
     }
 
     .prompt-box {
@@ -85,85 +84,77 @@
       font-style: italic;
     }
 
-    h1 {
+    .module-title {
+      font-size: 28px;
       color: red;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar toggle -->
   <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#" onclick="showModule('dashboard')">Dashboard</a>
-    <a href="#" onclick="showModule('scripts')">Script Writer</a>
-    <a href="#" onclick="showModule('voiceover')">Voiceover AI</a>
-    <a href="#" onclick="showModule('video')">Video Clipper</a>
-    <a href="#" onclick="showModule('legal')">Legal Checker</a>
-    <a href="#" onclick="showModule('uploader')">Uploader</a>
+    <a href="#" onclick="showDashboard()">Dashboard</a>
+    <a href="#" onclick="showScriptWriter()">Scripts</a>
+    <a href="#">Voiceovers</a>
+    <a href="#">Uploads</a>
+    <a href="#">Settings</a>
   </div>
 
-  <!-- Main content -->
-  <div class="main-content" id="main-content">
+  <div class="main-content" id="main">
     <h1>🚀 Boss AI Dashboard</h1>
-    <p>Welcome to Boss AI. Enter a command to begin.</p>
-    <div class="prompt-box">
-      <input type="text" placeholder="Enter your command or video topic..." />
+    <p>Your AI-Powered Content Studio</p>
+
+    <div class="prompt-box" id="dashboard-box">
+      <input type="text" placeholder="Enter your prompt here..." />
       <button onclick="generate()">Generate Video</button>
+      <div class="output" id="output">Awaiting input...</div>
     </div>
-    <div class="output" id="output">Awaiting input...</div>
+
+    <div id="script-box" style="display: none;">
+      <h2 class="module-title">Script Writer AI</h2>
+      <input id="scriptPrompt" type="text" placeholder="Enter your script idea..." />
+      <button onclick="generateScript()">Generate Script</button>
+      <div class="output" id="scriptOutput">Waiting for input...</div>
+    </div>
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+      if (sidebar.style.left === '0px') {
+        sidebar.style.left = '-250px';
+      } else {
+        sidebar.style.left = '0px';
+      }
     }
 
     function generate() {
       const output = document.getElementById('output');
-      output.textContent = 'Generating... (placeholder)';
+      output.textContent = 'Generating video... (placeholder logic)';
     }
 
-    function showModule(module) {
-      const content = document.getElementById('main-content');
-      let html = '';
-
-      switch (module) {
-        case 'dashboard':
-          html = `
-            <h1>🚀 Boss AI Dashboard</h1>
-            <p>Welcome to Boss AI. Enter a command to begin.</p>
-            <div class="prompt-box">
-              <input type="text" placeholder="Enter your command or video topic..." />
-              <button onclick="generate()">Generate Video</button>
-            </div>
-            <div class="output" id="output">Awaiting input...</div>
-          `;
-          break;
-        case 'scripts':
-          html = `<h1>✍️ Script Writer AI</h1><p>Enter your video idea below.</p>`;
-          break;
-        case 'voiceover':
-          html = `<h1>🎙️ Voiceover AI</h1><p>Upload a script to generate audio narration.</p>`;
-          break;
-        case 'video':
-          html = `<h1>🎞️ Video Clipper AI</h1><p>Upload content to clip and edit with AI.</p>`;
-          break;
-        case 'legal':
-          html = `<h1>⚖️ Legal Checker AI</h1><p>Run compliance and copyright checks on your content.</p>`;
-          break;
-        case 'uploader':
-          html = `<h1>📤 Uploader AI</h1><p>Schedule and publish content to YouTube and TikTok.</p>`;
-          break;
-        default:
-          html = `<h1>Boss AI</h1><p>Select a module from the sidebar.</p>`;
+    function generateScript() {
+      const input = document.getElementById('scriptPrompt').value;
+      const output = document.getElementById('scriptOutput');
+      if (input.trim() === "") {
+        output.textContent = "Please enter a script prompt.";
+        return;
       }
+      output.textContent = "Generating script for: " + input + " ... (placeholder)";
+    }
 
-      content.innerHTML = html;
+    function showScriptWriter() {
+      document.getElementById("script-box").style.display = "block";
+      document.getElementById("dashboard-box").style.display = "none";
+    }
+
+    function showDashboard() {
+      document.getElementById("script-box").style.display = "none";
+      document.getElementById("dashboard-box").style.display = "block";
     }
   </script>
 
