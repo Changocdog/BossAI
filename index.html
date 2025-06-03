@@ -1,25 +1,21 @@
-<body>
-  <!-- Sidebar toggle button -->
-  <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<!-- Toggle Button -->
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
 
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <h2>📁 Modules</h2>
-    <ul>
-      <li><a href="#" onclick="loadModule('Dashboard')">Dashboard</a></li>
-      <li><a href="#" onclick="loadModule('Scripts')">Scripts</a></li>
-      <li><a href="#" onclick="loadModule('Voiceovers')">Voiceovers</a></li>
-      <li><a href="#" onclick="loadModule('Uploads')">Uploads</a></li>
-      <li><a href="#" onclick="loadModule('Settings')">Settings</a></li>
-    </ul>
-  </div>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <h2>📁 Modules</h2>
+  <ul>
+    <li onclick="showSection('dashboard')">Dashboard</li>
+    <li onclick="showSection('scripts')">Scripts</li>
+    <li onclick="showSection('voiceovers')">Voiceovers</li>
+    <li onclick="showSection('uploads')">Uploads</li>
+    <li onclick="showSection('settings')">Settings</li>
+  </ul>
+</div>
 
-  <!-- Main content -->
-  <div class="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
-    <input type="text" id="prompt" placeholder="Enter your prompt here..." />
-    <button onclick="generate()">Generate Video</button>
-    <div id="output">Awaiting input...</div>
-  </div>
-</body>
+<!-- Content Sections -->
+<div class="content-section" id="dashboard">📊 Dashboard Content</div>
+<div class="content-section" id="scripts" style="display:none;">✍️ Script Writing Tools</div>
+<div class="content-section" id="voiceovers" style="display:none;">🎙️ Voiceover Studio</div>
+<div class="content-section" id="uploads" style="display:none;">📤 Upload Manager</div>
+<div class="content-section" id="settings" style="display:none;">⚙️ Settings</div>
