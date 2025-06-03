@@ -1,40 +1,55 @@
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: Arial, sans-serif;
+  display: flex;
+  height: 100vh;
   background-color: #000;
   color: white;
-  display: flex;
 }
 
 .sidebar {
   width: 220px;
   background-color: #111;
-  padding: 20px;
-  height: 100vh;
+  padding: 30px 20px;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 
 .sidebar h2 {
-  color: #f00;
+  color: #ccc;
+  margin-bottom: 20px;
 }
 
 .sidebar ul {
-  list-style-type: none;
-  padding: 0;
+  list-style: none;
 }
 
 .sidebar ul li {
-  padding: 10px 0;
+  margin-bottom: 12px;
+  font-size: 16px;
 }
 
-.main-content {
-  flex-grow: 1;
-  padding: 30px;
+.main {
+  margin-left: 240px;
+  padding: 40px;
+  flex: 1;
+}
+
+h1 {
+  color: red;
+  margin-bottom: 10px;
 }
 
 input[type="text"] {
-  width: 300px;
   padding: 10px;
-  margin-top: 10px;
+  width: 300px;
 }
 
 button {
@@ -44,4 +59,8 @@ button {
   background-color: black;
   color: red;
   cursor: pointer;
+}
+
+#output {
+  margin-top: 20px;
 }
