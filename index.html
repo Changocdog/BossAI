@@ -7,12 +7,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="top-bar">
+    <button id="toggleBtn">☰</button>
+    <h1 class="logo">📊 Boss AI</h1>
+  </div>
+
   <div class="container">
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <button id="toggleBtn">☰</button>
-        <h2>📊 Boss AI</h2>
-      </div>
       <ul>
         <li onclick="switchModule('dashboard')" class="active">Dashboard</li>
         <li onclick="switchModule('script')">Script Writer</li>
@@ -68,6 +69,7 @@
       </div>
     </main>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
