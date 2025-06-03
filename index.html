@@ -2,74 +2,132 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #111;
+      padding-top: 60px;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .sidebar a {
+      padding: 12px 24px;
+      display: block;
+      color: white;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+    }
+
+    /* Toggle button */
+    .toggle-btn {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1100;
+      background-color: #111;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+    }
+
+    /* Content */
+    .main-content {
+      margin-left: 30px;
+      padding: 20px;
+      transition: margin-left 0.3s;
+    }
+
+    h1 {
+      color: red;
+    }
+
+    .prompt-box {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px;
+      margin-left: 10px;
+      background-color: black;
+      color: red;
+      border: 2px solid red;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .output {
+      margin-top: 20px;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
-  <div class="top-bar">
-    <button id="toggleBtn">☰</button>
-    <h1 class="logo">📊 Boss AI</h1>
+
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <div class="sidebar" id="sidebar">
+    <h2 style="padding-left: 24px;">📁 Modules</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Scripts</a>
+    <a href="#">Voiceovers</a>
+    <a href="#">Uploads</a>
+    <a href="#">Settings</a>
   </div>
 
-  <div class="container">
-    <aside class="sidebar" id="sidebar">
-      <ul>
-        <li onclick="switchModule('dashboard')" class="active">Dashboard</li>
-        <li onclick="switchModule('script')">Script Writer</li>
-        <li onclick="switchModule('voice')">Voiceover AI</li>
-        <li onclick="switchModule('video')">Video Clipper</li>
-        <li onclick="switchModule('legal')">Legal Checker</li>
-        <li onclick="switchModule('upload')">Uploader</li>
-      </ul>
-    </aside>
+  <div class="main-content" id="main">
+    <h1>🚀 Boss AI Dashboard</h1>
+    <p>Your AI-Powered Content Studio</p>
 
-    <main class="main">
-      <div id="dashboard" class="module active">
-        <h1>Dashboard</h1>
-        <p>Welcome to Boss AI. Enter a command to begin.</p>
-        <input type="text" placeholder="Enter your command or video topic..." />
-        <button onclick="generate('dashboard')">Generate Video</button>
-        <p class="output">Awaiting input...</p>
-      </div>
+    <div class="prompt-box">
+      <input type="text" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Video</button>
+    </div>
 
-      <div id="script" class="module">
-        <h1>Script Writer</h1>
-        <input type="text" placeholder="Enter video topic..." />
-        <button onclick="generate('script')">Generate Script</button>
-        <p class="output">Awaiting input...</p>
-      </div>
-
-      <div id="voice" class="module">
-        <h1>Voiceover AI</h1>
-        <input type="text" placeholder="Enter script text..." />
-        <button onclick="generate('voice')">Generate Voiceover</button>
-        <p class="output">Awaiting input...</p>
-      </div>
-
-      <div id="video" class="module">
-        <h1>Video Clipper</h1>
-        <input type="text" placeholder="Enter clip idea..." />
-        <button onclick="generate('video')">Create Clip</button>
-        <p class="output">Awaiting input...</p>
-      </div>
-
-      <div id="legal" class="module">
-        <h1>Legal Checker</h1>
-        <input type="text" placeholder="Enter script to check..." />
-        <button onclick="generate('legal')">Run Legal Check</button>
-        <p class="output">Awaiting input...</p>
-      </div>
-
-      <div id="upload" class="module">
-        <h1>Uploader</h1>
-        <input type="text" placeholder="Enter upload info..." />
-        <button onclick="generate('upload')">Upload Video</button>
-        <p class="output">Awaiting input...</p>
-      </div>
-    </main>
+    <div class="output" id="output">Awaiting input...</div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.style.left === '0px') {
+        sidebar.style.left = '-250px';
+      } else {
+        sidebar.style.left = '0px';
+      }
+    }
+
+    function generate() {
+      const output = document.getElementById('output');
+      output.textContent = 'Generating... (this is a placeholder)';
+    }
+  </script>
+
 </body>
 </html>
