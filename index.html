@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <style>
     body {
@@ -82,74 +82,35 @@
     .output {
       margin-top: 20px;
       font-style: italic;
-    }
-
-    .panel {
-      display: none;
-      margin-top: 30px;
+      white-space: pre-line;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar Toggle Button -->
   <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#" onclick="activatePanel('dashboard')">Dashboard</a>
-    <a href="#" onclick="activatePanel('scriptAI')">📝 Script Writer AI</a>
-    <a href="#" onclick="activatePanel('voiceAI')">🎙️ Voiceover AI</a>
-    <a href="#" onclick="activatePanel('uploadAI')">📤 Upload AI</a>
-    <a href="#" onclick="activatePanel('legalAI')">⚖️ Legal Checker AI</a>
-    <a href="#" onclick="activatePanel('settings')">⚙️ Settings</a>
+    <a href="#">Dashboard</a>
+    <a href="#">Scripts</a>
+    <a href="#">Voiceovers</a>
+    <a href="#">Uploads</a>
+    <a href="#">Settings</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content" id="main">
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
-    <!-- Prompt Box -->
     <div class="prompt-box">
-      <input type="text" id="mainPrompt" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+      <input type="text" id="userPrompt" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Script</button>
     </div>
 
     <div class="output" id="output">Awaiting input...</div>
-
-    <!-- Panels -->
-    <div id="scriptAI-panel" class="panel">
-      <h2>📝 Script Writer AI</h2>
-      <p>Enter a topic and this AI will generate a short script for your video:</p>
-      <input type="text" id="scriptInput" placeholder="e.g. 'How to Save Money Fast'" />
-      <button onclick="generateScript()">Generate Script</button>
-      <div id="scriptOutput" class="output"></div>
-    </div>
-
-    <div id="voiceAI-panel" class="panel">
-      <h2>🎙️ Voiceover AI</h2>
-      <p>(Coming soon)</p>
-    </div>
-
-    <div id="uploadAI-panel" class="panel">
-      <h2>📤 Upload AI</h2>
-      <p>(Coming soon)</p>
-    </div>
-
-    <div id="legalAI-panel" class="panel">
-      <h2>⚖️ Legal Checker AI</h2>
-      <p>(Coming soon)</p>
-    </div>
-
-    <div id="settings-panel" class="panel">
-      <h2>⚙️ Settings</h2>
-      <p>(Coming soon)</p>
-    </div>
   </div>
 
-  <!-- Scripts -->
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -157,30 +118,28 @@
     }
 
     function generate() {
-      const prompt = document.getElementById("mainPrompt").value;
+      const prompt = document.getElementById("userPrompt").value.trim();
       const output = document.getElementById("output");
-      if (!prompt.trim()) {
-        output.textContent = "Please enter a prompt.";
-      } else {
-        output.textContent = `Generating video for: "${prompt}"... (this is a placeholder)`;
-      }
-    }
 
-    function activatePanel(panelId) {
-      const panels = document.querySelectorAll('.panel');
-      panels.forEach(p => p.style.display = 'none');
-      const selected = document.getElementById(`${panelId}-panel`);
-      if (selected) selected.style.display = 'block';
-    }
-
-    function generateScript() {
-      const input = document.getElementById("scriptInput").value;
-      const output = document.getElementById("scriptOutput");
-      if (!input.trim()) {
-        output.textContent = "Please enter a topic to generate a script.";
-      } else {
-        output.textContent = `Generating script for "${input}"... (this is a placeholder output)`;
+      if (!prompt) {
+        output.textContent = "⚠️ Please enter a prompt.";
+        return;
       }
+
+      // Simulated AI response (replace this with OpenAI API call later)
+      const script = `🎬 Script for: "${prompt}"
+
+Intro: 
+  "Hey everyone, welcome back to the channel!"
+
+Main Content:
+  "Today we're diving into: ${prompt}."
+  "Let's break it down in simple steps..."
+
+Conclusion:
+  "Thanks for watching! Like and subscribe for more!"`;
+
+      output.textContent = script;
     }
   </script>
 
