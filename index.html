@@ -54,10 +54,6 @@
       transition: margin-left 0.3s;
     }
 
-    .module {
-      display: none;
-    }
-
     h1 {
       color: red;
     }
@@ -66,7 +62,7 @@
       margin-top: 20px;
     }
 
-    input[type="text"], textarea {
+    input[type="text"] {
       padding: 10px;
       width: 60%;
       border: none;
@@ -75,7 +71,7 @@
 
     button {
       padding: 10px;
-      margin-top: 10px;
+      margin-left: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
@@ -87,102 +83,104 @@
       margin-top: 20px;
       font-style: italic;
     }
+
+    .panel {
+      display: none;
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Sidebar Toggle Button -->
   <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#" onclick="activateModule('dashboard')">Dashboard</a>
-    <a href="#" onclick="activateModule('scripts')">Scripts</a>
-    <a href="#" onclick="activateModule('voiceovers')">Voiceovers</a>
-    <a href="#" onclick="activateModule('uploads')">Uploads</a>
-    <a href="#" onclick="activateModule('settings')">Settings</a>
-    <a href="#" onclick="activateModule('legal')">Legal AI Review</a>
+    <a href="#" onclick="activatePanel('dashboard')">Dashboard</a>
+    <a href="#" onclick="activatePanel('scriptAI')">📝 Script Writer AI</a>
+    <a href="#" onclick="activatePanel('voiceAI')">🎙️ Voiceover AI</a>
+    <a href="#" onclick="activatePanel('uploadAI')">📤 Upload AI</a>
+    <a href="#" onclick="activatePanel('legalAI')">⚖️ Legal Checker AI</a>
+    <a href="#" onclick="activatePanel('settings')">⚙️ Settings</a>
   </div>
 
-  <div class="main-content">
-    <div id="dashboard" class="module" style="display: block;">
-      <h1>🚀 Boss AI Dashboard</h1>
-      <p>Your AI-Powered Content Studio</p>
+  <!-- Main Content -->
+  <div class="main-content" id="main">
+    <h1>🚀 Boss AI Dashboard</h1>
+    <p>Your AI-Powered Content Studio</p>
 
-      <div class="prompt-box">
-        <input type="text" id="mainPrompt" placeholder="Enter your prompt here..." />
-        <button onclick="generate()">Generate Video</button>
-      </div>
-
-      <div class="output" id="output">Awaiting input...</div>
+    <!-- Prompt Box -->
+    <div class="prompt-box">
+      <input type="text" id="mainPrompt" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Video</button>
     </div>
 
-    <div id="scripts" class="module">
-      <h2>✍️ Script Generator</h2>
-      <p>Coming soon...</p>
+    <div class="output" id="output">Awaiting input...</div>
+
+    <!-- Panels -->
+    <div id="scriptAI-panel" class="panel">
+      <h2>📝 Script Writer AI</h2>
+      <p>Enter a topic and this AI will generate a short script for your video:</p>
+      <input type="text" id="scriptInput" placeholder="e.g. 'How to Save Money Fast'" />
+      <button onclick="generateScript()">Generate Script</button>
+      <div id="scriptOutput" class="output"></div>
     </div>
 
-    <div id="voiceovers" class="module">
-      <h2>🎙 Voiceover Generator</h2>
-      <p>Coming soon...</p>
+    <div id="voiceAI-panel" class="panel">
+      <h2>🎙️ Voiceover AI</h2>
+      <p>(Coming soon)</p>
     </div>
 
-    <div id="uploads" class="module">
-      <h2>📤 Upload Manager</h2>
-      <p>Coming soon...</p>
+    <div id="uploadAI-panel" class="panel">
+      <h2>📤 Upload AI</h2>
+      <p>(Coming soon)</p>
     </div>
 
-    <div id="settings" class="module">
+    <div id="legalAI-panel" class="panel">
+      <h2>⚖️ Legal Checker AI</h2>
+      <p>(Coming soon)</p>
+    </div>
+
+    <div id="settings-panel" class="panel">
       <h2>⚙️ Settings</h2>
-      <p>Coming soon...</p>
-    </div>
-
-    <div id="legal" class="module">
-      <h2>⚖️ Legal AI Review</h2>
-      <p>This module checks content for potential legal and copyright issues before posting.</p>
-
-      <textarea id="legalInput" placeholder="Paste content or video script to review..." style="width: 80%; height: 120px;"></textarea><br>
-      <button onclick="runLegalReview()">Run Legal Review</button>
-
-      <div id="legalOutput" class="output"></div>
+      <p>(Coming soon)</p>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
     }
 
-    function activateModule(moduleId) {
-      const modules = document.querySelectorAll('.module');
-      modules.forEach(mod => mod.style.display = 'none');
-      document.getElementById(moduleId).style.display = 'block';
-    }
-
     function generate() {
-      const prompt = document.getElementById('mainPrompt').value;
-      const output = document.getElementById('output');
-      output.textContent = prompt ? `Generating video for: "${prompt}"` : "Please enter a prompt.";
+      const prompt = document.getElementById("mainPrompt").value;
+      const output = document.getElementById("output");
+      if (!prompt.trim()) {
+        output.textContent = "Please enter a prompt.";
+      } else {
+        output.textContent = `Generating video for: "${prompt}"... (this is a placeholder)`;
+      }
     }
 
-    function runLegalReview() {
-      const content = document.getElementById('legalInput').value.trim();
-      const output = document.getElementById('legalOutput');
+    function activatePanel(panelId) {
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(p => p.style.display = 'none');
+      const selected = document.getElementById(`${panelId}-panel`);
+      if (selected) selected.style.display = 'block';
+    }
 
-      if (!content) {
-        output.innerHTML = "<span style='color: orange;'>Please enter content to review.</span>";
-        return;
+    function generateScript() {
+      const input = document.getElementById("scriptInput").value;
+      const output = document.getElementById("scriptOutput");
+      if (!input.trim()) {
+        output.textContent = "Please enter a topic to generate a script.";
+      } else {
+        output.textContent = `Generating script for "${input}"... (this is a placeholder output)`;
       }
-
-      output.innerHTML = "🔍 Scanning for issues...<br><br>";
-      setTimeout(() => {
-        output.innerHTML = `
-          ✅ No major copyright flags found.<br>
-          ✅ Language appears appropriate for posting.<br>
-          ⚠️ Reminder: Avoid using trademarked brand names or copyrighted music.<br><br>
-          <span style='color: green;'>✔ Content approved for next step.</span>
-        `;
-      }, 1000);
     }
   </script>
 
