@@ -1,87 +1,87 @@
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background-color: #111;
-  color: #f2f2f2;
+  color: #f1f1f1;
+}
+
+.container {
   display: flex;
   height: 100vh;
 }
 
 .sidebar {
   width: 220px;
-  background-color: #181818;
+  background-color: #1e1e1e;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 5px #000;
 }
 
-.sidebar h1 {
-  font-size: 22px;
-  margin-bottom: 30px;
-  color: #00eaff;
-}
-
-.sidebar button {
-  background-color: transparent;
-  border: none;
-  color: #ccc;
-  font-size: 16px;
-  padding: 10px;
-  text-align: left;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: 0.2s ease;
-  border-radius: 6px;
-}
-
-.sidebar button:hover {
-  background-color: #333;
+.sidebar h2 {
+  font-size: 20px;
   color: #fff;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 15px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+  background-color: #333;
+  color: #00bfff;
 }
 
 .main {
-  flex: 1;
+  flex-grow: 1;
   padding: 40px;
-  overflow-y: auto;
+  background-color: #181818;
 }
 
 .module {
-  background-color: #1e1e1e;
-  padding: 25px;
-  border-radius: 10px;
-  max-width: 700px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  display: none;
+}
+
+.module.active {
+  display: block;
 }
 
 input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  margin-top: 12px;
-  margin-bottom: 20px;
-  border: none;
-  border-radius: 6px;
-  background-color: #292929;
-  color: #eee;
+  width: 60%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #222;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 4px;
 }
 
 button {
+  margin-top: 10px;
+  padding: 10px 20px;
   background-color: transparent;
-  color: #00eaff;
-  border: 1px solid #00eaff;
-  padding: 10px 16px;
-  font-size: 15px;
-  border-radius: 6px;
+  color: #00bfff;
+  border: 1px solid #00bfff;
+  border-radius: 4px;
   cursor: pointer;
-  transition: 0.3s ease;
 }
 
 button:hover {
-  background-color: #00eaff;
-  color: #111;
+  background-color: #00bfff;
+  color: #000;
 }
 
-.hidden {
-  display: none;
+.output {
+  font-style: italic;
+  margin-top: 20px;
+  color: #aaa;
 }
