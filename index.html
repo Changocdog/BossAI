@@ -1,31 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boss AI Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
 <body>
-  <div class="sidebar">
+  <!-- Sidebar toggle button -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
     <h2>📁 Modules</h2>
     <ul>
-      <li>🏠 Dashboard</li>
-      <li>📝 Scripts</li>
-      <li>🎙️ Voiceovers</li>
-      <li>📤 Uploads</li>
-      <li>⚙️ Settings</li>
+      <li><a href="#" onclick="loadModule('Dashboard')">Dashboard</a></li>
+      <li><a href="#" onclick="loadModule('Scripts')">Scripts</a></li>
+      <li><a href="#" onclick="loadModule('Voiceovers')">Voiceovers</a></li>
+      <li><a href="#" onclick="loadModule('Uploads')">Uploads</a></li>
+      <li><a href="#" onclick="loadModule('Settings')">Settings</a></li>
     </ul>
   </div>
 
-  <div class="main-content">
+  <!-- Main content -->
+  <div class="main">
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
     <input type="text" id="prompt" placeholder="Enter your prompt here..." />
     <button onclick="generate()">Generate Video</button>
     <div id="output">Awaiting input...</div>
   </div>
-
-  <script src="script.js"></script>
 </body>
-</html>
