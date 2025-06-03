@@ -101,6 +101,7 @@
     <a href="#" onclick="showScriptWriter()">Scripts</a>
     <a href="#" onclick="showVoiceover()">Voiceovers</a>
     <a href="#" onclick="showClipper()">Clipper</a>
+    <a href="#" onclick="showUploader()">Uploads</a>
     <a href="#">Settings</a>
   </div>
 
@@ -131,12 +132,20 @@
       <div class="output" id="voiceOutput">Voiceover preview loading...</div>
     </div>
 
-    <!-- 🎞️ Video Clipper AI -->
+    <!-- Video Clipper AI -->
     <div id="clipper-box" style="display: none;">
       <h2 class="module-title">Video Clipper AI</h2>
       <input id="clipPrompt" type="text" placeholder="Describe your clip idea..." />
       <button onclick="generateClip()">Generate Clip</button>
       <div class="output" id="clipOutput">Clip preview coming soon...</div>
+    </div>
+
+    <!-- Upload Strategy AI -->
+    <div id="upload-box" style="display: none;">
+      <h2 class="module-title">Upload Strategy AI</h2>
+      <input id="uploadPrompt" type="text" placeholder="Describe your upload goals..." />
+      <button onclick="generateUpload()">Generate Upload Strategy</button>
+      <div class="output" id="uploadOutput">Waiting for upload plan...</div>
     </div>
   </div>
 
@@ -166,11 +175,17 @@
       document.getElementById("clipper-box").style.display = "block";
     }
 
+    function showUploader() {
+      hideAll();
+      document.getElementById("upload-box").style.display = "block";
+    }
+
     function hideAll() {
       document.getElementById("dashboard-box").style.display = "none";
       document.getElementById("script-box").style.display = "none";
       document.getElementById("voiceover-box").style.display = "none";
       document.getElementById("clipper-box").style.display = "none";
+      document.getElementById("upload-box").style.display = "none";
     }
 
     function generate() {
@@ -193,6 +208,12 @@
       const input = document.getElementById('clipPrompt').value;
       const output = document.getElementById('clipOutput');
       output.textContent = input.trim() ? `Editing clip for: "${input}"...` : 'Please enter a clip prompt.';
+    }
+
+    function generateUpload() {
+      const input = document.getElementById('uploadPrompt').value;
+      const output = document.getElementById('uploadOutput');
+      output.textContent = input.trim() ? `Planning upload strategy for: "${input}"...` : 'Please enter your upload goals.';
     }
   </script>
 
