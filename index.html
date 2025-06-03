@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <style>
     body {
@@ -12,7 +12,6 @@
       color: white;
     }
 
-    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
@@ -30,13 +29,13 @@
       display: block;
       color: white;
       text-decoration: none;
+      cursor: pointer;
     }
 
     .sidebar a:hover {
       background-color: #575757;
     }
 
-    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
@@ -50,7 +49,6 @@
       padding: 5px 10px;
     }
 
-    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
@@ -87,22 +85,12 @@
       font-style: italic;
     }
 
-    #scripts-module input[type="text"] {
-      padding: 10px;
-      width: 60%;
-      margin-top: 10px;
-      border: none;
-      border-radius: 5px;
+    .panel {
+      display: none;
     }
 
-    #scripts-module button {
-      padding: 10px;
-      margin-left: 10px;
-      background-color: black;
-      color: red;
-      border: 2px solid red;
-      border-radius: 5px;
-      cursor: pointer;
+    .panel.active {
+      display: block;
     }
   </style>
 </head>
@@ -112,31 +100,48 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Scripts</a>
-    <a href="#">Voiceovers</a>
-    <a href="#">Uploads</a>
-    <a href="#">Settings</a>
+    <a onclick="showPanel('dashboard')">Dashboard</a>
+    <a onclick="showPanel('scripts')">Scripts</a>
+    <a onclick="showPanel('voiceovers')">Voiceovers</a>
+    <a onclick="showPanel('uploads')">Uploads</a>
+    <a onclick="showPanel('settings')">Settings</a>
   </div>
 
   <div class="main-content" id="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
 
-    <div class="prompt-box">
-      <input type="text" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+    <div id="dashboard" class="panel active">
+      <h1>🚀 Boss AI Dashboard</h1>
+      <p>Your AI-Powered Content Studio</p>
+      <div class="prompt-box">
+        <input type="text" placeholder="Enter your prompt here..." />
+        <button onclick="generate()">Generate Video</button>
+      </div>
+      <div class="output" id="output">Awaiting input...</div>
     </div>
 
-    <div class="output" id="output">Awaiting input...</div>
+    <div id="scripts" class="panel">
+      <h1>📝 Scripts Module</h1>
+      <p>Generate and manage your AI scripts here.</p>
+    </div>
 
-    <!-- Scripts Module -->
-    <div id="scripts-module" style="margin-top: 40px;">
-      <h2>📝 Script Generator</h2>
-      <p>Enter a topic below to generate a content script:</p>
-      <input type="text" id="script-topic" placeholder="Enter topic (e.g., passive income ideas)">
-      <button onclick="generateScript()">Generate Script</button>
-      <div class="output" id="script-output">Script will appear here...</div>
+    <div id="voiceovers" class="panel">
+      <h1>🎤 Voiceovers Module</h1>
+      <p>Create voiceovers from scripts using AI voices.</p>
+      <div class="prompt-box">
+        <input type="text" placeholder="Enter script for voiceover..." />
+        <button onclick="generateVoice()">Generate Voice</button>
+      </div>
+      <div class="output" id="voice-output">Voice output will appear here...</div>
+    </div>
+
+    <div id="uploads" class="panel">
+      <h1>📤 Uploads Module</h1>
+      <p>Upload and schedule your video content.</p>
+    </div>
+
+    <div id="settings" class="panel">
+      <h1>⚙️ Settings Module</h1>
+      <p>Customize Boss AI configurations and integrations.</p>
     </div>
 
   </div>
@@ -144,11 +149,13 @@
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      if (sidebar.style.left === '0px') {
-        sidebar.style.left = '-250px';
-      } else {
-        sidebar.style.left = '0px';
-      }
+      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+    }
+
+    function showPanel(panelId) {
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(panel => panel.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
     }
 
     function generate() {
@@ -156,24 +163,9 @@
       output.textContent = 'Generating... (this is a placeholder)';
     }
 
-    function generateScript() {
-      const topic = document.getElementById('script-topic').value;
-      const output = document.getElementById('script-output');
-
-      if (!topic.trim()) {
-        output.textContent = 'Please enter a topic first.';
-        return;
-      }
-
-      output.innerHTML = `
-        <strong>Title:</strong> Unlocking ${topic}<br><br>
-        <strong>Hook:</strong> What if you could master ${topic} in just 60 seconds?<br><br>
-        <strong>Body:</strong> Here's how you do it...<br>
-        1. Research key methods.<br>
-        2. Apply strategies daily.<br>
-        3. Track performance and scale.<br><br>
-        <strong>Call to Action:</strong> Follow Boss AI for more daily growth tips!
-      `;
+    function generateVoice() {
+      const output = document.getElementById('voice-output');
+      output.textContent = 'Creating voiceover... (this is a placeholder)';
     }
   </script>
 
