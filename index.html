@@ -72,6 +72,7 @@
     button {
       padding: 10px;
       margin-left: 10px;
+      margin-top: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
@@ -109,6 +110,8 @@
     </div>
 
     <div class="output" id="output">Awaiting input...</div>
+    <button onclick="generateVoiceover()">🎙️ Generate Voiceover</button>
+    <div class="output" id="voiceoverOutput"></div>
   </div>
 
   <script>
@@ -120,13 +123,14 @@
     function generate() {
       const prompt = document.getElementById("userPrompt").value.trim();
       const output = document.getElementById("output");
+      const voiceoverOutput = document.getElementById("voiceoverOutput");
 
       if (!prompt) {
         output.textContent = "⚠️ Please enter a prompt.";
+        voiceoverOutput.textContent = "";
         return;
       }
 
-      // Simulated AI response (replace this with OpenAI API call later)
       const script = `🎬 Script for: "${prompt}"
 
 Intro: 
@@ -140,6 +144,20 @@ Conclusion:
   "Thanks for watching! Like and subscribe for more!"`;
 
       output.textContent = script;
+      voiceoverOutput.textContent = "";
+    }
+
+    function generateVoiceover() {
+      const script = document.getElementById("output").textContent;
+      const voiceoverOutput = document.getElementById("voiceoverOutput");
+
+      if (!script || script === "Awaiting input..." || script.startsWith("⚠️")) {
+        voiceoverOutput.textContent = "⚠️ Generate a script first.";
+        return;
+      }
+
+      // Simulated voiceover response
+      voiceoverOutput.textContent = "🔊 Voiceover generated: [Simulated voice file for preview]";
     }
   </script>
 
