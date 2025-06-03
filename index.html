@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: black;
-      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #000;
+      color: #fff;
     }
 
-    /* Sidebar */
     .sidebar {
       height: 100%;
       width: 250px;
@@ -21,7 +20,7 @@
       left: -250px;
       background-color: #111;
       padding-top: 60px;
-      transition: 0.3s;
+      transition: 0.3s ease;
       z-index: 1000;
     }
 
@@ -32,13 +31,10 @@
       text-decoration: none;
     }
 
-    .sidebar a:hover,
-    .sidebar a.active {
-      background-color: #ff0000;
-      color: white;
+    .sidebar a:hover {
+      background-color: #575757;
     }
 
-    /* Toggle button */
     .toggle-btn {
       position: fixed;
       left: 10px;
@@ -52,11 +48,9 @@
       padding: 5px 10px;
     }
 
-    /* Content */
     .main-content {
       margin-left: 30px;
       padding: 20px;
-      margin-top: 50px;
       transition: margin-left 0.3s;
     }
 
@@ -65,37 +59,34 @@
     }
 
     .prompt-box {
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     input[type="text"] {
-      padding: 10px;
+      padding: 12px;
       width: 60%;
       border: none;
       border-radius: 5px;
+      font-size: 16px;
     }
 
     button {
-      padding: 10px;
+      padding: 12px 20px;
       margin-left: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
       border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
     }
 
     .output {
-      margin-top: 20px;
+      margin-top: 30px;
       font-style: italic;
-    }
-
-    .panel {
-      display: none;
-    }
-
-    .panel.active {
-      display: block;
+      font-size: 16px;
+      border-left: 4px solid red;
+      padding-left: 15px;
     }
   </style>
 </head>
@@ -105,63 +96,50 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#" class="active" onclick="showPanel(event, 'dashboard')">Dashboard</a>
-    <a href="#" onclick="showPanel(event, 'scripts')">Scripts</a>
-    <a href="#" onclick="showPanel(event, 'voiceovers')">Voiceovers</a>
-    <a href="#" onclick="showPanel(event, 'uploads')">Uploads</a>
-    <a href="#" onclick="showPanel(event, 'settings')">Settings</a>
+    <a href="#">Dashboard</a>
+    <a href="#">Scripts</a>
+    <a href="#">Voiceovers</a>
+    <a href="#">Uploads</a>
+    <a href="#">Settings</a>
   </div>
 
   <div class="main-content" id="main">
-    <div id="dashboard" class="panel active">
-      <h1>🚀 Boss AI Dashboard</h1>
-      <p>Your AI-Powered Content Studio</p>
-      <div class="prompt-box">
-        <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
-        <button onclick="generate()">Generate Video</button>
-      </div>
-      <div class="output" id="output">Awaiting input...</div>
+    <h1>🚀 Boss AI Dashboard</h1>
+    <p>Your AI-Powered Content Studio</p>
+
+    <div class="prompt-box">
+      <input id="promptInput" type="text" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Video</button>
     </div>
 
-    <div id="scripts" class="panel">
-      <h1>📜 Script Writer AI</h1>
-      <p>Generate high-quality scripts based on your topic.</p>
-    </div>
-
-    <div id="voiceovers" class="panel">
-      <h1>🎤 Voiceover AI</h1>
-      <p>Convert your script into voice with AI.</p>
-    </div>
-
-    <div id="uploads" class="panel">
-      <h1>📤 Upload Manager</h1>
-      <p>Upload and manage video files here.</p>
-    </div>
-
-    <div id="settings" class="panel">
-      <h1>⚙️ Settings</h1>
-      <p>Configure your dashboard preferences.</p>
-    </div>
+    <div class="output" id="output">Awaiting input...</div>
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
+      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
     }
 
     function generate() {
-      const prompt = document.getElementById('promptInput').value;
+      const prompt = document.getElementById('promptInput').value.trim();
       const output = document.getElementById('output');
-      output.textContent = `Generating video for: "${prompt}" (this is a placeholder)`;
-    }
 
-    function showPanel(e, panelId) {
-      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
-      document.getElementById(panelId).classList.add('active');
+      if (!prompt) {
+        output.textContent = "Please enter a prompt to generate video content.";
+        return;
+      }
 
-      document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-      e.target.classList.add('active');
+      output.textContent = "Generating your video script...";
+
+      setTimeout(() => {
+        output.innerHTML = `
+          <strong>AI Output:</strong><br>
+          Here's a high-impact short based on your prompt:<br><br>
+          <em>"In a world where passive income is king, here's how you can start with just $100..."</em><br><br>
+          Want the full video + voiceover? (coming soon)
+        `;
+      }, 1500);
     }
   </script>
 
