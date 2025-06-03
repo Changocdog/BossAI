@@ -29,7 +29,6 @@
       display: block;
       color: white;
       text-decoration: none;
-      cursor: pointer;
     }
 
     .sidebar a:hover {
@@ -59,20 +58,21 @@
       color: red;
     }
 
-    .prompt-box {
+    .prompt-box, .upload-box {
       margin-top: 20px;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="file"], textarea {
       padding: 10px;
       width: 60%;
       border: none;
       border-radius: 5px;
+      margin-top: 10px;
     }
 
     button {
       padding: 10px;
-      margin-left: 10px;
+      margin-top: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
@@ -80,17 +80,13 @@
       cursor: pointer;
     }
 
-    .output {
+    .output, .upload-output {
       margin-top: 20px;
       font-style: italic;
     }
 
-    .panel {
+    .hidden {
       display: none;
-    }
-
-    .panel.active {
-      display: block;
     }
   </style>
 </head>
@@ -100,72 +96,93 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a onclick="showPanel('dashboard')">Dashboard</a>
-    <a onclick="showPanel('scripts')">Scripts</a>
-    <a onclick="showPanel('voiceovers')">Voiceovers</a>
-    <a onclick="showPanel('uploads')">Uploads</a>
-    <a onclick="showPanel('settings')">Settings</a>
+    <a href="#" onclick="showModule('dashboard')">Dashboard</a>
+    <a href="#" onclick="showModule('scripts')">Scripts</a>
+    <a href="#" onclick="showModule('voiceovers')">Voiceovers</a>
+    <a href="#" onclick="showModule('uploads')">Uploads</a>
+    <a href="#" onclick="showModule('settings')">Settings</a>
   </div>
 
   <div class="main-content" id="main">
-
-    <div id="dashboard" class="panel active">
+    <div id="dashboard">
       <h1>🚀 Boss AI Dashboard</h1>
       <p>Your AI-Powered Content Studio</p>
+
       <div class="prompt-box">
-        <input type="text" placeholder="Enter your prompt here..." />
+        <input type="text" placeholder="Enter your prompt here..." id="promptInput"/>
         <button onclick="generate()">Generate Video</button>
       </div>
+
       <div class="output" id="output">Awaiting input...</div>
     </div>
 
-    <div id="scripts" class="panel">
-      <h1>📝 Scripts Module</h1>
-      <p>Generate and manage your AI scripts here.</p>
+    <div id="scripts" class="hidden">
+      <h1>📝 Script Generator</h1>
+      <p>This module will generate scripts from your prompts.</p>
     </div>
 
-    <div id="voiceovers" class="panel">
-      <h1>🎤 Voiceovers Module</h1>
-      <p>Create voiceovers from scripts using AI voices.</p>
-      <div class="prompt-box">
-        <input type="text" placeholder="Enter script for voiceover..." />
-        <button onclick="generateVoice()">Generate Voice</button>
+    <div id="voiceovers" class="hidden">
+      <h1>🎤 Voiceover Generator</h1>
+      <p>This module will generate voiceover audio.</p>
+    </div>
+
+    <div id="uploads" class="hidden">
+      <h1>📤 Uploads</h1>
+      <p>Upload your final video content here.</p>
+      <div class="upload-box">
+        <input type="file" id="fileInput" /><br/>
+        <input type="text" placeholder="Enter video title..." id="videoTitle" /><br/>
+        <textarea placeholder="Enter video description..." rows="4" id="videoDescription"></textarea><br/>
+        <button onclick="uploadVideo()">Upload</button>
       </div>
-      <div class="output" id="voice-output">Voice output will appear here...</div>
+      <div class="upload-output" id="uploadStatus">Awaiting upload...</div>
     </div>
 
-    <div id="uploads" class="panel">
-      <h1>📤 Uploads Module</h1>
-      <p>Upload and schedule your video content.</p>
+    <div id="settings" class="hidden">
+      <h1>⚙️ Settings</h1>
+      <p>Customize your Boss AI system preferences.</p>
     </div>
-
-    <div id="settings" class="panel">
-      <h1>⚙️ Settings Module</h1>
-      <p>Customize Boss AI configurations and integrations.</p>
-    </div>
-
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+      if (sidebar.style.left === '0px') {
+        sidebar.style.left = '-250px';
+      } else {
+        sidebar.style.left = '0px';
+      }
     }
 
-    function showPanel(panelId) {
-      const panels = document.querySelectorAll('.panel');
-      panels.forEach(panel => panel.classList.remove('active'));
-      document.getElementById(panelId).classList.add('active');
+    function showModule(moduleId) {
+      const sections = ['dashboard', 'scripts', 'voiceovers', 'uploads', 'settings'];
+      sections.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(moduleId).classList.remove('hidden');
     }
 
     function generate() {
+      const prompt = document.getElementById('promptInput').value;
       const output = document.getElementById('output');
-      output.textContent = 'Generating... (this is a placeholder)';
+      output.textContent = prompt ? `Generating content for: "${prompt}"...` : 'Please enter a prompt.';
     }
 
-    function generateVoice() {
-      const output = document.getElementById('voice-output');
-      output.textContent = 'Creating voiceover... (this is a placeholder)';
+    function uploadVideo() {
+      const fileInput = document.getElementById('fileInput');
+      const title = document.getElementById('videoTitle').value;
+      const description = document.getElementById('videoDescription').value;
+      const status = document.getElementById('uploadStatus');
+
+      if (fileInput.files.length === 0 || !title || !description) {
+        status.textContent = 'Please fill out all fields and select a file.';
+      } else {
+        status.textContent = `Uploading "${title}"... (simulation)`;
+        // Real upload integration would go here
+        setTimeout(() => {
+          status.textContent = `✅ "${title}" uploaded successfully!`;
+        }, 1000);
+      }
     }
   </script>
 
