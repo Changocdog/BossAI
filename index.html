@@ -2,132 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: black;
-      color: white;
+      display: flex;
+      height: 100vh;
     }
 
-    /* Sidebar */
     .sidebar {
-      height: 100%;
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      background-color: #111;
-      padding-top: 60px;
-      transition: 0.3s;
-      z-index: 1000;
-    }
-
-    .sidebar a {
-      padding: 12px 24px;
-      display: block;
+      width: 240px;
+      background-color: #1e1e1e;
       color: white;
-      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
     }
 
-    .sidebar a:hover {
-      background-color: #575757;
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
     }
 
-    /* Toggle button */
-    .toggle-btn {
-      position: fixed;
-      left: 10px;
-      top: 10px;
-      font-size: 30px;
+    .module {
+      padding: 15px 20px;
       cursor: pointer;
-      z-index: 1100;
-      background-color: #111;
-      border: none;
-      color: white;
-      padding: 5px 10px;
+      border-bottom: 1px solid #333;
+      transition: background 0.2s;
     }
 
-    /* Content */
-    .main-content {
-      margin-left: 30px;
-      padding: 20px;
-      transition: margin-left 0.3s;
+    .module:hover {
+      background-color: #333;
     }
 
-    h1 {
-      color: red;
+    .module.active {
+      background-color: #555;
+      font-weight: bold;
     }
 
-    .prompt-box {
-      margin-top: 20px;
+    .content {
+      flex-grow: 1;
+      padding: 30px;
+      background-color: #f4f4f4;
+      overflow-y: auto;
     }
 
-    input[type="text"] {
-      padding: 10px;
-      width: 60%;
-      border: none;
-      border-radius: 5px;
+    #main-output h2 {
+      margin-top: 0;
     }
 
-    button {
-      padding: 10px;
-      margin-left: 10px;
-      background-color: black;
-      color: red;
-      border: 2px solid red;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
 
-    .output {
-      margin-top: 20px;
-      font-style: italic;
+      .sidebar {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .module {
+        flex: 1;
+        text-align: center;
+        border-bottom: none;
+        border-right: 1px solid #333;
+      }
     }
   </style>
 </head>
 <body>
-
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
-  <div class="sidebar" id="sidebar">
-    <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Scripts</a>
-    <a href="#">Voiceovers</a>
-    <a href="#">Uploads</a>
-    <a href="#">Settings</a>
+  <div class="sidebar">
+    <h2>Boss AI</h2>
+    <div class="module active">Dashboard</div>
+    <div class="module">Script Writer</div>
+    <div class="module">Voiceover AI</div>
+    <div class="module">Video Clipper</div>
+    <div class="module">Legal Checker</div>
+    <div class="module">Uploader</div>
+    <div class="module">Settings</div>
   </div>
 
-  <div class="main-content" id="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
-
-    <div class="prompt-box">
-      <input type="text" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+  <div class="content">
+    <div id="main-output">
+      <h2>Dashboard</h2>
+      <p>Welcome to Boss AI. Select a module from the sidebar to begin.</p>
     </div>
-
-    <div class="output" id="output">Awaiting input...</div>
   </div>
 
   <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar.style.left === '0px') {
-        sidebar.style.left = '-250px';
-      } else {
-        sidebar.style.left = '0px';
-      }
-    }
+    const modules = document.querySelectorAll(".module");
+    const output = document.getElementById("main-output");
 
-    function generate() {
-      const output = document.getElementById('output');
-      output.textContent = 'Generating... (this is a placeholder)';
-    }
+    modules.forEach((module) => {
+      module.addEventListener("click", () => {
+        const name = module.textContent.trim();
+        output.innerHTML = `
+          <h2>${name}</h2>
+          <p>This is the active panel for <strong>${name}</strong>. More interactive features coming next.</p>
+        `;
+
+        modules.forEach(m => m.classList.remove("active"));
+        module.classList.add("active");
+      });
+    });
   </script>
-
 </body>
 </html>
