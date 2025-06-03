@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -97,8 +97,12 @@
       margin-top: 15px;
     }
 
-    .stats div {
-      margin-bottom: 8px;
+    .manager-box {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -115,6 +119,7 @@
     <a href="#" onclick="showUploader()">Uploads</a>
     <a href="#" onclick="showLegal()">Legal Checker</a>
     <a href="#" onclick="showPerformance()">Performance Dashboard</a>
+    <a href="#" onclick="showManager()">Manager AI</a>
     <a href="#">Settings</a>
   </div>
 
@@ -129,7 +134,7 @@
       <div class="output" id="output">Awaiting input...</div>
     </div>
 
-    <!-- Script Writer AI -->
+    <!-- Script Writer -->
     <div id="script-box" style="display: none;">
       <h2 class="module-title">Script Writer AI</h2>
       <input id="scriptPrompt" type="text" placeholder="Enter your script idea..." />
@@ -137,7 +142,7 @@
       <div class="output" id="scriptOutput">Waiting for input...</div>
     </div>
 
-    <!-- Voiceover AI -->
+    <!-- Voiceover -->
     <div id="voiceover-box" style="display: none;">
       <h2 class="module-title">Voiceover AI</h2>
       <input id="voicePrompt" type="text" placeholder="Enter your voiceover script..." />
@@ -145,7 +150,7 @@
       <div class="output" id="voiceOutput">Voiceover preview loading...</div>
     </div>
 
-    <!-- Video Clipper AI -->
+    <!-- Clipper -->
     <div id="clipper-box" style="display: none;">
       <h2 class="module-title">Video Clipper AI</h2>
       <input id="clipPrompt" type="text" placeholder="Describe your clip idea..." />
@@ -153,7 +158,7 @@
       <div class="output" id="clipOutput">Clip preview coming soon...</div>
     </div>
 
-    <!-- Upload Strategy AI -->
+    <!-- Upload -->
     <div id="upload-box" style="display: none;">
       <h2 class="module-title">Upload Strategy AI</h2>
       <input id="uploadPrompt" type="text" placeholder="Describe your upload goals..." />
@@ -161,7 +166,7 @@
       <div class="output" id="uploadOutput">Waiting for upload plan...</div>
     </div>
 
-    <!-- Legal Checker AI -->
+    <!-- Legal -->
     <div id="legal-box" style="display: none;">
       <h2 class="module-title">Legal Checker AI</h2>
       <input id="legalPrompt" type="text" placeholder="Paste your script or title for review..." />
@@ -169,7 +174,7 @@
       <div class="output" id="legalOutput">Awaiting compliance check...</div>
     </div>
 
-    <!-- Performance Dashboard AI -->
+    <!-- Performance -->
     <div id="performance-box" style="display: none;">
       <h2 class="module-title">Performance Dashboard AI</h2>
       <div class="stats">
@@ -178,6 +183,21 @@
         <div>💬 Comments: <strong>133</strong></div>
         <div>📈 Engagement Rate: <strong>7.5%</strong></div>
         <div>🕒 Avg Watch Time: <strong>47s</strong></div>
+      </div>
+    </div>
+
+    <!-- General Manager -->
+    <div id="manager-box" style="display: none;">
+      <h2 class="module-title">General Manager AI</h2>
+      <div class="manager-box">
+        <p>🧠 <strong>Status:</strong> Monitoring all modules.</p>
+        <p>📊 <strong>Last Actions:</strong></p>
+        <ul>
+          <li>Script generated: “Top 3 Investing Tips”</li>
+          <li>Voiceover produced: “Smooth Male Voice”</li>
+          <li>Upload strategy suggested for TikTok</li>
+        </ul>
+        <p>📌 <strong>Strategy Tip:</strong> “Focus on short, emotionally engaging clips this week. Prioritize finance content with trending tags.”</p>
       </div>
     </div>
 
@@ -197,80 +217,45 @@
       document.getElementById("upload-box").style.display = "none";
       document.getElementById("legal-box").style.display = "none";
       document.getElementById("performance-box").style.display = "none";
+      document.getElementById("manager-box").style.display = "none";
     }
 
-    function showDashboard() {
-      hideAll();
-      document.getElementById("dashboard-box").style.display = "block";
-    }
-
-    function showScriptWriter() {
-      hideAll();
-      document.getElementById("script-box").style.display = "block";
-    }
-
-    function showVoiceover() {
-      hideAll();
-      document.getElementById("voiceover-box").style.display = "block";
-    }
-
-    function showClipper() {
-      hideAll();
-      document.getElementById("clipper-box").style.display = "block";
-    }
-
-    function showUploader() {
-      hideAll();
-      document.getElementById("upload-box").style.display = "block";
-    }
-
-    function showLegal() {
-      hideAll();
-      document.getElementById("legal-box").style.display = "block";
-    }
-
-    function showPerformance() {
-      hideAll();
-      document.getElementById("performance-box").style.display = "block";
-    }
+    function showDashboard() { hideAll(); document.getElementById("dashboard-box").style.display = "block"; }
+    function showScriptWriter() { hideAll(); document.getElementById("script-box").style.display = "block"; }
+    function showVoiceover() { hideAll(); document.getElementById("voiceover-box").style.display = "block"; }
+    function showClipper() { hideAll(); document.getElementById("clipper-box").style.display = "block"; }
+    function showUploader() { hideAll(); document.getElementById("upload-box").style.display = "block"; }
+    function showLegal() { hideAll(); document.getElementById("legal-box").style.display = "block"; }
+    function showPerformance() { hideAll(); document.getElementById("performance-box").style.display = "block"; }
+    function showManager() { hideAll(); document.getElementById("manager-box").style.display = "block"; }
 
     function generate() {
       document.getElementById('output').textContent = 'Generating video... (placeholder)';
     }
-
     function generateScript() {
       const input = document.getElementById('scriptPrompt').value;
       document.getElementById('scriptOutput').textContent = input.trim()
-        ? `Creating script for: "${input}"...`
-        : 'Please enter a script prompt.';
+        ? `Creating script for: "${input}"...` : 'Please enter a script prompt.';
     }
-
     function generateVoice() {
       const input = document.getElementById('voicePrompt').value;
       document.getElementById('voiceOutput').textContent = input.trim()
-        ? `Synthesizing voice for: "${input}"...`
-        : 'Please enter a voiceover prompt.';
+        ? `Synthesizing voice for: "${input}"...` : 'Please enter a voiceover prompt.';
     }
-
     function generateClip() {
       const input = document.getElementById('clipPrompt').value;
       document.getElementById('clipOutput').textContent = input.trim()
-        ? `Editing clip for: "${input}"...`
-        : 'Please enter a clip prompt.';
+        ? `Editing clip for: "${input}"...` : 'Please enter a clip prompt.';
     }
-
     function generateUpload() {
       const input = document.getElementById('uploadPrompt').value;
       document.getElementById('uploadOutput').textContent = input.trim()
-        ? `Planning upload strategy for: "${input}"...`
-        : 'Please enter your upload goals.';
+        ? `Planning upload strategy for: "${input}"...` : 'Please enter your upload goals.';
     }
-
     function generateLegal() {
       const input = document.getElementById('legalPrompt').value;
       document.getElementById('legalOutput').textContent = input.trim()
-        ? `Checking legal compliance for: "${input}"...`
-        : 'Please enter something to check.';
+        ? `Checking legal compliance for: "${input}"...` : 'Please enter something to check.';
     }
   </script>
 
