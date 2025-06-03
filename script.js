@@ -22,3 +22,12 @@ function generate(id) {
   const output = module.querySelector('.output');
   output.innerText = input ? `Generated result: ${input}` : 'Please enter something.';
 }
+
+// Sidebar toggle
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleBtn');
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+});
