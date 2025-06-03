@@ -89,6 +89,17 @@
       color: red;
       margin-top: 20px;
     }
+
+    .stats {
+      background-color: #222;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .stats div {
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -103,6 +114,7 @@
     <a href="#" onclick="showClipper()">Clipper</a>
     <a href="#" onclick="showUploader()">Uploads</a>
     <a href="#" onclick="showLegal()">Legal Checker</a>
+    <a href="#" onclick="showPerformance()">Performance Dashboard</a>
     <a href="#">Settings</a>
   </div>
 
@@ -156,12 +168,35 @@
       <button onclick="generateLegal()">Run Legal Check</button>
       <div class="output" id="legalOutput">Awaiting compliance check...</div>
     </div>
+
+    <!-- Performance Dashboard AI -->
+    <div id="performance-box" style="display: none;">
+      <h2 class="module-title">Performance Dashboard AI</h2>
+      <div class="stats">
+        <div>🎬 Recent Video Views: <strong>12,437</strong></div>
+        <div>❤️ Likes: <strong>824</strong></div>
+        <div>💬 Comments: <strong>133</strong></div>
+        <div>📈 Engagement Rate: <strong>7.5%</strong></div>
+        <div>🕒 Avg Watch Time: <strong>47s</strong></div>
+      </div>
+    </div>
+
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+    }
+
+    function hideAll() {
+      document.getElementById("dashboard-box").style.display = "none";
+      document.getElementById("script-box").style.display = "none";
+      document.getElementById("voiceover-box").style.display = "none";
+      document.getElementById("clipper-box").style.display = "none";
+      document.getElementById("upload-box").style.display = "none";
+      document.getElementById("legal-box").style.display = "none";
+      document.getElementById("performance-box").style.display = "none";
     }
 
     function showDashboard() {
@@ -194,13 +229,9 @@
       document.getElementById("legal-box").style.display = "block";
     }
 
-    function hideAll() {
-      document.getElementById("dashboard-box").style.display = "none";
-      document.getElementById("script-box").style.display = "none";
-      document.getElementById("voiceover-box").style.display = "none";
-      document.getElementById("clipper-box").style.display = "none";
-      document.getElementById("upload-box").style.display = "none";
-      document.getElementById("legal-box").style.display = "none";
+    function showPerformance() {
+      hideAll();
+      document.getElementById("performance-box").style.display = "block";
     }
 
     function generate() {
