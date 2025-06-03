@@ -1,5 +1,5 @@
-
 function generate() {
   const input = document.getElementById('prompt').value;
-  document.getElementById('output').innerText = `Processing: "${input}"...`;
+  const output = document.getElementById('output');
+  output.innerText = `Generating video for: "${input}" ...`;
 }
