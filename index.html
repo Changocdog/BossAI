@@ -4,155 +4,68 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #121212;
-      color: #fff;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      background-color: #1e1e1e;
-      padding: 10px 20px;
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 1px solid #333;
-    }
-
-    header img {
-      height: 24px;
-      margin-right: 10px;
-    }
-
-    nav {
-      display: flex;
-      justify-content: space-around;
-      background-color: #222;
-      padding: 10px;
-      border-bottom: 1px solid #333;
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 10px 15px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    nav button.active {
-      background-color: #333;
-      border-radius: 5px;
-    }
-
-    main {
-      padding: 40px 20px;
-    }
-
-    .module {
-      display: none;
-    }
-
-    .module.active {
-      display: block;
-    }
-
-    .prompt-box {
-      margin-top: 20px;
-    }
-
-    .prompt-box input {
-      padding: 10px;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 5px;
-      border: 1px solid #444;
-      background-color: #1e1e1e;
-      color: white;
-    }
-
-    .prompt-box button {
-      margin-left: 10px;
-      padding: 10px 20px;
-      border: 1px solid red;
-      background: none;
-      color: red;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <img src="https://emoji.slack-edge.com/T02F99X2WA3/rocket/beb0c902bb3a364efba4b773adf24e4f.png" alt="🚀"/>
-    Boss AI Dashboard
-  </header>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>📊 Boss AI</h2>
+      <ul>
+        <li onclick="switchModule('dashboard')" class="active">Dashboard</li>
+        <li onclick="switchModule('script')">Script Writer</li>
+        <li onclick="switchModule('voice')">Voiceover AI</li>
+        <li onclick="switchModule('video')">Video Clipper</li>
+        <li onclick="switchModule('legal')">Legal Checker</li>
+        <li onclick="switchModule('upload')">Uploader</li>
+      </ul>
+    </aside>
 
-  <nav>
-    <button onclick="showModule('dashboard')" class="active">Dashboard</button>
-    <button onclick="showModule('script')">Script Writer</button>
-    <button onclick="showModule('voiceover')">Voiceover AI</button>
-    <button onclick="showModule('clipper')">Video Clipper</button>
-    <button onclick="showModule('legal')">Legal Checker</button>
-    <button onclick="showModule('uploader')">Uploader</button>
-  </nav>
-
-  <main>
-    <section id="dashboard" class="module active">
-      <h2>Dashboard</h2>
-      <p>Welcome to Boss AI. Select a module from the top menu to begin.</p>
-      <div class="prompt-box">
-        <input type="text" id="prompt" placeholder="Enter your command or video topic..." />
-        <button onclick="generate()">Generate Video</button>
+    <main class="main">
+      <div id="dashboard" class="module active">
+        <h1>Dashboard</h1>
+        <p>Welcome to Boss AI. Enter a command to begin.</p>
+        <input type="text" placeholder="Enter your command or video topic..." />
+        <button onclick="generate('dashboard')">Generate Video</button>
+        <p class="output">Awaiting input...</p>
       </div>
-      <p id="output">Awaiting input...</p>
-    </section>
 
-    <section id="script" class="module">
-      <h2>Script Writer AI</h2>
-      <p>This will generate your scripts...</p>
-    </section>
+      <div id="script" class="module">
+        <h1>Script Writer</h1>
+        <input type="text" placeholder="Enter video topic..." />
+        <button onclick="generate('script')">Generate Script</button>
+        <p class="output">Awaiting input...</p>
+      </div>
 
-    <section id="voiceover" class="module">
-      <h2>Voiceover AI</h2>
-      <p>This module will handle voiceovers...</p>
-    </section>
+      <div id="voice" class="module">
+        <h1>Voiceover AI</h1>
+        <input type="text" placeholder="Enter script text..." />
+        <button onclick="generate('voice')">Generate Voiceover</button>
+        <p class="output">Awaiting input...</p>
+      </div>
 
-    <section id="clipper" class="module">
-      <h2>Video Clipper AI</h2>
-      <p>This module will manage your clips...</p>
-    </section>
+      <div id="video" class="module">
+        <h1>Video Clipper</h1>
+        <input type="text" placeholder="Enter clip idea..." />
+        <button onclick="generate('video')">Create Clip</button>
+        <p class="output">Awaiting input...</p>
+      </div>
 
-    <section id="legal" class="module">
-      <h2>Legal Checker AI</h2>
-      <p>Scan your content for copyright and compliance.</p>
-    </section>
+      <div id="legal" class="module">
+        <h1>Legal Checker</h1>
+        <input type="text" placeholder="Enter script to check..." />
+        <button onclick="generate('legal')">Run Legal Check</button>
+        <p class="output">Awaiting input...</p>
+      </div>
 
-    <section id="uploader" class="module">
-      <h2>Uploader</h2>
-      <p>Automatically upload videos to social platforms.</p>
-    </section>
-  </main>
+      <div id="upload" class="module">
+        <h1>Uploader</h1>
+        <input type="text" placeholder="Enter upload info..." />
+        <button onclick="generate('upload')">Upload Video</button>
+        <p class="output">Awaiting input...</p>
+      </div>
+    </main>
+  </div>
 
-  <script>
-    function showModule(id) {
-      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-
-    function generate() {
-      const input = document.getElementById('prompt').value;
-      document.getElementById('output').innerText = input ? "Processing: " + input : "Please enter a prompt.";
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
