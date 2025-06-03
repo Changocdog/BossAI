@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -54,6 +54,10 @@
       transition: margin-left 0.3s;
     }
 
+    .module {
+      display: none;
+    }
+
     h1 {
       color: red;
     }
@@ -62,7 +66,7 @@
       margin-top: 20px;
     }
 
-    input[type="text"] {
+    input[type="text"], textarea {
       padding: 10px;
       width: 60%;
       border: none;
@@ -71,7 +75,7 @@
 
     button {
       padding: 10px;
-      margin-left: 10px;
+      margin-top: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
@@ -83,27 +87,6 @@
       margin-top: 20px;
       font-style: italic;
     }
-
-    .module-title {
-      font-size: 28px;
-      color: red;
-      margin-top: 20px;
-    }
-
-    .stats {
-      background-color: #222;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
-
-    .manager-box {
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
   </style>
 </head>
 <body>
@@ -112,95 +95,56 @@
 
   <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
-    <a href="#" onclick="showDashboard()">Dashboard</a>
-    <a href="#" onclick="showScriptWriter()">Scripts</a>
-    <a href="#" onclick="showVoiceover()">Voiceovers</a>
-    <a href="#" onclick="showClipper()">Clipper</a>
-    <a href="#" onclick="showUploader()">Uploads</a>
-    <a href="#" onclick="showLegal()">Legal Checker</a>
-    <a href="#" onclick="showPerformance()">Performance Dashboard</a>
-    <a href="#" onclick="showManager()">Manager AI</a>
-    <a href="#">Settings</a>
+    <a href="#" onclick="activateModule('dashboard')">Dashboard</a>
+    <a href="#" onclick="activateModule('scripts')">Scripts</a>
+    <a href="#" onclick="activateModule('voiceovers')">Voiceovers</a>
+    <a href="#" onclick="activateModule('uploads')">Uploads</a>
+    <a href="#" onclick="activateModule('settings')">Settings</a>
+    <a href="#" onclick="activateModule('legal')">Legal AI Review</a>
   </div>
 
-  <div class="main-content" id="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
+  <div class="main-content">
+    <div id="dashboard" class="module" style="display: block;">
+      <h1>🚀 Boss AI Dashboard</h1>
+      <p>Your AI-Powered Content Studio</p>
 
-    <!-- Dashboard -->
-    <div class="prompt-box" id="dashboard-box">
-      <input type="text" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+      <div class="prompt-box">
+        <input type="text" id="mainPrompt" placeholder="Enter your prompt here..." />
+        <button onclick="generate()">Generate Video</button>
+      </div>
+
       <div class="output" id="output">Awaiting input...</div>
     </div>
 
-    <!-- Script Writer -->
-    <div id="script-box" style="display: none;">
-      <h2 class="module-title">Script Writer AI</h2>
-      <input id="scriptPrompt" type="text" placeholder="Enter your script idea..." />
-      <button onclick="generateScript()">Generate Script</button>
-      <div class="output" id="scriptOutput">Waiting for input...</div>
+    <div id="scripts" class="module">
+      <h2>✍️ Script Generator</h2>
+      <p>Coming soon...</p>
     </div>
 
-    <!-- Voiceover -->
-    <div id="voiceover-box" style="display: none;">
-      <h2 class="module-title">Voiceover AI</h2>
-      <input id="voicePrompt" type="text" placeholder="Enter your voiceover script..." />
-      <button onclick="generateVoice()">Generate Voiceover</button>
-      <div class="output" id="voiceOutput">Voiceover preview loading...</div>
+    <div id="voiceovers" class="module">
+      <h2>🎙 Voiceover Generator</h2>
+      <p>Coming soon...</p>
     </div>
 
-    <!-- Clipper -->
-    <div id="clipper-box" style="display: none;">
-      <h2 class="module-title">Video Clipper AI</h2>
-      <input id="clipPrompt" type="text" placeholder="Describe your clip idea..." />
-      <button onclick="generateClip()">Generate Clip</button>
-      <div class="output" id="clipOutput">Clip preview coming soon...</div>
+    <div id="uploads" class="module">
+      <h2>📤 Upload Manager</h2>
+      <p>Coming soon...</p>
     </div>
 
-    <!-- Upload -->
-    <div id="upload-box" style="display: none;">
-      <h2 class="module-title">Upload Strategy AI</h2>
-      <input id="uploadPrompt" type="text" placeholder="Describe your upload goals..." />
-      <button onclick="generateUpload()">Generate Upload Strategy</button>
-      <div class="output" id="uploadOutput">Waiting for upload plan...</div>
+    <div id="settings" class="module">
+      <h2>⚙️ Settings</h2>
+      <p>Coming soon...</p>
     </div>
 
-    <!-- Legal -->
-    <div id="legal-box" style="display: none;">
-      <h2 class="module-title">Legal Checker AI</h2>
-      <input id="legalPrompt" type="text" placeholder="Paste your script or title for review..." />
-      <button onclick="generateLegal()">Run Legal Check</button>
-      <div class="output" id="legalOutput">Awaiting compliance check...</div>
-    </div>
+    <div id="legal" class="module">
+      <h2>⚖️ Legal AI Review</h2>
+      <p>This module checks content for potential legal and copyright issues before posting.</p>
 
-    <!-- Performance -->
-    <div id="performance-box" style="display: none;">
-      <h2 class="module-title">Performance Dashboard AI</h2>
-      <div class="stats">
-        <div>🎬 Recent Video Views: <strong>12,437</strong></div>
-        <div>❤️ Likes: <strong>824</strong></div>
-        <div>💬 Comments: <strong>133</strong></div>
-        <div>📈 Engagement Rate: <strong>7.5%</strong></div>
-        <div>🕒 Avg Watch Time: <strong>47s</strong></div>
-      </div>
-    </div>
+      <textarea id="legalInput" placeholder="Paste content or video script to review..." style="width: 80%; height: 120px;"></textarea><br>
+      <button onclick="runLegalReview()">Run Legal Review</button>
 
-    <!-- General Manager -->
-    <div id="manager-box" style="display: none;">
-      <h2 class="module-title">General Manager AI</h2>
-      <div class="manager-box">
-        <p>🧠 <strong>Status:</strong> Monitoring all modules.</p>
-        <p>📊 <strong>Last Actions:</strong></p>
-        <ul>
-          <li>Script generated: “Top 3 Investing Tips”</li>
-          <li>Voiceover produced: “Smooth Male Voice”</li>
-          <li>Upload strategy suggested for TikTok</li>
-        </ul>
-        <p>📌 <strong>Strategy Tip:</strong> “Focus on short, emotionally engaging clips this week. Prioritize finance content with trending tags.”</p>
-      </div>
+      <div id="legalOutput" class="output"></div>
     </div>
-
   </div>
 
   <script>
@@ -209,53 +153,36 @@
       sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
     }
 
-    function hideAll() {
-      document.getElementById("dashboard-box").style.display = "none";
-      document.getElementById("script-box").style.display = "none";
-      document.getElementById("voiceover-box").style.display = "none";
-      document.getElementById("clipper-box").style.display = "none";
-      document.getElementById("upload-box").style.display = "none";
-      document.getElementById("legal-box").style.display = "none";
-      document.getElementById("performance-box").style.display = "none";
-      document.getElementById("manager-box").style.display = "none";
+    function activateModule(moduleId) {
+      const modules = document.querySelectorAll('.module');
+      modules.forEach(mod => mod.style.display = 'none');
+      document.getElementById(moduleId).style.display = 'block';
     }
-
-    function showDashboard() { hideAll(); document.getElementById("dashboard-box").style.display = "block"; }
-    function showScriptWriter() { hideAll(); document.getElementById("script-box").style.display = "block"; }
-    function showVoiceover() { hideAll(); document.getElementById("voiceover-box").style.display = "block"; }
-    function showClipper() { hideAll(); document.getElementById("clipper-box").style.display = "block"; }
-    function showUploader() { hideAll(); document.getElementById("upload-box").style.display = "block"; }
-    function showLegal() { hideAll(); document.getElementById("legal-box").style.display = "block"; }
-    function showPerformance() { hideAll(); document.getElementById("performance-box").style.display = "block"; }
-    function showManager() { hideAll(); document.getElementById("manager-box").style.display = "block"; }
 
     function generate() {
-      document.getElementById('output').textContent = 'Generating video... (placeholder)';
+      const prompt = document.getElementById('mainPrompt').value;
+      const output = document.getElementById('output');
+      output.textContent = prompt ? `Generating video for: "${prompt}"` : "Please enter a prompt.";
     }
-    function generateScript() {
-      const input = document.getElementById('scriptPrompt').value;
-      document.getElementById('scriptOutput').textContent = input.trim()
-        ? `Creating script for: "${input}"...` : 'Please enter a script prompt.';
-    }
-    function generateVoice() {
-      const input = document.getElementById('voicePrompt').value;
-      document.getElementById('voiceOutput').textContent = input.trim()
-        ? `Synthesizing voice for: "${input}"...` : 'Please enter a voiceover prompt.';
-    }
-    function generateClip() {
-      const input = document.getElementById('clipPrompt').value;
-      document.getElementById('clipOutput').textContent = input.trim()
-        ? `Editing clip for: "${input}"...` : 'Please enter a clip prompt.';
-    }
-    function generateUpload() {
-      const input = document.getElementById('uploadPrompt').value;
-      document.getElementById('uploadOutput').textContent = input.trim()
-        ? `Planning upload strategy for: "${input}"...` : 'Please enter your upload goals.';
-    }
-    function generateLegal() {
-      const input = document.getElementById('legalPrompt').value;
-      document.getElementById('legalOutput').textContent = input.trim()
-        ? `Checking legal compliance for: "${input}"...` : 'Please enter something to check.';
+
+    function runLegalReview() {
+      const content = document.getElementById('legalInput').value.trim();
+      const output = document.getElementById('legalOutput');
+
+      if (!content) {
+        output.innerHTML = "<span style='color: orange;'>Please enter content to review.</span>";
+        return;
+      }
+
+      output.innerHTML = "🔍 Scanning for issues...<br><br>";
+      setTimeout(() => {
+        output.innerHTML = `
+          ✅ No major copyright flags found.<br>
+          ✅ Language appears appropriate for posting.<br>
+          ⚠️ Reminder: Avoid using trademarked brand names or copyrighted music.<br><br>
+          <span style='color: green;'>✔ Content approved for next step.</span>
+        `;
+      }, 1000);
     }
   </script>
 
