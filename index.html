@@ -4,59 +4,154 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: #fff;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #1e1e1e;
+      padding: 10px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+    }
+
+    header img {
+      height: 24px;
+      margin-right: 10px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background-color: #222;
+      padding: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    nav button.active {
+      background-color: #333;
+      border-radius: 5px;
+    }
+
+    main {
+      padding: 40px 20px;
+    }
+
+    .module {
+      display: none;
+    }
+
+    .module.active {
+      display: block;
+    }
+
+    .prompt-box {
+      margin-top: 20px;
+    }
+
+    .prompt-box input {
+      padding: 10px;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background-color: #1e1e1e;
+      color: white;
+    }
+
+    .prompt-box button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      border: 1px solid red;
+      background: none;
+      color: red;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <nav class="top-nav">
-    <div class="logo">🚀 Boss AI</div>
-    <ul class="nav-links">
-      <li class="active" onclick="showModule('dashboard')">Dashboard</li>
-      <li onclick="showModule('script')">Script Writer</li>
-      <li onclick="showModule('voiceover')">Voiceover AI</li>
-      <li onclick="showModule('clipper')">Video Clipper</li>
-      <li onclick="showModule('legal')">Legal Checker</li>
-      <li onclick="showModule('upload')">Uploader</li>
-    </ul>
+  <header>
+    <img src="https://emoji.slack-edge.com/T02F99X2WA3/rocket/beb0c902bb3a364efba4b773adf24e4f.png" alt="🚀"/>
+    Boss AI Dashboard
+  </header>
+
+  <nav>
+    <button onclick="showModule('dashboard')" class="active">Dashboard</button>
+    <button onclick="showModule('script')">Script Writer</button>
+    <button onclick="showModule('voiceover')">Voiceover AI</button>
+    <button onclick="showModule('clipper')">Video Clipper</button>
+    <button onclick="showModule('legal')">Legal Checker</button>
+    <button onclick="showModule('uploader')">Uploader</button>
   </nav>
 
   <main>
     <section id="dashboard" class="module active">
       <h2>Dashboard</h2>
-      <p>Welcome to Boss AI. Select a module from the top to begin.</p>
+      <p>Welcome to Boss AI. Select a module from the top menu to begin.</p>
+      <div class="prompt-box">
+        <input type="text" id="prompt" placeholder="Enter your command or video topic..." />
+        <button onclick="generate()">Generate Video</button>
+      </div>
+      <p id="output">Awaiting input...</p>
     </section>
 
     <section id="script" class="module">
-      <h2>Script Writer</h2>
-      <p>Script writing tools will go here.</p>
+      <h2>Script Writer AI</h2>
+      <p>This will generate your scripts...</p>
     </section>
 
     <section id="voiceover" class="module">
       <h2>Voiceover AI</h2>
-      <p>Voiceover module goes here.</p>
+      <p>This module will handle voiceovers...</p>
     </section>
 
     <section id="clipper" class="module">
-      <h2>Video Clipper</h2>
-      <p>Clipper module goes here.</p>
+      <h2>Video Clipper AI</h2>
+      <p>This module will manage your clips...</p>
     </section>
 
     <section id="legal" class="module">
-      <h2>Legal Checker</h2>
-      <p>Compliance tools and scans here.</p>
+      <h2>Legal Checker AI</h2>
+      <p>Scan your content for copyright and compliance.</p>
     </section>
 
-    <section id="upload" class="module">
+    <section id="uploader" class="module">
       <h2>Uploader</h2>
-      <p>Upload and manage your content.</p>
+      <p>Automatically upload videos to social platforms.</p>
     </section>
   </main>
 
   <script>
     function showModule(id) {
-      document.querySelectorAll('.module').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-      document.querySelector(`.nav-links li[onclick="showModule('${id}')"]`).classList.add('active');
+
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function generate() {
+      const input = document.getElementById('prompt').value;
+      document.getElementById('output').innerText = input ? "Processing: " + input : "Please enter a prompt.";
     }
   </script>
 </body>
