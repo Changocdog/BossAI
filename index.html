@@ -1,181 +1,40 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f9f9f9;
-      color: #111;
-    }
-
-    .topbar {
-      background-color: #000;
-      display: flex;
-      align-items: center;
-      padding: 15px 25px;
-      color: white;
-    }
-
-    .logo {
-      font-weight: 800;
-      font-size: 20px;
-      margin-right: 40px;
-      display: flex;
-      align-items: center;
-    }
-
-    .logo img {
-      height: 24px;
-      margin-right: 10px;
-    }
-
-    nav {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 10px 15px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-
-    nav button:hover {
-      background: #222;
-    }
-
-    nav button.active {
-      background-color: red;
-    }
-
-    main {
-      padding: 40px 25px;
-    }
-
-    .module {
-      display: none;
-    }
-
-    .module.active {
-      display: block;
-    }
-
-    h2 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .prompt-box {
-      margin-top: 30px;
-    }
-
-    .prompt-box input {
-      padding: 12px;
-      width: 60%;
-      max-width: 500px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-
-    .prompt-box button {
-      margin-left: 12px;
-      padding: 12px 22px;
-      border: none;
-      background-color: red;
-      color: white;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #output {
-      margin-top: 20px;
-      font-style: italic;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div class="topbar">
-    <div class="logo">
-      <img src="https://emoji.slack-edge.com/T02F99X2WA3/rocket/beb0c902bb3a364efba4b773adf24e4f.png" alt="🚀"/>
-      Boss AI
-    </div>
-    <nav>
-      <button onclick="showModule('dashboard')" class="active">Dashboard</button>
-      <button onclick="showModule('script')">Script Writer</button>
-      <button onclick="showModule('voiceover')">Voiceover AI</button>
-      <button onclick="showModule('clipper')">Video Clipper</button>
-      <button onclick="showModule('legal')">Legal Checker</button>
-      <button onclick="showModule('uploader')">Uploader</button>
+  <header class="topbar">
+    <div class="logo">🧠 Boss AI Dashboard</div>
+    <nav class="navbar">
+      <button onclick="switchModule('dashboard')" id="btn-dashboard" class="nav-button active">Dashboard</button>
+      <button onclick="switchModule('script')" id="btn-script" class="nav-button">Script Writer</button>
+      <button onclick="switchModule('voice')" id="btn-voice" class="nav-button">Voiceover AI</button>
+      <button onclick="switchModule('clipper')" id="btn-clipper" class="nav-button">Video Clipper</button>
+      <button onclick="switchModule('legal')" id="btn-legal" class="nav-button">Legal Checker</button>
+      <button onclick="switchModule('upload')" id="btn-upload" class="nav-button">Uploader</button>
     </nav>
-  </div>
+  </header>
 
-  <main>
+  <main class="main-content">
     <section id="dashboard" class="module active">
-      <h2>Dashboard</h2>
-      <p>Welcome to Boss AI. Select a module from the top to begin.</p>
-      <div class="prompt-box">
-        <input type="text" id="prompt" placeholder="Enter your prompt here..." />
-        <button onclick="generate()">Generate Video</button>
-      </div>
-      <p id="output">Awaiting input...</p>
+      <h1>Dashboard</h1>
+      <p>Welcome to Boss AI. Select a module from the top menu to begin.</p>
+      <input type="text" id="prompt" placeholder="Enter your command or video topic..." />
+      <button onclick="generate()" class="generate-btn">Generate Video</button>
+      <div class="output" id="output">Awaiting input...</div>
     </section>
 
-    <section id="script" class="module">
-      <h2>Script Writer</h2>
-      <p>This module generates your short-form video scripts using AI.</p>
-    </section>
-
-    <section id="voiceover" class="module">
-      <h2>Voiceover AI</h2>
-      <p>Use AI to generate natural-sounding voiceovers from your script.</p>
-    </section>
-
-    <section id="clipper" class="module">
-      <h2>Video Clipper</h2>
-      <p>This tool selects, cuts, and assembles video content.</p>
-    </section>
-
-    <section id="legal" class="module">
-      <h2>Legal Checker</h2>
-      <p>Check scripts and clips for copyright or terms violations.</p>
-    </section>
-
-    <section id="uploader" class="module">
-      <h2>Uploader</h2>
-      <p>Automatically upload finished videos to YouTube, TikTok, and more.</p>
-    </section>
+    <section id="script" class="module"><h1>Script Writer</h1><p>[Script AI Coming Soon]</p></section>
+    <section id="voice" class="module"><h1>Voiceover AI</h1><p>[Voiceover Tools Here]</p></section>
+    <section id="clipper" class="module"><h1>Video Clipper</h1><p>[Clipper AI Features]</p></section>
+    <section id="legal" class="module"><h1>Legal Checker</h1><p>[Compliance Checker]</p></section>
+    <section id="upload" class="module"><h1>Uploader</h1><p>[Upload Options]</p></section>
   </main>
 
-  <script>
-    function showModule(id) {
-      document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-    }
-
-    function generate() {
-      const input = document.getElementById('prompt').value;
-      document.getElementById('output').innerText = input ? "Generating: " + input : "Please enter a prompt.";
-    }
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
