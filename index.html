@@ -3,34 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard</title>
+  <title>Boss AI</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div class="sidebar">
-    <h1>🚀 Boss AI</h1>
-    <button class="tab" onclick="showModule('dashboard')">Dashboard</button>
-    <button class="tab" onclick="showModule('script')">Script Writer</button>
-    <button class="tab" onclick="showModule('voice')">Voiceover AI</button>
-    <button class="tab" onclick="showModule('clip')">Video Clipper</button>
-    <button class="tab" onclick="showModule('legal')">Legal Checker</button>
-    <button class="tab" onclick="showModule('upload')">Uploader</button>
+    <h1>🤖 Boss AI</h1>
+    <button onclick="showModule('manager')">Manager AI</button>
+    <button onclick="showModule('script')">Script Writer AI</button>
+    <button onclick="showModule('voice')">Voiceover AI</button>
+    <button onclick="showModule('clip')">Video Clipper AI</button>
+    <button onclick="showModule('upload')">Upload Strategy AI</button>
+    <button onclick="showModule('legal')">Legal Checker AI</button>
+    <button onclick="showModule('research')">Research AI</button>
   </div>
 
   <div class="main">
-    <div id="dashboard" class="module">
-      <h2>Dashboard</h2>
-      <p>Welcome to Boss AI. Select a module from the sidebar to begin.</p>
-      <input type="text" placeholder="Enter your command or video topic..." />
-      <button>Generate Video</button>
-      <p><em>Awaiting input...</em></p>
+    <div id="manager" class="module">
+      <h2>Manager AI</h2>
+      <p>This AI coordinates all Boss AI modules.</p>
+      <input type="text" placeholder="Enter your command here..." />
+      <button>Run Manager</button>
     </div>
-    <div id="script" class="module hidden">📝 Script Writer Module</div>
-    <div id="voice" class="module hidden">🎙️ Voiceover Module</div>
-    <div id="clip" class="module hidden">✂️ Video Clipper Module</div>
-    <div id="legal" class="module hidden">⚖️ Legal Checker Module</div>
-    <div id="upload" class="module hidden">📤 Upload Strategy Module</div>
+
+    <div id="script" class="module hidden">
+      <h2>Script Writer AI</h2>
+      <input type="text" placeholder="Enter a video topic..." />
+      <button>Generate Script</button>
+    </div>
+
+    <div id="voice" class="module hidden">
+      <h2>Voiceover AI</h2>
+      <input type="text" placeholder="Paste script text here..." />
+      <button>Create Voiceover</button>
+    </div>
+
+    <div id="clip" class="module hidden">
+      <h2>Video Clipper AI</h2>
+      <input type="text" placeholder="Enter video reference..." />
+      <button>Generate Clip</button>
+    </div>
+
+    <div id="upload" class="module hidden">
+      <h2>Upload Strategy AI</h2>
+      <input type="text" placeholder="Platform or upload time..." />
+      <button>Plan Upload</button>
+    </div>
+
+    <div id="legal" class="module hidden">
+      <h2>Legal Checker AI</h2>
+      <input type="text" placeholder="Paste script or clip info..." />
+      <button>Check Compliance</button>
+    </div>
+
+    <div id="research" class="module hidden">
+      <h2>Research AI</h2>
+      <input type="text" placeholder="Enter trend or topic..." />
+      <button>Fetch Research</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
