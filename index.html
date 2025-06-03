@@ -2,68 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boss AI Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #1e1e1e;
+      height: 100vh;
+      padding: 20px;
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    .nav-link {
+      display: block;
+      margin-bottom: 18px;
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    .main {
+      flex-grow: 1;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 480px;
+      padding: 10px 14px;
+      margin: 20px 0;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background-color: #1e1e1e;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: transparent;
+      border: 1px solid #00bfff;
+      color: #00bfff;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .output {
+      margin-top: 30px;
+      font-style: italic;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
-    <h1>🤖 Boss AI</h1>
-    <button onclick="showModule('manager')">Manager AI</button>
-    <button onclick="showModule('script')">Script Writer AI</button>
-    <button onclick="showModule('voice')">Voiceover AI</button>
-    <button onclick="showModule('clip')">Video Clipper AI</button>
-    <button onclick="showModule('upload')">Upload Strategy AI</button>
-    <button onclick="showModule('legal')">Legal Checker AI</button>
-    <button onclick="showModule('research')">Research AI</button>
+    <h2>📊 Boss AI</h2>
+    <a href="#" class="nav-link">Dashboard</a>
+    <a href="#" class="nav-link">Script Writer</a>
+    <a href="#" class="nav-link">Voiceover AI</a>
+    <a href="#" class="nav-link">Video Clipper</a>
+    <a href="#" class="nav-link">Legal Checker</a>
+    <a href="#" class="nav-link">Uploader</a>
   </div>
 
   <div class="main">
-    <div id="manager" class="module">
-      <h2>Manager AI</h2>
-      <p>This AI coordinates all Boss AI modules.</p>
-      <input type="text" placeholder="Enter your command here..." />
-      <button>Run Manager</button>
-    </div>
-
-    <div id="script" class="module hidden">
-      <h2>Script Writer AI</h2>
-      <input type="text" placeholder="Enter a video topic..." />
-      <button>Generate Script</button>
-    </div>
-
-    <div id="voice" class="module hidden">
-      <h2>Voiceover AI</h2>
-      <input type="text" placeholder="Paste script text here..." />
-      <button>Create Voiceover</button>
-    </div>
-
-    <div id="clip" class="module hidden">
-      <h2>Video Clipper AI</h2>
-      <input type="text" placeholder="Enter video reference..." />
-      <button>Generate Clip</button>
-    </div>
-
-    <div id="upload" class="module hidden">
-      <h2>Upload Strategy AI</h2>
-      <input type="text" placeholder="Platform or upload time..." />
-      <button>Plan Upload</button>
-    </div>
-
-    <div id="legal" class="module hidden">
-      <h2>Legal Checker AI</h2>
-      <input type="text" placeholder="Paste script or clip info..." />
-      <button>Check Compliance</button>
-    </div>
-
-    <div id="research" class="module hidden">
-      <h2>Research AI</h2>
-      <input type="text" placeholder="Enter trend or topic..." />
-      <button>Fetch Research</button>
-    </div>
+    <h1>Dashboard</h1>
+    <p>Welcome to Boss AI. Enter a command to begin.</p>
+    <input type="text" id="prompt" placeholder="Enter your command or video topic..." />
+    <br />
+    <button onclick="generate()">Generate Video</button>
+    <div class="output" id="output">Awaiting input...</div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    function generate() {
+      const input = document.getElementById('prompt').value.trim();
+      const output = document.getElementById('output');
+      if (input.length === 0) {
+        output.innerText = "Please enter a valid prompt.";
+        return;
+      }
+      output.innerText = `🧠 Processing: "${input}"... (This is placeholder logic)`;
+    }
+  </script>
 </body>
 </html>
