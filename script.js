@@ -23,7 +23,7 @@ function generate(id) {
   output.innerText = input ? `Generated result: ${input}` : 'Please enter something.';
 }
 
-// Sidebar toggle
+// Sidebar toggle logic
 document.addEventListener("DOMContentLoaded", () => {
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('toggleBtn');
