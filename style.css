@@ -5,6 +5,7 @@ body {
   color: #fff;
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -16,33 +17,45 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
 }
 
 .sidebar h2 {
   color: #ccc;
+  font-size: 20px;
   margin-bottom: 20px;
 }
 
 .sidebar ul {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
 }
 
 .sidebar ul li {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sidebar ul li:hover {
+  color: red;
 }
 
 /* Main content */
 .main-content {
   margin-left: 240px;
-  padding: 40px;
+  padding: 60px 40px;
   flex: 1;
 }
 
 h1 {
   color: red;
-  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+p {
+  margin-bottom: 20px;
 }
 
 input[type="text"] {
@@ -60,5 +73,6 @@ button {
 }
 
 #output {
-  margin-top: 20px;
+  margin-top: 30px;
+  font-style: italic;
 }
