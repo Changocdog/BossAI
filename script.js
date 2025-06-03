@@ -1,13 +1,10 @@
 function toggleSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("show");
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('active');
 }
 
-function loadModule(name) {
-  document.getElementById("output").innerText = `Loaded ${name} module...`;
-}
-
-function generate() {
-  const prompt = document.getElementById("prompt").value;
-  document.getElementById("output").innerText = `Generating video for: ${prompt}`;
+function showSection(id) {
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(sec => sec.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
 }
