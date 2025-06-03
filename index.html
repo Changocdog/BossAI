@@ -9,8 +9,10 @@
 <body>
   <div class="container">
     <aside class="sidebar" id="sidebar">
-      <button id="toggleBtn">☰</button>
-      <h2>📊 Boss AI</h2>
+      <div class="sidebar-header">
+        <button id="toggleBtn">☰</button>
+        <h2>📊 Boss AI</h2>
+      </div>
       <ul>
         <li onclick="switchModule('dashboard')" class="active">Dashboard</li>
         <li onclick="switchModule('script')">Script Writer</li>
@@ -66,7 +68,6 @@
       </div>
     </main>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
