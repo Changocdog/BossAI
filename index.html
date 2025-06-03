@@ -99,7 +99,7 @@
     <h2 style="padding-left: 24px;">📁 Modules</h2>
     <a href="#" onclick="showDashboard()">Dashboard</a>
     <a href="#" onclick="showScriptWriter()">Scripts</a>
-    <a href="#">Voiceovers</a>
+    <a href="#" onclick="showVoiceover()">Voiceovers</a>
     <a href="#">Uploads</a>
     <a href="#">Settings</a>
   </div>
@@ -108,53 +108,71 @@
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
+    <!-- Dashboard -->
     <div class="prompt-box" id="dashboard-box">
       <input type="text" placeholder="Enter your prompt here..." />
       <button onclick="generate()">Generate Video</button>
       <div class="output" id="output">Awaiting input...</div>
     </div>
 
+    <!-- Script Writer AI -->
     <div id="script-box" style="display: none;">
       <h2 class="module-title">Script Writer AI</h2>
       <input id="scriptPrompt" type="text" placeholder="Enter your script idea..." />
       <button onclick="generateScript()">Generate Script</button>
       <div class="output" id="scriptOutput">Waiting for input...</div>
     </div>
+
+    <!-- ✅ Voiceover AI -->
+    <div id="voiceover-box" style="display: none;">
+      <h2 class="module-title">Voiceover AI</h2>
+      <input id="voicePrompt" type="text" placeholder="Enter your voiceover script..." />
+      <button onclick="generateVoice()">Generate Voiceover</button>
+      <div class="output" id="voiceOutput">Voiceover preview loading...</div>
+    </div>
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      if (sidebar.style.left === '0px') {
-        sidebar.style.left = '-250px';
-      } else {
-        sidebar.style.left = '0px';
-      }
+      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+    }
+
+    function showDashboard() {
+      hideAll();
+      document.getElementById("dashboard-box").style.display = "block";
+    }
+
+    function showScriptWriter() {
+      hideAll();
+      document.getElementById("script-box").style.display = "block";
+    }
+
+    function showVoiceover() {
+      hideAll();
+      document.getElementById("voiceover-box").style.display = "block";
+    }
+
+    function hideAll() {
+      document.getElementById("dashboard-box").style.display = "none";
+      document.getElementById("script-box").style.display = "none";
+      document.getElementById("voiceover-box").style.display = "none";
     }
 
     function generate() {
-      const output = document.getElementById('output');
-      output.textContent = 'Generating video... (placeholder logic)';
+      document.getElementById('output').textContent = 'Generating video... (placeholder)';
     }
 
     function generateScript() {
       const input = document.getElementById('scriptPrompt').value;
       const output = document.getElementById('scriptOutput');
-      if (input.trim() === "") {
-        output.textContent = "Please enter a script prompt.";
-        return;
-      }
-      output.textContent = "Generating script for: " + input + " ... (placeholder)";
+      output.textContent = input.trim() ? `Creating script for: "${input}"...` : 'Please enter a script prompt.';
     }
 
-    function showScriptWriter() {
-      document.getElementById("script-box").style.display = "block";
-      document.getElementById("dashboard-box").style.display = "none";
-    }
-
-    function showDashboard() {
-      document.getElementById("script-box").style.display = "none";
-      document.getElementById("dashboard-box").style.display = "block";
+    function generateVoice() {
+      const input = document.getElementById('voicePrompt').value;
+      const output = document.getElementById('voiceOutput');
+      output.textContent = input.trim() ? `Synthesizing voice for: "${input}"...` : 'Please enter a voiceover prompt.';
     }
   </script>
 
