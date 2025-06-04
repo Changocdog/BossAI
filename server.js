@@ -1,41 +1,42 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const { Configuration, OpenAIApi } = require('openai');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const { OpenAI } = require("openai");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
-app.post('/generate', async (req, res) => {
+app.post("/api/generate", async (req, res) => {
   const { prompt } = req.body;
 
   if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' });
+    return res.status(400).json({ error: "Prompt is required" });
   }
 
   try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
+    const response = await openai.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
     });
 
-    const response = completion.data.choices[0].message.content;
-    res.json({ response });
+    res.json({ result: response.choices[0].message.content });
   } catch (error) {
-    console.error('OpenAI error:', error.message);
-    res.status(500).json({ error: 'Failed to generate response' });
+    console.error("OpenAI error:", error);
+    res.status(500).json({ error: "Failed to generate response" });
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Boss AI server is running.");
+});
+
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server is listening on port ${port}`);
 });
