@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boss AI Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boss AI Dashboard - Settings</title>
   <style>
     body {
       margin: 0;
@@ -17,10 +17,9 @@
       width: 250px;
       position: fixed;
       top: 0;
-      left: -250px;
+      left: 0;
       background-color: #111;
       padding-top: 60px;
-      transition: 0.3s;
       z-index: 1000;
     }
 
@@ -35,62 +34,55 @@
       background-color: #575757;
     }
 
-    .toggle-btn {
-      position: fixed;
-      left: 10px;
-      top: 10px;
-      font-size: 30px;
-      cursor: pointer;
-      z-index: 1100;
-      background-color: #111;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-    }
-
     .main-content {
-      margin-left: 30px;
+      margin-left: 270px;
       padding: 20px;
-      transition: margin-left 0.3s;
     }
 
     h1 {
       color: red;
     }
 
-    .prompt-box {
+    .settings-section {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
       margin-top: 20px;
     }
 
-    input[type="text"] {
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
       padding: 10px;
-      width: 60%;
+      margin-bottom: 20px;
       border: none;
       border-radius: 5px;
     }
 
     button {
-      padding: 10px;
-      margin-left: 10px;
-      background-color: black;
-      color: red;
-      border: 2px solid red;
+      background-color: red;
+      border: none;
+      color: white;
+      padding: 10px 20px;
       border-radius: 5px;
       cursor: pointer;
     }
 
-    .output {
-      margin-top: 20px;
-      font-style: italic;
-      white-space: pre-line;
+    button:hover {
+      background-color: darkred;
     }
   </style>
 </head>
 <body>
 
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
-  <div class="sidebar" id="sidebar">
+  <div class="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
     <a href="#">Dashboard</a>
     <a href="#">Scripts</a>
@@ -99,51 +91,49 @@
     <a href="#">Settings</a>
   </div>
 
-  <div class="main-content" id="main">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Your AI-Powered Content Studio</p>
+  <div class="main-content">
+    <h1>⚙️ Settings</h1>
 
-    <!-- Prompt Input -->
-    <div class="prompt-box">
-      <input type="text" id="main-prompt" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Video</button>
+    <div class="settings-section">
+      <h2>Account Configuration</h2>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" />
+
+      <label for="apiKey">OpenAI API Key</label>
+      <input type="password" id="apiKey" placeholder="Enter your API key securely" />
+
+      <button onclick="saveSettings()">Save Settings</button>
     </div>
 
-    <!-- Output -->
-    <div class="output" id="output">Awaiting input...</div>
+    <div class="settings-section">
+      <h2>Preferences</h2>
+      <label for="theme">Theme</label>
+      <select id="theme">
+        <option value="dark" selected>Dark</option>
+        <option value="light">Light</option>
+      </select>
 
-    <!-- Upload Strategy AI -->
-    <h2>📤 Upload Strategy</h2>
-    <p>Generate your upload plan based on the generated content.</p>
-    <div class="prompt-box">
-      <button onclick="generateUploadStrategy()">Generate Upload Strategy</button>
+      <label for="voice">Default Voice Type</label>
+      <select id="voice">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <button onclick="savePreferences()">Save Preferences</button>
     </div>
-    <div class="output" id="upload-strategy-output">No strategy generated yet.</div>
   </div>
 
   <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+    function saveSettings() {
+      const user = document.getElementById('username').value;
+      const key = document.getElementById('apiKey').value;
+      alert(`Settings saved:\nUser: ${user}\nAPI Key: ${key ? '*****' : 'Not entered'}`);
     }
 
-    function generate() {
-      const prompt = document.getElementById('main-prompt').value;
-      const output = document.getElementById('output');
-      if (prompt.trim() === "") {
-        output.textContent = "Please enter a prompt first.";
-      } else {
-        output.textContent = "Generating... (placeholder result for: " + prompt + ")";
-      }
-    }
-
-    function generateUploadStrategy() {
-      const output = document.getElementById('upload-strategy-output');
-      output.textContent =
-        "🗓 Monday: Post to YouTube Shorts\n" +
-        "📱 Tuesday: Repurpose for TikTok\n" +
-        "📸 Wednesday: Instagram Reels\n" +
-        "📊 Thursday: Review analytics and iterate.";
+    function savePreferences() {
+      const theme = document.getElementById('theme').value;
+      const voice = document.getElementById('voice').value;
+      alert(`Preferences saved:\nTheme: ${theme}\nVoice: ${voice}`);
     }
   </script>
 
