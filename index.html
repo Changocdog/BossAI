@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
   <style>
     body {
@@ -72,7 +72,6 @@
     button {
       padding: 10px;
       margin-left: 10px;
-      margin-top: 10px;
       background-color: black;
       color: red;
       border: 2px solid red;
@@ -104,14 +103,22 @@
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
+    <!-- Prompt Input -->
     <div class="prompt-box">
-      <input type="text" id="userPrompt" placeholder="Enter your prompt here..." />
-      <button onclick="generate()">Generate Script</button>
+      <input type="text" id="main-prompt" placeholder="Enter your prompt here..." />
+      <button onclick="generate()">Generate Video</button>
     </div>
 
+    <!-- Output -->
     <div class="output" id="output">Awaiting input...</div>
-    <button onclick="generateVoiceover()">🎙️ Generate Voiceover</button>
-    <div class="output" id="voiceoverOutput"></div>
+
+    <!-- Upload Strategy AI -->
+    <h2>📤 Upload Strategy</h2>
+    <p>Generate your upload plan based on the generated content.</p>
+    <div class="prompt-box">
+      <button onclick="generateUploadStrategy()">Generate Upload Strategy</button>
+    </div>
+    <div class="output" id="upload-strategy-output">No strategy generated yet.</div>
   </div>
 
   <script>
@@ -121,43 +128,22 @@
     }
 
     function generate() {
-      const prompt = document.getElementById("userPrompt").value.trim();
-      const output = document.getElementById("output");
-      const voiceoverOutput = document.getElementById("voiceoverOutput");
-
-      if (!prompt) {
-        output.textContent = "⚠️ Please enter a prompt.";
-        voiceoverOutput.textContent = "";
-        return;
+      const prompt = document.getElementById('main-prompt').value;
+      const output = document.getElementById('output');
+      if (prompt.trim() === "") {
+        output.textContent = "Please enter a prompt first.";
+      } else {
+        output.textContent = "Generating... (placeholder result for: " + prompt + ")";
       }
-
-      const script = `🎬 Script for: "${prompt}"
-
-Intro: 
-  "Hey everyone, welcome back to the channel!"
-
-Main Content:
-  "Today we're diving into: ${prompt}."
-  "Let's break it down in simple steps..."
-
-Conclusion:
-  "Thanks for watching! Like and subscribe for more!"`;
-
-      output.textContent = script;
-      voiceoverOutput.textContent = "";
     }
 
-    function generateVoiceover() {
-      const script = document.getElementById("output").textContent;
-      const voiceoverOutput = document.getElementById("voiceoverOutput");
-
-      if (!script || script === "Awaiting input..." || script.startsWith("⚠️")) {
-        voiceoverOutput.textContent = "⚠️ Generate a script first.";
-        return;
-      }
-
-      // Simulated voiceover response
-      voiceoverOutput.textContent = "🔊 Voiceover generated: [Simulated voice file for preview]";
+    function generateUploadStrategy() {
+      const output = document.getElementById('upload-strategy-output');
+      output.textContent =
+        "🗓 Monday: Post to YouTube Shorts\n" +
+        "📱 Tuesday: Repurpose for TikTok\n" +
+        "📸 Wednesday: Instagram Reels\n" +
+        "📊 Thursday: Review analytics and iterate.";
     }
   </script>
 
