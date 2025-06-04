@@ -1,154 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boss AI Dashboard</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
+<script>
+  const apiKeyInput = document.getElementById("api-key");
+  const generateBtn = document.getElementById("generate-btn");
+  const userPrompt = document.getElementById("user-prompt");
+  const contentPanel = document.getElementById("content-panel");
+  let currentModule = "manager"; // Default module
+
+  // Sidebar Switching
+  const sidebarButtons = document.querySelectorAll(".sidebar button");
+  sidebarButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      sidebarButtons.forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+      currentModule = button.dataset.module;
+      displayModule(currentModule);
+    });
+  });
+
+  function displayModule(module) {
+    if (module === "manager") {
+      contentPanel.innerHTML = `<h2>General Manager AI</h2><p>Ask the Manager to oversee content creation and task coordination.</p>`;
+    } else if (module === "legal") {
+      contentPanel.innerHTML = `<h2>Legal AI Review</h2><p>This module checks content for compliance and copyright safety.</p>`;
+    } else if (module === "script") {
+      contentPanel.innerHTML = `
+        <h2>Script Writer AI</h2>
+        <textarea id="script-input" rows="4" placeholder="Enter your video topic or idea..."></textarea>
+        <button id="run-script">Generate Script</button>
+        <pre id="script-output">Script will appear here.</pre>
+      `;
+
+      document.getElementById("run-script").addEventListener("click", async () => {
+        const prompt = document.getElementById("script-input").value;
+        const apiKey = apiKeyInput.value.trim();
+        const output = document.getElementById("script-output");
+        output.textContent = "⏳ Generating script...";
+
+        try {
+          const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: [{ role: "user", content: `Write a viral short-form video script for: ${prompt}` }],
+              temperature: 0.8
+            })
+          });
+
+          const data = await response.json();
+          const script = data.choices?.[0]?.message?.content || "⚠️ No output received.";
+          output.textContent = script;
+        } catch (error) {
+          output.textContent = "❌ Error generating script. Check your API key and try again.";
+          console.error(error);
+        }
+      });
+    } else {
+      contentPanel.innerHTML = `<p>Select a module from the sidebar.</p>`;
     }
+  }
 
-    .toggle-btn {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 24px;
-      background-color: #111;
-      color: white;
-      border: none;
-      z-index: 1001;
-      cursor: pointer;
-    }
-
-    .sidebar {
-      height: 100%;
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      background-color: #1a1a1a;
-      overflow-x: hidden;
-      padding-top: 60px;
-      transition: 0.3s;
-      z-index: 1000;
-    }
-
-    .sidebar h2 {
-      padding-left: 24px;
-    }
-
-    .sidebar a {
-      padding: 12px 24px;
-      display: block;
-      color: white;
-      text-decoration: none;
-    }
-
-    .sidebar a:hover {
-      background-color: #333;
-    }
-
-    .main-content {
-      margin-left: 20px;
-      padding: 40px 20px 20px 280px;
-      transition: margin-left 0.3s;
-    }
-
-    h1 {
-      color: #ff4b4b;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      width: 60%;
-      border-radius: 5px;
-      border: none;
-    }
-
-    button {
-      padding: 10px 14px;
-      background-color: #111;
-      color: red;
-      border: 2px solid red;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .output {
-      margin-top: 20px;
-      font-style: italic;
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        padding-left: 20px;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
-  <div class="sidebar" id="sidebar">
-    <h2>📁 Modules</h2>
-    <a href="#">Dashboard</a>
-    <a href="#">Script Writer</a>
-    <a href="#">Voiceover AI</a>
-    <a href="#">Video Clipper</a>
-    <a href="#">Legal Checker</a>
-    <a href="#">Uploader</a>
-  </div>
-
-  <div class="main-content">
-    <h1>🚀 Boss AI Dashboard</h1>
-    <p>Welcome to Boss AI. Enter a command to begin.</p>
-
-    <div class="prompt-box">
-      <input type="text" id="user-prompt" placeholder="Enter your command or video topic..." />
-      <button onclick="generate()">Generate Video</button>
-    </div>
-
-    <div class="output" id="output">Awaiting input...</div>
-  </div>
-
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
-    }
-
-    async function generate() {
-      const input = document.getElementById('user-prompt').value.trim();
-      const output = document.getElementById('output');
-
-      if (!input) {
-        output.textContent = 'Please enter a prompt.';
-        return;
-      }
-
-      output.textContent = '🧠 Generating...';
-
-      try {
-        const response = await fetch('https://boss-ai-live.onrender.com/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: input })
-        });
-
-        const data = await response.json();
-        output.textContent = data.output || '⚠️ No response from AI.';
-      } catch (error) {
-        console.error(error);
-        output.textContent = '❌ Error contacting the server.';
-      }
-    }
-  </script>
-
-</body>
-</html>
+  // Initialize default view
+  displayModule(currentModule);
+</script>
