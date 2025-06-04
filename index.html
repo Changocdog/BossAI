@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard - Settings</title>
+  <title>Boss AI Dashboard</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background-color: black;
-      color: white;
+      background-color: #000;
+      color: #fff;
     }
 
     .sidebar {
@@ -17,9 +17,10 @@
       width: 250px;
       position: fixed;
       top: 0;
-      left: 0;
+      left: -250px;
       background-color: #111;
       padding-top: 60px;
+      transition: 0.3s;
       z-index: 1000;
     }
 
@@ -34,55 +35,73 @@
       background-color: #575757;
     }
 
+    .toggle-btn {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1100;
+      background-color: #111;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+    }
+
     .main-content {
-      margin-left: 270px;
+      margin-left: 30px;
       padding: 20px;
+      transition: margin-left 0.3s;
+      max-width: 900px;
     }
 
     h1 {
       color: red;
     }
 
-    .settings-section {
-      background-color: #1e1e1e;
-      padding: 20px;
-      border-radius: 8px;
+    .prompt-box {
       margin-top: 20px;
     }
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    input[type="text"],
-    input[type="password"],
-    select {
-      width: 100%;
+    input[type="text"] {
       padding: 10px;
-      margin-bottom: 20px;
+      width: 60%;
       border: none;
       border-radius: 5px;
     }
 
     button {
-      background-color: red;
-      border: none;
-      color: white;
-      padding: 10px 20px;
+      padding: 10px;
+      margin-left: 10px;
+      background-color: black;
+      color: red;
+      border: 2px solid red;
       border-radius: 5px;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: darkred;
+    .output-section {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #1a1a1a;
+      border-left: 5px solid red;
+      border-radius: 5px;
+    }
+
+    .output-section h2 {
+      color: #ff4d4d;
+    }
+
+    .output-section p {
+      font-style: italic;
     }
   </style>
 </head>
 <body>
 
-  <div class="sidebar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <div class="sidebar" id="sidebar">
     <h2 style="padding-left: 24px;">📁 Modules</h2>
     <a href="#">Dashboard</a>
     <a href="#">Scripts</a>
@@ -92,48 +111,53 @@
   </div>
 
   <div class="main-content">
-    <h1>⚙️ Settings</h1>
+    <h1>🚀 Boss AI Dashboard</h1>
+    <p>Your AI-Powered Content Studio</p>
 
-    <div class="settings-section">
-      <h2>Account Configuration</h2>
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter your username" />
-
-      <label for="apiKey">OpenAI API Key</label>
-      <input type="password" id="apiKey" placeholder="Enter your API key securely" />
-
-      <button onclick="saveSettings()">Save Settings</button>
+    <div class="prompt-box">
+      <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
+      <button onclick="runAIPipeline()">Generate Video</button>
     </div>
 
-    <div class="settings-section">
-      <h2>Preferences</h2>
-      <label for="theme">Theme</label>
-      <select id="theme">
-        <option value="dark" selected>Dark</option>
-        <option value="light">Light</option>
-      </select>
+    <div class="output-section" id="managerAI">
+      <h2>🧠 Manager AI</h2>
+      <p>Awaiting input...</p>
+    </div>
 
-      <label for="voice">Default Voice Type</label>
-      <select id="voice">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
+    <div class="output-section" id="scriptAI">
+      <h2>✍️ Script Writer AI</h2>
+      <p>Awaiting input...</p>
+    </div>
 
-      <button onclick="savePreferences()">Save Preferences</button>
+    <div class="output-section" id="voiceAI">
+      <h2>🎤 Voiceover Generator</h2>
+      <p>Awaiting input...</p>
+    </div>
+
+    <div class="output-section" id="legalAI">
+      <h2>⚖️ Legal AI Review</h2>
+      <p>Awaiting input...</p>
     </div>
   </div>
 
   <script>
-    function saveSettings() {
-      const user = document.getElementById('username').value;
-      const key = document.getElementById('apiKey').value;
-      alert(`Settings saved:\nUser: ${user}\nAPI Key: ${key ? '*****' : 'Not entered'}`);
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
     }
 
-    function savePreferences() {
-      const theme = document.getElementById('theme').value;
-      const voice = document.getElementById('voice').value;
-      alert(`Preferences saved:\nTheme: ${theme}\nVoice: ${voice}`);
+    function runAIPipeline() {
+      const prompt = document.getElementById("promptInput").value;
+      document.getElementById("managerAI").querySelector("p").textContent = "Managing input...";
+      setTimeout(() => {
+        document.getElementById("scriptAI").querySelector("p").textContent = `Script created for: "${prompt}"`;
+        setTimeout(() => {
+          document.getElementById("voiceAI").querySelector("p").textContent = "Voiceover generated.";
+          setTimeout(() => {
+            document.getElementById("legalAI").querySelector("p").textContent = "Legal check passed.";
+          }, 1000);
+        }, 1000);
+      }, 1000);
     }
   </script>
 
