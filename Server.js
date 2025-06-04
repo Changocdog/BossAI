@@ -1,9 +1,8 @@
-// server.js
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
-require('dotenv').config();
+const bodyParser = require('body-parser');
 const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,10 +13,9 @@ app.use(bodyParser.json());
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
 const openai = new OpenAIApi(configuration);
 
-app.post('/api/generate', async (req, res) => {
+app.post('/generate', async (req, res) => {
   const { prompt } = req.body;
 
   if (!prompt) {
@@ -30,14 +28,14 @@ app.post('/api/generate', async (req, res) => {
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const message = completion.data.choices[0].message.content;
-    res.json({ response: message });
+    const response = completion.data.choices[0].message.content;
+    res.json({ response });
   } catch (error) {
-    console.error('Error generating response:', error.response?.data || error.message);
+    console.error('OpenAI error:', error.message);
     res.status(500).json({ error: 'Failed to generate response' });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
