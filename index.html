@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: white;
     }
 
     .sidebar {
@@ -18,7 +18,7 @@
       position: fixed;
       top: 0;
       left: -250px;
-      background-color: #111;
+      background-color: #1e1e1e;
       padding-top: 60px;
       transition: 0.3s;
       z-index: 1000;
@@ -32,27 +32,27 @@
     }
 
     .sidebar a:hover {
-      background-color: #575757;
+      background-color: #333;
     }
 
     .toggle-btn {
       position: fixed;
       left: 10px;
       top: 10px;
-      font-size: 30px;
+      font-size: 28px;
       cursor: pointer;
       z-index: 1100;
-      background-color: #111;
+      background-color: #1e1e1e;
       border: none;
       color: white;
-      padding: 5px 10px;
+      padding: 6px 12px;
+      border-radius: 4px;
     }
 
     .main-content {
       margin-left: 30px;
       padding: 20px;
       transition: margin-left 0.3s;
-      max-width: 900px;
     }
 
     h1 {
@@ -68,32 +68,27 @@
       width: 60%;
       border: none;
       border-radius: 5px;
+      background-color: #292929;
+      color: white;
     }
 
     button {
       padding: 10px;
       margin-left: 10px;
-      background-color: black;
+      background-color: #111;
       color: red;
       border: 2px solid red;
       border-radius: 5px;
       cursor: pointer;
     }
 
-    .output-section {
-      margin-top: 30px;
-      padding: 15px;
-      background-color: #1a1a1a;
-      border-left: 5px solid red;
-      border-radius: 5px;
-    }
-
-    .output-section h2 {
-      color: #ff4d4d;
-    }
-
-    .output-section p {
+    .output {
+      margin-top: 20px;
       font-style: italic;
+      white-space: pre-wrap;
+      background-color: #1e1e1e;
+      padding: 10px;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -110,54 +105,43 @@
     <a href="#">Settings</a>
   </div>
 
-  <div class="main-content">
+  <div class="main-content" id="main">
     <h1>🚀 Boss AI Dashboard</h1>
     <p>Your AI-Powered Content Studio</p>
 
     <div class="prompt-box">
       <input type="text" id="promptInput" placeholder="Enter your prompt here..." />
-      <button onclick="runAIPipeline()">Generate Video</button>
+      <button onclick="generate()">Generate Video</button>
     </div>
 
-    <div class="output-section" id="managerAI">
-      <h2>🧠 Manager AI</h2>
-      <p>Awaiting input...</p>
-    </div>
-
-    <div class="output-section" id="scriptAI">
-      <h2>✍️ Script Writer AI</h2>
-      <p>Awaiting input...</p>
-    </div>
-
-    <div class="output-section" id="voiceAI">
-      <h2>🎤 Voiceover Generator</h2>
-      <p>Awaiting input...</p>
-    </div>
-
-    <div class="output-section" id="legalAI">
-      <h2>⚖️ Legal AI Review</h2>
-      <p>Awaiting input...</p>
-    </div>
+    <div class="output" id="output">Awaiting input...</div>
   </div>
 
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      sidebar.style.left = (sidebar.style.left === '0px') ? '-250px' : '0px';
+      sidebar.style.left = sidebar.style.left === '0px' ? '-250px' : '0px';
     }
 
-    function runAIPipeline() {
-      const prompt = document.getElementById("promptInput").value;
-      document.getElementById("managerAI").querySelector("p").textContent = "Managing input...";
-      setTimeout(() => {
-        document.getElementById("scriptAI").querySelector("p").textContent = `Script created for: "${prompt}"`;
-        setTimeout(() => {
-          document.getElementById("voiceAI").querySelector("p").textContent = "Voiceover generated.";
-          setTimeout(() => {
-            document.getElementById("legalAI").querySelector("p").textContent = "Legal check passed.";
-          }, 1000);
-        }, 1000);
-      }, 1000);
+    async function generate() {
+      const input = document.getElementById("promptInput").value;
+      const outputBox = document.getElementById("output");
+      outputBox.textContent = "Generating...";
+
+      try {
+        const response = await fetch("https://YOUR_BACKEND_URL_HERE/generate-script", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ prompt: input })
+        });
+
+        const data = await response.json();
+        outputBox.textContent = data.result || "No output received.";
+      } catch (err) {
+        outputBox.textContent = "Error generating script.";
+      }
     }
   </script>
 
