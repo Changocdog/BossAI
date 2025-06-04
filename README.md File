@@ -1,0 +1,23 @@
+# Boss AI Backend
+
+This is the backend server for the Boss AI dashboard. It is built with Node.js and Express, and connects your frontend (GitHub Pages) to the OpenAI API securely.
+
+## Setup Instructions (for local or Render deployment)
+
+1. Clone this repository:
+2. 2. Install dependencies:
+   3. 3. Add your OpenAI API key:
+- Create a file called `.env`
+- Add this line:
+  ```
+  OPENAI_API_KEY=your_key_here
+  ```
+
+4. Start the server:
+5. ## Endpoints
+
+- `POST /api/generate` — Handles prompt input and returns response from OpenAI API.
+
+---
+
+Hosted via [Render](https://render.com) or any Node-friendly hosting platform.
