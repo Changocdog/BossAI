@@ -4,16 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712107.png" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
+      margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to bottom right, #0a1729, #122b46);
-      height: 100vh;
-      color: white;
       display: flex;
+      height: 100vh;
+      background: linear-gradient(135deg, #0a192f, #0c2340);
+      color: #fff;
     }
 
     #toggle-btn {
@@ -21,110 +23,75 @@
       top: 12px;
       left: 12px;
       z-index: 1001;
+      padding: 10px 18px;
       background-color: #007bff;
       color: white;
+      font-size: 16px;
       border: none;
-      border-radius: 4px;
-      padding: 8px 12px;
+      border-radius: 6px;
       cursor: pointer;
     }
 
     .sidebar {
       width: 240px;
-      height: 100vh;
-      background: #000;
-      color: white;
-      padding: 20px;
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      background: #0e0e0e;
+      padding-top: 60px;
+      padding-left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       transition: transform 0.3s ease;
-      z-index: 1000;
     }
 
     .sidebar.hidden {
-      transform: translateX(-100%);
+      transform: translateX(-250px);
     }
 
     .sidebar button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 12px;
-      background: #1e1e1e;
+      background: #1a1a1a;
       color: white;
       border: none;
-      border-radius: 4px;
+      padding: 12px;
+      font-size: 15px;
       text-align: left;
+      border-radius: 5px;
       cursor: pointer;
       transition: background 0.2s ease;
     }
 
     .sidebar button:hover {
-      background: #2d2d2d;
+      background: #333;
     }
 
     .sidebar button.active {
-      background: #007bff;
+      background-color: #007bff;
     }
 
     .main {
-      flex: 1;
-      margin-left: 240px;
-      transition: margin-left 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    .main.expanded {
-      margin-left: 0;
-    }
-
-    .header {
-      background: #000;
-      display: flex;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid #222;
-    }
-
-    .header img {
-      height: 40px;
-      margin-right: 12px;
-    }
-
-    .header h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    .main-content {
-      padding: 30px;
       flex-grow: 1;
+      padding: 80px 40px 20px 40px;
+      overflow-y: auto;
     }
 
     input {
-      width: 100%;
       padding: 12px;
+      font-size: 15px;
+      border-radius: 5px;
       border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      margin-top: 20px;
-      background: #1d1f22;
+      width: 100%;
+      background-color: #222;
       color: white;
+      margin-bottom: 20px;
     }
 
     h2 {
-      margin-top: 30px;
-      color: #66ccff;
+      color: #3eb0ff;
     }
 
     p {
-      font-size: 15px;
-      line-height: 1.6;
+      color: #ccc;
     }
+
   </style>
 </head>
 <body>
@@ -141,27 +108,41 @@
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
-  <div class="main" id="main-content">
-    <div class="header">
-      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712107.png" alt="Logo">
-      <h1>Boss AI Dashboard</h1>
-    </div>
-
-    <div class="main-content">
-      <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+  <div class="main" id="main">
+    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <div id="content-panel">
       <h2>🤖 General Manager AI</h2>
       <p>This AI coordinates the sub-AIs and manages workflows.</p>
     </div>
   </div>
 
   <script>
-    const toggleBtn = document.getElementById('toggle-btn');
-    const sidebar = document.getElementById('sidebar');
-    const main = document.getElementById('main-content');
+    const toggleBtn = document.getElementById("toggle-btn");
+    const sidebar = document.getElementById("sidebar");
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('hidden');
-      main.classList.toggle('expanded');
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+    });
+
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const module = button.getAttribute("data-module");
+        const content = {
+          manager: `<h2>🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+          legal: `<h2>📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+          script: `<h2>✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
+          voiceover: `<h2>🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+          upload: `<h2>📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+          output: `<h2>📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2>🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2>⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+        };
+
+        document.getElementById("content-panel").innerHTML = content[module] || `<p>Module not found.</p>`;
+      });
     });
   </script>
 </body>
