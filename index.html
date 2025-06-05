@@ -14,8 +14,8 @@
       font-family: "Segoe UI", sans-serif;
       display: flex;
       height: 100vh;
-      background-color: #f8f9fa;
-      color: #222;
+      background-color: #0e0e11;
+      color: white;
     }
 
     .sidebar {
@@ -55,15 +55,40 @@
 
     .main {
       flex-grow: 1;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
       position: relative;
+      background: linear-gradient(135deg, #0d1c2e, #122b46);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: #0e1520;
+      border-bottom: 1px solid #222;
+    }
+
+    .header img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .main-content {
+      padding: 20px;
+      flex-grow: 1;
     }
 
     #toggle-btn {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: 15px;
+      left: 15px;
       padding: 8px 12px;
       background-color: #007bff;
       color: white;
@@ -73,13 +98,26 @@
       z-index: 10;
     }
 
+    #api-key {
+      width: 100%;
+      margin: 20px 0;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background: #1b1f24;
+      color: white;
+    }
+
     textarea, input, select {
       width: 100%;
       margin-top: 10px;
       padding: 12px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      border: none;
       border-radius: 4px;
+      background: #1b1f24;
+      color: white;
     }
 
     button {
@@ -93,11 +131,12 @@
     }
 
     pre {
-      background-color: #eee;
+      background-color: #1e1e1e;
       padding: 12px;
       border-radius: 4px;
       white-space: pre-wrap;
       word-wrap: break-word;
+      color: #0f0;
     }
 
     video {
@@ -121,8 +160,14 @@
   </div>
 
   <div class="main">
-    <input id="api-key" type="password" placeholder="🔑 OpenAI API Key" />
-    <div id="content-panel"></div>
+    <div class="header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg" alt="Logo" />
+      <h1>Boss AI Dashboard</h1>
+    </div>
+    <div class="main-content">
+      <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+      <div id="content-panel"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>
