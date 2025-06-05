@@ -1,4 +1,4 @@
-<!-- FULL HTML CODE - START -->
+<!-- FULL HTML CODE - FINAL OUTPUT MODULE ADDED -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -242,11 +242,24 @@
             <button onclick="generateUpload()">Generate Strategy</button>
             <pre id="upload-output"></pre>
           `;
+        } else if (module === "output") {
+          main.innerHTML = `
+            <h2 style="color:#00bfff;">📺 Final Output</h2>
+            <p>Here's your complete video draft:</p>
+            <pre>
+🎬 Final Render Simulation
+----------------------------
+📜 Script: [Sample script or your latest entry]
+🎤 Voiceover: [Simulated narration based on script]
+📤 Upload Plan: [Optimized platform timing and tags]
+
+[Video file will appear here in future versions]
+            </pre>
+          `;
         } else {
           const content = {
             manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
             legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-            output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
             history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
             settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
           };
@@ -299,4 +312,3 @@
 
 </body>
 </html>
-<!-- FULL HTML CODE - END -->
