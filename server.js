@@ -37,7 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
       <button onclick="generateUploadStrategy()">Generate Strategy</button>
       <pre id="upload-output"></pre>
     `,
-    output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+    output: `
+      <h2 style="color:#00bfff;">📺 Final Output</h2>
+      <p>Here is a preview of your generated video content:</p>
+      <div style="background:#1a1a1a; border:1px solid #00bfff; padding:16px; border-radius:8px; max-width:600px;">
+        <h3 style="color:#4fc3f7;">🎬 "The Power of Compound Interest"</h3>
+        <p style="color:#ccc;">Script: "In just 60 seconds, you’ll learn how saving small amounts consistently can turn into massive returns..."</p>
+        <p style="color:#ccc;">Voiceover: ✅ Ready (Simulated)</p>
+        <p style="color:#ccc;">Upload Strategy: Post to TikTok at 6PM with tags #finance #growth</p>
+        <p style="color:#4fc3f7;">✅ Final Review Complete</p>
+      </div>
+    `,
     history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
     settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
   };
