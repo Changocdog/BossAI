@@ -4,197 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: #0d0d0d;
-      padding: 60px 10px 20px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      border-right: 1px solid #1a1a1a;
-      transition: transform 0.3s ease;
-      z-index: 100;
-    }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
-    .sidebar button {
-      background: #121212;
-      color: #ffffff;
-      border: none;
-      padding: 12px;
-      font-size: 14px;
-      text-align: left;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-    }
-
-    .sidebar button.active {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .main {
-      flex-grow: 1;
-      margin-left: 240px;
-      width: calc(100% - 240px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 20px;
-      text-align: center;
-      transition: margin-left 0.3s ease;
-    }
-
-    .main.full {
-      margin-left: 0;
-      width: 100%;
-    }
-
-    #toggle-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0 0 12px #00bfff;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
-    input::placeholder {
-      color: #bbbbbb;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <button id="toggle-btn">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="legal">📜 Legal Review</button>
-    <button data-module="script">✍️ Script Writer</button>
-    <button data-module="voiceover">🎤 Voiceover</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="output">📺 Final Output</button>
-    <button data-module="history">🗂️ History</button>
-    <button data-module="settings">⚙️ Settings</button>
+    <button class="sidebar-btn" data-module="manager">🤖 Manager AI</button>
+    <button class="sidebar-btn" data-module="legal">📜 Legal Review</button>
+    <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
+    <button class="sidebar-btn" data-module="voiceover">🎤 Voiceover</button>
+    <button class="sidebar-btn" data-module="upload">📤 Upload Strategy</button>
+    <button class="sidebar-btn" data-module="output">📺 Final Output</button>
+    <button class="sidebar-btn" data-module="history">🗂️ History</button>
+    <button class="sidebar-btn" data-module="settings">⚙️ Settings</button>
   </div>
 
-  <div class="main" id="main">
-    <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
+  <div class="main centered">
+    <h1 class="title">Boss AI Dashboard</h1>
+    <p class="subtitle">Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
   </div>
 
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        const content = {
-          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
-          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
-        };
-
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: left;">
-            ${content[module] || ''}
-          </div>
-        `;
-      });
-    });
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
