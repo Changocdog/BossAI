@@ -1,49 +1,61 @@
-// Sidebar module switching
-document.querySelectorAll(".sidebar-btn").forEach(button => {
-  button.addEventListener("click", () => {
-    const module = button.dataset.module;
+// Sidebar switching
+document.querySelectorAll('.sidebar-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
 
-    // Reset active states
-    document.querySelectorAll(".sidebar-btn").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-
-    // Hide all panels
-    document.querySelectorAll(".module-panel").forEach(panel => {
-      panel.style.display = "none";
+    const target = button.dataset.module;
+    document.querySelectorAll('.module-panel').forEach(panel => {
+      panel.classList.add('hidden');
     });
-
-    // Show the selected module panel
-    const targetPanel = document.getElementById(`${module}-panel`);
-    if (targetPanel) targetPanel.style.display = "block";
+    document.getElementById(`${target}-panel`).classList.remove('hidden');
   });
 });
 
-// Load default module (Dashboard)
-document.querySelector('.sidebar-btn[data-module="manager"]')?.click();
+// Script Writer
+document.getElementById('generate-script-btn').addEventListener('click', async () => {
+  const input = document.getElementById('script-input').value;
+  const apiKey = document.getElementById('api-key').value;
+  const output = document.getElementById('script-output');
 
-// Script Writer (placeholder output)
-document.getElementById("generate-script-btn")?.addEventListener("click", () => {
-  const input = document.getElementById("script-input").value.trim();
-  const output = document.getElementById("script-output");
-
-  if (!input) {
-    output.textContent = "⚠️ Please enter a topic.";
+  if (!input || !apiKey) {
+    output.textContent = '❗ Enter a topic and your OpenAI API key.';
     return;
   }
 
-  output.textContent = `🎬 Generating video script for:\n"${input}"\n\n(This is simulated output.)`;
+  output.textContent = '⏳ Generating...';
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: `Write a short YouTube script about: ${input}` }]
+      })
+    });
+
+    const data = await response.json();
+    output.textContent = data.choices?.[0]?.message?.content || '⚠️ No output.';
+  } catch (error) {
+    output.textContent = '❌ Error generating script.';
+  }
 });
 
-// Voiceover Simulation
-document.getElementById("generate-voiceover-btn")?.addEventListener("click", () => {
-  const status = document.getElementById("voiceover-status");
-  status.textContent = "🔊 Simulated voiceover generated!";
+// Voiceover AI (simulated)
+document.getElementById('generate-voiceover-btn').addEventListener('click', () => {
+  const status = document.getElementById('voiceover-status');
+  status.textContent = '🎤 Voiceover simulated! (Audio generation coming soon)';
 });
 
-// Feedback popup
-document.getElementById("feedback-form")?.addEventListener("submit", (e) => {
+// Feedback Form
+document.getElementById('feedback-form').addEventListener('submit', (e) => {
   e.preventDefault();
-  const popup = document.getElementById("popup");
-  popup.classList.remove("hidden");
-  setTimeout(() => popup.classList.add("hidden"), 2000);
+  document.getElementById('popup').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('popup').classList.add('hidden');
+  }, 2000);
 });
