@@ -154,6 +154,23 @@
       border: 1px solid #007bff;
     }
 
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      color: #00bfff;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #007bff;
+      background: #1a1a1a;
+      color: #ffffff;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -205,6 +222,30 @@
         <li><strong>Script 2:</strong> “How to Build Wealth in Your 20s”</li>
         <li><strong>Voiceover 3:</strong> “AI vs Human Creativity”</li>
       </ul>
+    </div>
+
+    <div id="settings-panel" style="display:none;">
+      <h2 style="color:#00bfff;">⚙️ Settings</h2>
+      <p>Adjust preferences for your AI workflow:</p>
+      <label for="theme">Theme:</label>
+      <select id="theme">
+        <option value="dark" selected>Dark Mode</option>
+        <option value="light">Light Mode (coming soon)</option>
+      </select>
+
+      <label for="voice">Voice Type:</label>
+      <select id="voice">
+        <option value="default" selected>Default (Neutral)</option>
+        <option value="male">Male Voice</option>
+        <option value="female">Female Voice</option>
+      </select>
+
+      <label for="video-quality">Video Quality:</label>
+      <select id="video-quality">
+        <option value="hd" selected>HD 720p</option>
+        <option value="fullhd">Full HD 1080p</option>
+        <option value="4k">4K (Experimental)</option>
+      </select>
     </div>
   </div>
 
