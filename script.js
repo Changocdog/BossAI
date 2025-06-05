@@ -1,25 +1,25 @@
-} else if (module === "upload") {
+} else if (module === "legal") {
   contentPanel.innerHTML = `
-    <h1>📤 Upload Strategy AI</h1>
-    <p class="subtext">Paste your finished script below and Boss AI will generate a high-performing upload plan.</p>
+    <h1>📜 Legal AI Review</h1>
+    <p class="subtext">Paste your script to check for copyright, defamation, or inappropriate content.</p>
 
-    <textarea id="upload-script" rows="5" placeholder="Paste your video script here..." style="width:100%;padding:12px;font-size:15px;border-radius:8px;border:1px solid #ccc;"></textarea>
-    <button id="generate-upload" style="margin-top:10px;">Generate Upload Strategy</button>
+    <textarea id="legal-script" rows="5" placeholder="Paste script here for legal review..." style="width:100%;padding:12px;font-size:15px;border-radius:8px;border:1px solid #ccc;"></textarea>
+    <button id="run-legal-review" style="margin-top:10px;">Run Legal Review</button>
 
-    <div id="upload-result" style="margin-top:30px;"></div>
+    <div id="legal-result" style="margin-top:30px;"></div>
   `;
 
-  document.getElementById("generate-upload").addEventListener("click", async () => {
-    const script = document.getElementById("upload-script").value.trim();
+  document.getElementById("run-legal-review").addEventListener("click", async () => {
+    const script = document.getElementById("legal-script").value.trim();
     const apiKey = document.getElementById("api-key").value.trim();
-    const resultBox = document.getElementById("upload-result");
+    const resultBox = document.getElementById("legal-result");
 
     if (!script || !apiKey) {
       resultBox.innerHTML = `<p style="color:red;">❗ Please enter a script and API key.</p>`;
       return;
     }
 
-    resultBox.innerHTML = `<p>⏳ Generating upload strategy...</p>`;
+    resultBox.innerHTML = `<p>🔎 Reviewing script for legal risks...</p>`;
 
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -33,28 +33,22 @@
           messages: [{
             role: "user",
             content: `
-Given this short-form video script, generate an upload strategy:
-
-1. Choose the best platform (YouTube Shorts, TikTok, or Instagram Reels)
-2. Suggest a strong video title
-3. Provide 3 top hashtags
-4. Recommend the best time of day to post for reach
-5. Include a brief reason for each choice
+Review the following script and provide a legal risk assessment. Identify any potential copyright infringement, defamation, offensive content, false claims, or unsafe advice. Suggest how to fix any issues found.
 
 SCRIPT:
 "${script}"
             `
           }],
-          temperature: 0.7
+          temperature: 0.6
         })
       });
 
       const data = await response.json();
       const result = data.choices?.[0]?.message?.content || "⚠️ No response.";
-      resultBox.innerHTML = `<div style="white-space:pre-wrap;padding:16px;background:#f9f9f9;border-radius:8px;border:1px solid #ddd;">${result}</div>`;
+      resultBox.innerHTML = `<div style="white-space:pre-wrap;padding:16px;background:#fff5f5;border-radius:8px;border:1px solid #f5c2c2;color:#8b0000;">${result}</div>`;
     } catch (err) {
       console.error(err);
-      resultBox.innerHTML = `<p style="color:red;">❌ Failed to fetch strategy. Check your API key.</p>`;
+      resultBox.innerHTML = `<p style="color:red;">❌ Legal review failed. Check your API key.</p>`;
     }
   });
 }
