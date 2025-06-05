@@ -25,7 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
       <button onclick="generateVoiceover()">Generate Voiceover</button>
       <pre id="voiceover-output"></pre>
     `,
-    upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+    upload: `
+      <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
+      <p>Get platform-specific upload recommendations:</p>
+      <select id="platform-select">
+        <option value="">Select a platform</option>
+        <option value="YouTube">YouTube</option>
+        <option value="TikTok">TikTok</option>
+        <option value="Instagram">Instagram</option>
+      </select>
+      <button onclick="generateUploadStrategy()">Generate Strategy</button>
+      <pre id="upload-output"></pre>
+    `,
     output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
     history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
     settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
@@ -63,4 +74,22 @@ function generateVoiceover() {
 
   output.textContent = `🔊 Simulated voiceover:
 "${script}" [This is a placeholder. Real audio coming in future version.]`;
+}
+
+function generateUploadStrategy() {
+  const platform = document.getElementById("platform-select").value;
+  const output = document.getElementById("upload-output");
+
+  const strategies = {
+    YouTube: `📅 Best time: Weekdays at 2–4 PM\n📈 Tags: #shorts, #trending\n📝 Tips: Use strong thumbnails, short titles, and post consistently.`,
+    TikTok: `📅 Best time: Evenings & weekends\n📈 Tags: #fyp, #viral\n📝 Tips: Hook viewers in first 2s, use trending audio, and post 1–2x daily.`,
+    Instagram: `📅 Best time: Mornings (Tue–Thu)\n📈 Tags: #reels, #explore\n📝 Tips: Use hashtags, cross-promote stories, and reply to comments fast.`
+  };
+
+  if (!platform) {
+    output.textContent = "❗ Please select a platform.";
+    return;
+  }
+
+  output.textContent = strategies[platform] || "No strategy available for selected platform.";
 }
