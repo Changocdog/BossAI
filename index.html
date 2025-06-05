@@ -110,9 +110,11 @@
       margin-bottom: 20px;
     }
 
-    #api-key {
-      padding: 18px;
-      font-size: 18px;
+    #api-key,
+    textarea,
+    select {
+      padding: 14px 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -120,35 +122,34 @@
       border-radius: 8px;
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
+      margin-bottom: 20px;
     }
 
-    input::placeholder {
+    input::placeholder,
+    textarea::placeholder {
       color: #bbbbbb;
     }
 
-    select, button {
-      font-family: 'Orbitron', sans-serif;
-    }
-
     button {
+      font-family: 'Orbitron', sans-serif;
+      padding: 12px 18px;
+      font-size: 16px;
       background-color: #007bff;
       color: white;
       border: none;
-      padding: 10px 16px;
       border-radius: 6px;
-      margin-top: 10px;
       cursor: pointer;
-      box-shadow: 0 0 6px #00bfff88;
+      margin-top: 10px;
     }
 
     pre {
-      background: #111;
-      padding: 14px;
-      border-radius: 6px;
-      margin-top: 20px;
-      color: #00ffff;
+      background-color: #1a1a1a;
+      padding: 16px;
+      border-radius: 8px;
+      color: #00bfff;
+      max-width: 600px;
+      overflow-x: auto;
       text-align: left;
-      white-space: pre-wrap;
     }
 
     @media (max-width: 768px) {
@@ -212,7 +213,7 @@
               <option value="tech">Tech</option>
               <option value="horror">Horror</option>
             </select>
-            <select id="script-tone" style="margin-top:10px;">
+            <select id="script-tone">
               <option value="serious">Serious</option>
               <option value="funny">Funny</option>
               <option value="dramatic">Dramatic</option>
@@ -220,11 +221,18 @@
             <button onclick="generateScript()">Generate Script</button>
             <pre id="script-output"></pre>
           `;
+        } else if (module === "voiceover") {
+          main.innerHTML = `
+            <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+            <p>Paste a script below and click to simulate a voiceover:</p>
+            <textarea id="voice-script" rows="6" placeholder="Paste your script here..."></textarea>
+            <button onclick="generateVoice()">Generate Voiceover</button>
+            <pre id="voice-output"></pre>
+          `;
         } else {
           const content = {
             manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
             legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-            voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
             upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
             output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
             history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
@@ -242,8 +250,16 @@
     function generateScript() {
       const topic = document.getElementById("script-topic").value;
       const tone = document.getElementById("script-tone").value;
-      const result = `Generated a ${tone} video script on the topic of "${topic}".\n\n[This is placeholder text. Future integration will use GPT for real scripts.]`;
+      const result = `Generated a ${tone} video script on "${topic}".\n\n[This is a placeholder. Future version will generate real content using GPT.]`;
       document.getElementById("script-output").innerText = result;
+    }
+
+    function generateVoice() {
+      const script = document.getElementById("voice-script").value.trim();
+      const output = script
+        ? `🎤 Simulated voiceover:\n\n"${script}"\n\n[This will become real audio in a future version.]`
+        : "⚠️ Please enter a script to simulate voiceover.";
+      document.getElementById("voice-output").innerText = output;
     }
   </script>
 
