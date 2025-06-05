@@ -1,105 +1,105 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const sidebarButtons = document.querySelectorAll("#sidebar button");
-  const contentPanel = document.getElementById("content-panel");
+  const sidebarButtons = document.querySelectorAll(".sidebar-btn");
+  const panels = document.querySelectorAll(".module-panel");
   const toggleBtn = document.getElementById("toggle-btn");
   const sidebar = document.getElementById("sidebar");
-  const popup = document.getElementById("onboarding-popup");
-  const closePopup = document.getElementById("close-popup");
   const modeToggle = document.getElementById("mode-toggle");
+  const feedbackForm = document.getElementById("feedback-form");
 
+  // Toggle sidebar
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
   });
 
+  // Dark mode toggle
   modeToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark-mode", modeToggle.checked);
   });
 
-  closePopup.addEventListener("click", () => {
-    popup.classList.add("hidden");
-  });
-
-  // Show onboarding popup once
-  if (!sessionStorage.getItem("onboardingShown")) {
-    popup.classList.remove("hidden");
-    sessionStorage.setItem("onboardingShown", "true");
-  }
-
+  // Sidebar navigation
   sidebarButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      sidebarButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
       const module = btn.getAttribute("data-module");
-      renderModule(module);
+      showPanel(module);
     });
   });
 
-  document.getElementById("sample-script").addEventListener("click", () => {
-    contentPanel.innerHTML = `
-      <h2>📽️ Sample Video Script</h2>
-      <pre>
-Here's how to build wealth in your 20s:
+  // Show the requested panel
+  function showPanel(module) {
+    panels.forEach(panel => panel.style.display = "none");
+    document.getElementById(`${module}-panel`).style.display = "block";
+  }
 
-1. Live below your means
-2. Invest early and often
-3. Build high-income skills
-4. Avoid bad debt
+  // Submit feedback
+  if (feedbackForm) {
+    feedbackForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const message = document.getElementById("message").value;
+      if (!message.trim()) {
+        alert("Please enter feedback.");
+        return;
+      }
+      document.getElementById("popup").classList.remove("hidden");
+      setTimeout(() => {
+        document.getElementById("popup").classList.add("hidden");
+      }, 3000);
+      feedbackForm.reset();
+    });
+  }
 
-Let your money work while you sleep. 💸
-      </pre>`;
-  });
+  // Script Writer AI logic
+  const generateBtn = document.getElementById("generate-script-btn");
+  const scriptInput = document.getElementById("script-input");
+  const scriptOutput = document.getElementById("script-output");
 
-  function renderModule(module) {
-    switch (module) {
-      case "manager":
-        contentPanel.innerHTML = `
-          <h1>👑 Boss AI Manager</h1>
-          <p class="subtext">Your AI empire starts here. Select a module to begin or try a sample task.</p>
-          <button id="sample-script" class="primary">🎬 Try Sample Script</button>
-        `;
-        document.getElementById("sample-script").addEventListener("click", () => {
-          contentPanel.innerHTML = `
-            <h2>📽️ Sample Video Script</h2>
-            <pre>
-Here's how to build wealth in your 20s:
+  if (generateBtn) {
+    generateBtn.addEventListener("click", async () => {
+      const prompt = scriptInput.value.trim();
+      const apiKey = document.getElementById("api-key").value.trim();
 
-1. Live below your means
-2. Invest early and often
-3. Build high-income skills
-4. Avoid bad debt
+      if (!prompt) {
+        alert("Please enter a prompt.");
+        return;
+      }
 
-Let your money work while you sleep. 💸
-            </pre>`;
+      if (!apiKey) {
+        alert("Please enter your OpenAI API key.");
+        return;
+      }
+
+      scriptOutput.textContent = "Generating script...";
+
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "user",
+                content: `Create a 60-second short video script based on this prompt: ${prompt}`
+              }
+            ],
+            max_tokens: 300,
+            temperature: 0.7
+          })
         });
-        break;
 
-      case "feedback":
-        contentPanel.innerHTML = `
-          <div class="feedback-form">
-            <h2>📝 Send Feedback</h2>
-            <label for="name">Your Name</label>
-            <input type="text" id="name" placeholder="Optional..." />
-            <label for="message">Your Feedback</label>
-            <textarea id="message" rows="6" placeholder="Share your thoughts..."></textarea>
-            <button onclick="submitFeedback()" class="primary">Submit</button>
-          </div>
-        `;
-        break;
-
-      default:
-        contentPanel.innerHTML = `<h2>${module.toUpperCase()} coming soon...</h2>`;
-    }
+        const data = await response.json();
+        const result = data.choices?.[0]?.message?.content;
+        scriptOutput.textContent = result || "No response received.";
+      } catch (error) {
+        scriptOutput.textContent = "Error generating script.";
+        console.error(error);
+      }
+    });
   }
+
+  // Show default panel
+  showPanel("home");
 });
-
-function submitFeedback() {
-  const name = document.getElementById("name").value;
-  const message = document.getElementById("message").value;
-  if (!message.trim()) {
-    alert("Please enter a message before submitting.");
-    return;
-  }
-  alert("✅ Feedback submitted. Thank you!");
-  document.getElementById("name").value = "";
-  document.getElementById("message").value = "";
-}
