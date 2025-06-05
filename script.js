@@ -133,7 +133,7 @@ function displayModule(module) {
     contentPanel.innerHTML = `
       <h2>Final Output</h2>
       <pre>[Last generated script will appear here]</pre>
-      <video width="100%" controls>
+      <video controls>
         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
         Your browser does not support video.
       </video>
@@ -170,9 +170,9 @@ function displayModule(module) {
   }
 }
 
-// Sidebar toggle logic
+// ✅ SIDEBAR TOGGLE FUNCTION
 document.getElementById("toggle-btn").addEventListener("click", () => {
-  document.querySelector(".sidebar").classList.toggle("hidden");
+  document.getElementById("sidebar").classList.toggle("hidden");
 });
 
 // Load default module
