@@ -16,6 +16,24 @@
       background-color: #f4f6f9;
       color: #212529;
       display: flex;
+      min-height: 100vh;
+    }
+
+    /* Always-visible menu button */
+    #toggle-btn {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 999;
+      padding: 10px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .sidebar {
@@ -26,7 +44,7 @@
       width: 240px;
       background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
       color: white;
-      padding: 16px;
+      padding: 70px 16px 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -37,19 +55,6 @@
 
     .sidebar.hidden {
       transform: translateX(-100%);
-    }
-
-    #toggle-btn {
-      padding: 12px 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     .sidebar-buttons {
@@ -87,7 +92,6 @@
       transition: margin-left 0.3s ease;
       flex-grow: 1;
       width: 100%;
-      min-height: 100vh;
     }
 
     .sidebar.hidden + .main {
@@ -104,6 +108,17 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Modern module content style */
+    #content-panel {
+      background: #fff;
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     }
 
     h1 {
@@ -131,26 +146,17 @@
       color: green;
     }
 
-    .dashboard-box {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 40px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-      text-align: center;
-    }
-
-    .dashboard-box p.subtext {
-      color: #666;
-      font-size: 16px;
-      margin-bottom: 30px;
-    }
-
     .emoji {
       font-size: 36px;
       margin-top: 20px;
       color: #555;
+    }
+
+    .subtext {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 30px;
+      text-align: center;
     }
 
     @media (max-width: 768px) {
@@ -163,15 +169,16 @@
         width: 90%;
       }
 
-      .dashboard-box {
+      #content-panel {
         padding: 20px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <button id="toggle-btn">☰ Menu</button>
+  <button id="toggle-btn">☰ Menu</button>
+
+  <div class="sidebar hidden" id="sidebar">
     <div class="sidebar-buttons">
       <button data-module="manager" class="active">🤖 Manager AI</button>
       <button data-module="legal">📜 Legal Review</button>
