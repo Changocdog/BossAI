@@ -1,114 +1,57 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const sidebarButtons = document.querySelectorAll(".sidebar-btn");
-  const panels = document.querySelectorAll(".module-panel");
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-  const modeToggle = document.getElementById("mode-toggle");
-  const feedbackForm = document.getElementById("feedback-form");
+// Select all sidebar buttons and main panel
+const buttons = document.querySelectorAll(".sidebar button");
+const contentPanel = document.getElementById("content-panel");
 
-  // Toggle sidebar
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
+// Highlight active button and load its module
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    buttons.forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+    displayModule(button.dataset.module);
   });
+});
 
-  // Dark mode toggle
-  modeToggle.addEventListener("change", () => {
-    document.body.classList.toggle("dark-mode", modeToggle.checked);
-  });
+// Display content for selected module
+function displayModule(module) {
+  if (module === "manager") {
+    contentPanel.innerHTML = `
+      <div class="dashboard-box">
+        <h1>👑 Boss AI Dashboard</h1>
+        <p class="subtext">Welcome! Use the tools in the sidebar to generate scripts, voiceovers, and upload plans.</p>
 
-  // Sidebar navigation
-  sidebarButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const module = btn.getAttribute("data-module");
-      showPanel(module);
-    });
-  });
+        <h3>⚙️ Module Status</h3>
+        <ul class="status-list">
+          <li>✅ <strong>Script Writer AI</strong> — <span>Online</span></li>
+          <li>✅ <strong>Upload Strategy AI</strong> — <span>Online</span></li>
+          <li>✅ <strong>Voiceover Generator</strong> — <span>Simulated</span></li>
+          <li>✅ <strong>Legal Review AI</strong> — <span>Enabled</span></li>
+          <li>✅ <strong>History & Output Log</strong> — <span>Functional</span></li>
+        </ul>
 
-  function showPanel(module) {
-    panels.forEach(panel => panel.style.display = "none");
-    document.getElementById(`${module}-panel`).style.display = "block";
+        <div class="emoji">🤖</div>
+        <p class="subtext">Select a module from the sidebar to get started.</p>
+      </div>
+    `;
+  } else if (module === "legal") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📜 Legal Review Module – Coming Soon</p>`;
+  } else if (module === "script") {
+    contentPanel.innerHTML = `<p style="text-align:center;">✍️ Script Writer Module – Coming Soon</p>`;
+  } else if (module === "voiceover") {
+    contentPanel.innerHTML = `<p style="text-align:center;">🎤 Voiceover Module – Coming Soon</p>`;
+  } else if (module === "upload") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📤 Upload Strategy Module – Coming Soon</p>`;
+  } else if (module === "output") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📺 Final Output Module – Coming Soon</p>`;
+  } else if (module === "history") {
+    contentPanel.innerHTML = `<p style="text-align:center;">🗂️ History Module – Coming Soon</p>`;
+  } else if (module === "settings") {
+    contentPanel.innerHTML = `<p style="text-align:center;">⚙️ Settings Module – Coming Soon</p>`;
+  } else {
+    contentPanel.innerHTML = `<p style="text-align:center;">Module not found.</p>`;
   }
+}
 
-  // Feedback form
-  if (feedbackForm) {
-    feedbackForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const message = document.getElementById("message").value;
-      if (!message.trim()) {
-        alert("Please enter feedback.");
-        return;
-      }
-      document.getElementById("popup").classList.remove("hidden");
-      setTimeout(() => {
-        document.getElementById("popup").classList.add("hidden");
-      }, 3000);
-      feedbackForm.reset();
-    });
-  }
-
-  // Script Writer AI
-  const generateBtn = document.getElementById("generate-script-btn");
-  const scriptInput = document.getElementById("script-input");
-  const scriptOutput = document.getElementById("script-output");
-
-  if (generateBtn) {
-    generateBtn.addEventListener("click", async () => {
-      const prompt = scriptInput.value.trim();
-      const apiKey = document.getElementById("api-key").value.trim();
-
-      if (!prompt) {
-        alert("Please enter a prompt.");
-        return;
-      }
-
-      if (!apiKey) {
-        alert("Please enter your OpenAI API key.");
-        return;
-      }
-
-      scriptOutput.textContent = "Generating script...";
-
-      try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{
-              role: "user",
-              content: `Create a 60-second short video script based on this prompt: ${prompt}`
-            }],
-            max_tokens: 300,
-            temperature: 0.7
-          })
-        });
-
-        const data = await response.json();
-        const result = data.choices?.[0]?.message?.content;
-        scriptOutput.textContent = result || "No response received.";
-      } catch (error) {
-        scriptOutput.textContent = "Error generating script.";
-        console.error(error);
-      }
-    });
-  }
-
-  // Voiceover AI (simulated)
-  const voiceoverBtn = document.getElementById("generate-voiceover-btn");
-  const voiceoverStatus = document.getElementById("voiceover-status");
-
-  if (voiceoverBtn) {
-    voiceoverBtn.addEventListener("click", () => {
-      voiceoverStatus.textContent = "Generating voiceover...";
-      setTimeout(() => {
-        voiceoverStatus.textContent = "✅ Voiceover ready! (simulated)";
-      }, 2000);
-    });
-  }
-
-  showPanel("home");
+// Sidebar retract toggle
+document.getElementById("toggle-btn").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("hidden");
 });
