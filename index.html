@@ -6,7 +6,9 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -110,7 +112,7 @@
 
     #api-key {
       padding: 14px 18px;
-      font-size: 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -179,36 +181,34 @@
           legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
           script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
           voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-                   <p>This AI analyzes trends to suggest optimal upload times and platforms.</p>
-                   <ul style="color: #ccc; font-size: 16px; line-height: 1.6; text-align: left; max-width: 600px; margin: auto;">
-                     <li><strong>YouTube:</strong> Tuesdays & Thursdays at 5:00 PM</li>
-                     <li><strong>TikTok:</strong> Daily between 11:00 AM – 1:00 PM</li>
-                     <li><strong>Instagram Reels:</strong> Mondays, Wednesdays, and Fridays at 6:00 PM</li>
-                     <li><strong>Peak Engagement Time:</strong> Weekends between 12:00 PM – 3:00 PM</li>
-                   </ul>
-                   <p style="color:#888; font-size: 14px;">(Coming soon: automatic scheduler & cross-platform optimizer)</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output AI</h2>
-                   <p>This AI assembles and previews your final video content.</p>
-                   <div style="margin-top: 20px;">
-                     <video controls width="480" style="border-radius: 8px; box-shadow: 0 0 10px #00bfff66;">
-                       <source src="sample-video.mp4" type="video/mp4">
-                       Your browser does not support the video tag.
-                     </video>
-                     <p style="margin-top: 10px; color: #ccc; font-size: 14px;">(Preview only. Final upload integration coming soon.)</p>
-                   </div>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History Log</h2>
-                    <p>View your latest outputs below. Saved automatically.</p>
-                    <div style="background:#111; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
-                      <ul style="list-style: none; padding: 0; font-size: 14px; color: #ccc;">
-                        <li><strong>📝 Script:</strong> "How to Build Wealth in 2024" <span style="float:right;">✅</span></li>
-                        <li><strong>🎤 Voiceover:</strong> Converted to audio on June 5</li>
-                        <li><strong>📤 Upload Plan:</strong> Scheduled for YouTube - June 6 @ 5PM</li>
-                        <li><strong>📺 Output Video:</strong> 1:00 Short uploaded</li>
-                      </ul>
-                      <p style="color:#888; font-size: 12px; margin-top: 10px;">(This is a simulated history. Save and load features coming soon.)</p>
-                    </div>`,
-          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2>
+                     <p>Configure your preferences and integrations here:</p>
+                     <div style="background:#111; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
+                       <label for="theme-select" style="display:block; margin-bottom:10px;">🌗 Theme Mode:</label>
+                       <select id="theme-select" style="padding: 10px; border-radius: 6px; border: none; font-size: 14px; width: 100%;">
+                         <option value="dark">Dark Mode</option>
+                         <option value="light">Light Mode</option>
+                       </select>
+
+                       <label for="voice" style="display:block; margin: 20px 0 10px;">🎙 Voice Preference:</label>
+                       <select id="voice" style="padding: 10px; border-radius: 6px; border: none; font-size: 14px; width: 100%;">
+                         <option>Male - Bold</option>
+                         <option>Female - Calm</option>
+                         <option>AI - Robotic</option>
+                       </select>
+
+                       <label for="language" style="display:block; margin: 20px 0 10px;">🌐 Language:</label>
+                       <select id="language" style="padding: 10px; border-radius: 6px; border: none; font-size: 14px; width: 100%;">
+                         <option>English</option>
+                         <option>Spanish</option>
+                         <option>French</option>
+                       </select>
+
+                       <p style="font-size: 12px; color: #888; margin-top: 20px;">(Settings are saved locally for now. Cloud sync coming soon.)</p>
+                     </div>`
         };
 
         main.innerHTML = `
