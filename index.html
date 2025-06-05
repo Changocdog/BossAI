@@ -3,74 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Boss AI Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background-color: #f4f6f9;
+      color: #212529;
+      display: flex;
+    }
+
+    #toggle-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 200;
+      padding: 10px 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 240px;
+      background: #111;
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 6px 0;
+      padding: 12px;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      text-align: left;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background: #444;
+    }
+
+    .sidebar button.active {
+      background: #007bff;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 40px 20px;
+      transition: margin-left 0.3s ease;
+      flex-grow: 1;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .sidebar.hidden + .main {
+      margin-left: 0;
+    }
+
+    #api-key {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 14px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #007bff;
+    }
+
+    h3 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    ul.status-list {
+      list-style: none;
+      padding: 0;
+      line-height: 1.8;
+      font-size: 15px;
+      color: #333;
+    }
+
+    ul.status-list li span {
+      font-weight: bold;
+      color: green;
+    }
+
+    .dashboard-box {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .dashboard-box p.subtext {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .emoji {
+      font-size: 36px;
+      margin-top: 20px;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        padding: 20px;
+        margin-left: 0 !important;
+      }
+
+      #api-key {
+        width: 90%;
+      }
+
+      .dashboard-box {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <div class="logo">🤖 Boss AI</div>
-    <button class="sidebar-btn active" data-module="manager-panel">Manager AI</button>
-    <button class="sidebar-btn" data-module="legal-panel">Legal Review</button>
-    <button class="sidebar-btn" data-module="script-panel">Script Writer</button>
-    <button class="sidebar-btn" data-module="voice-panel">Voiceover</button>
-    <button class="sidebar-btn" data-module="upload-panel">Upload Strategy</button>
-    <button class="sidebar-btn" data-module="output-panel">Final Output</button>
-    <button class="sidebar-btn" data-module="history-panel">History</button>
-    <button class="sidebar-btn" data-module="settings-panel">Settings</button>
+  <button id="toggle-btn">☰ Menu</button>
+
+  <div class="sidebar" id="sidebar">
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="legal">📜 Legal Review</button>
+    <button data-module="script">✍️ Script Writer</button>
+    <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="upload">📤 Upload Strategy</button>
+    <button data-module="output">📺 Final Output</button>
+    <button data-module="history">🗂️ History</button>
+    <button data-module="settings">⚙️ Settings</button>
   </div>
 
-  <!-- Main -->
-  <main>
-    <div id="topbar">
-      <h1>Boss AI Dashboard</h1>
-      <input id="api-key" type="text" placeholder="🔑 OpenAI API Key" />
-    </div>
-
-    <!-- Panels -->
-
-    <div id="manager-panel" class="module-panel">
-      <h2>🧠 General Manager AI</h2>
-      <p>This AI coordinates all tools and oversees automation.</p>
-    </div>
-
-    <div id="legal-panel" class="module-panel hidden">
-      <h2>⚖️ Legal Review</h2>
-      <p>Reviewing content for compliance...</p>
-    </div>
-
-    <div id="script-panel" class="module-panel hidden">
-      <h2>✍️ Script Writer</h2>
-      <input type="text" id="script-input" placeholder="Enter video topic..." />
-      <button id="generate-btn">Generate Video</button>
-      <pre id="script-output">Awaiting input...</pre>
-    </div>
-
-    <div id="voice-panel" class="module-panel hidden">
-      <h2>🎙️ Voiceover AI</h2>
-      <button>Simulate Voiceover</button>
-    </div>
-
-    <div id="upload-panel" class="module-panel hidden">
-      <h2>🚀 Upload Strategy</h2>
-      <p>Auto-scheduling tools coming soon.</p>
-    </div>
-
-    <div id="output-panel" class="module-panel hidden">
-      <h2>🎬 Final Output</h2>
-      <p>Generated video and summary will appear here.</p>
-    </div>
-
-    <div id="history-panel" class="module-panel hidden">
-      <h2>📂 History</h2>
-      <p>Past scripts and results will be saved here.</p>
-    </div>
-
-    <div id="settings-panel" class="module-panel hidden">
-      <h2>⚙️ Settings</h2>
-      <p>Theme and config options go here.</p>
-    </div>
-  </main>
+  <div class="main" id="main">
+    <input id="api-key" type="password" placeholder="🔑 OpenAI API Key" />
+    <div id="content-panel"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
