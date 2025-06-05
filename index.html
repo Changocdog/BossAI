@@ -97,7 +97,7 @@
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -105,7 +105,7 @@
 
     p {
       color: #cccccc;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
@@ -190,7 +190,15 @@
                      <li><strong>Peak Engagement Time:</strong> Weekends between 12:00 PM – 3:00 PM</li>
                    </ul>
                    <p style="color:#888; font-size: 14px;">(Coming soon: automatic scheduler & cross-platform optimizer)</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output AI</h2>
+                   <p>This AI assembles and previews your final video content.</p>
+                   <div style="margin-top: 20px;">
+                     <video controls width="480" style="border-radius: 8px; box-shadow: 0 0 10px #00bfff66;">
+                       <source src="sample-video.mp4" type="video/mp4">
+                       Your browser does not support the video tag.
+                     </video>
+                     <p style="margin-top: 10px; color: #ccc; font-size: 14px;">(Preview only. Final upload integration coming soon.)</p>
+                   </div>`,
           history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
           settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
         };
