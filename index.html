@@ -3,54 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard</title>
+  <title>Boss AI</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
     <!-- Sidebar -->
-    <div id="sidebar">
-      <button class="sidebar-btn" data-module="manager">🧠 General Manager</button>
-      <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
-      <button class="sidebar-btn" data-module="voiceover">🎙️ Voiceover</button>
-      <button class="sidebar-btn" data-module="legal">⚖️ Legal Review</button>
-      <button class="sidebar-btn" data-module="upload">📤 Upload Strategy</button>
-      <button class="sidebar-btn" data-module="history">📜 Video History</button>
-      <button class="sidebar-btn" data-module="dashboard">📊 Performance</button>
-      <button class="sidebar-btn" data-module="monetization">💰 Monetization</button>
-      <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
-    </div>
+    <aside id="sidebar">
+      <div class="logo">🤖 Boss AI</div>
+      <nav>
+        <button class="sidebar-btn" data-module="manager">🧠 Manager</button>
+        <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
+        <button class="sidebar-btn" data-module="voiceover">🎙️ Voiceover</button>
+        <button class="sidebar-btn" data-module="upload">📤 Upload Strategy</button>
+        <button class="sidebar-btn" data-module="legal">⚖️ Legal Review</button>
+        <button class="sidebar-btn" data-module="history">📜 History</button>
+        <button class="sidebar-btn" data-module="dashboard">📊 Performance</button>
+        <button class="sidebar-btn" data-module="monetization">💰 Monetization</button>
+        <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
+      </nav>
+    </aside>
 
     <!-- Main -->
-    <div id="main">
-      <!-- Top Bar -->
-      <div id="topbar">
-        <div id="branding">
-          <h1>Boss AI</h1>
-          <p>Fully Automated AI Content System</p>
+    <main id="main">
+      <!-- Topbar -->
+      <header id="topbar">
+        <div class="left">
+          <h1>Boss AI Dashboard</h1>
+          <p>Automate your video content strategy with AI</p>
         </div>
-        <div id="topbar-controls">
-          <label>
-            <input type="checkbox" id="mode-toggle" />
-            Dark Mode
+        <div class="right">
+          <label class="toggle">
+            🌗 <input type="checkbox" id="mode-toggle" />
+            <span>Dark Mode</span>
           </label>
-          <input type="password" id="api-key" placeholder="OpenAI API Key" />
-          <button id="toggle-btn">☰ Menu</button>
+          <input type="password" id="api-key" placeholder="🔑 OpenAI API Key" />
         </div>
-      </div>
+      </header>
 
-      <!-- Content Area -->
-      <div id="content-panel">
-        <!-- Modules go here -->
-
+      <!-- Content -->
+      <section id="content-panel">
         <!-- 🧠 General Manager -->
-        <div id="manager-panel" class="module-panel" style="display: none;">
+        <div id="manager-panel" class="module-panel">
           <h2>🧠 General Manager AI</h2>
-          <p>This module coordinates all other tools to create fully automated content.</p>
+          <p>This module coordinates all the tools to generate automated video content flows.</p>
         </div>
 
         <!-- ✍️ Script Writer -->
-        <div id="script-panel" class="module-panel">
+        <div id="script-panel" class="module-panel" style="display: none;">
           <h2>✍️ Script Writer AI</h2>
           <input id="script-input" type="text" placeholder="Enter video topic or prompt..." />
           <button id="generate-script-btn" class="primary">Generate Script</button>
@@ -64,34 +64,33 @@
           <p id="voiceover-status"></p>
         </div>
 
-        <!-- ⚖️ Legal Review -->
-        <div id="legal-panel" class="module-panel" style="display: none;">
-          <h2>⚖️ Legal Checker AI</h2>
-          <p>All scripts will be reviewed here for legal compliance.</p>
-        </div>
-
         <!-- 📤 Upload Strategy -->
         <div id="upload-panel" class="module-panel" style="display: none;">
           <h2>📤 Upload Strategy AI</h2>
-          <p>This module will suggest when and where to upload based on current trends.</p>
+          <p>This tool recommends optimal upload timing and platforms for your videos.</p>
         </div>
 
-        <!-- 📜 Video History -->
+        <!-- ⚖️ Legal Review -->
+        <div id="legal-panel" class="module-panel" style="display: none;">
+          <h2>⚖️ Legal Checker AI</h2>
+          <pChecks your script content for potential copyright or policy risks.</p>
+        </div>
+
+        <!-- 📜 History -->
         <div id="history-panel" class="module-panel" style="display: none;">
-          <h2>📜 Content History</h2>
+          <h2>📜 Video History Log</h2>
           <div id="history-list"></div>
         </div>
 
-        <!-- 📊 Performance Dashboard -->
+        <!-- 📊 Dashboard -->
         <div id="dashboard-panel" class="module-panel" style="display: none;">
-          <h2>📊 AI Performance Dashboard</h2>
+          <h2>📊 Performance Dashboard</h2>
           <div id="dashboard-metrics"></div>
         </div>
 
-        <!-- 💰 Monetization Panel -->
+        <!-- 💰 Monetization -->
         <div id="monetization-panel" class="module-panel" style="display: none;">
           <h2>💰 Monetization Strategy</h2>
-
           <div class="monetization-section">
             <h3>Projected Earnings</h3>
             <p id="projected-revenue">Loading...</p>
@@ -116,13 +115,13 @@
         <div id="feedback-panel" class="module-panel" style="display: none;">
           <h2>💬 Feedback</h2>
           <form id="feedback-form">
-            <textarea placeholder="Your feedback..."></textarea>
+            <textarea placeholder="Your feedback..." rows="4"></textarea>
             <button type="submit" class="primary">Submit</button>
           </form>
-          <div id="popup" class="popup hidden">✅ Thank you for your feedback!</div>
+          <div id="popup" class="popup hidden">✅ Thanks for the feedback!</div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 
   <script src="script.js"></script>
