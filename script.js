@@ -26,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showPanel(module) {
     panels.forEach(panel => panel.style.display = "none");
-    document.getElementById(`${module}-panel`).style.display = "block";
+    const target = document.getElementById(`${module}-panel`);
+    if (target) target.style.display = "block";
   }
 
   // Feedback form
   if (feedbackForm) {
     feedbackForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const name = document.getElementById("name").value;
       const message = document.getElementById("message").value;
       if (!message.trim()) {
         alert("Please enter feedback.");
@@ -57,13 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const prompt = scriptInput.value.trim();
       const apiKey = document.getElementById("api-key").value.trim();
 
-      if (!prompt) {
-        alert("Please enter a prompt.");
-        return;
-      }
-
-      if (!apiKey) {
-        alert("Please enter your OpenAI API key.");
+      if (!prompt || !apiKey) {
+        alert("Please enter both a prompt and an API key.");
         return;
       }
 
@@ -91,17 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = data.choices?.[0]?.message?.content;
         scriptOutput.textContent = result || "No response received.";
       } catch (error) {
-        scriptOutput.textContent = "Error generating script.";
+        scriptOutput.textContent = "❌ Error generating script.";
         console.error(error);
       }
     });
   }
 
-  // Voiceover AI (simulated)
+  // Voiceover (simulated)
   const voiceoverBtn = document.getElementById("generate-voiceover-btn");
   const voiceoverStatus = document.getElementById("voiceover-status");
 
-  if (voiceoverBtn) {
+  if (voiceoverBtn && voiceoverStatus) {
     voiceoverBtn.addEventListener("click", () => {
       voiceoverStatus.textContent = "Generating voiceover...";
       setTimeout(() => {
@@ -110,5 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Set default panel
   showPanel("home");
 });
