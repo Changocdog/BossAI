@@ -153,7 +153,7 @@
 <body>
   <button id="toggle-btn">☰ Menu</button>
 
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
@@ -172,10 +172,21 @@
 
     <div class="main-content">
       <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-      <div id="content-panel"></div>
+      <div id="content-panel">
+        <h2>🤖 General Manager AI</h2>
+        <p>This AI coordinates the sub-AIs and manages workflows.</p>
+      </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    // Sidebar toggle
+    const toggleBtn = document.getElementById('toggle-btn');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
