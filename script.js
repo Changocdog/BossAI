@@ -1,53 +1,57 @@
-const buttons = document.querySelectorAll(".sidebar button[data-module]");
 const contentPanel = document.getElementById("content-panel");
+const buttons = document.querySelectorAll("#sidebar button");
+let historyLog = JSON.parse(localStorage.getItem("bossAIHistory") || "[]");
 
-const historyLog = []; // Global log array
+function saveHistory() {
+  localStorage.setItem("bossAIHistory", JSON.stringify(historyLog));
+}
 
-buttons.forEach(button => {
-  button.addEventListener("click", () => {
-    buttons.forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-    displayModule(button.dataset.module);
+// Handle module switching
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    buttons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const module = btn.getAttribute("data-module");
+    displayModule(module);
   });
 });
 
 function displayModule(module) {
   if (module === "manager") {
     contentPanel.innerHTML = `
-      <h1>👑 Boss AI Dashboard</h1>
-      <p class="subtext">Use the tools in the sidebar to generate content and manage uploads.</p>
-      <ul class="status-list">
-        <li>✅ Script Writer AI</li>
-        <li>✅ Voiceover AI</li>
-        <li>✅ Upload Strategy AI</li>
-        <li>✅ Legal Review AI</li>
-        <li>✅ Output Log</li>
-      </ul>
+      <h1>Welcome to Boss AI</h1>
+      <p class="subtext">Choose a module from the menu to get started.</p>
+      <button id="sample-script" style="margin-top: 10px;">🎬 Try Sample Script</button>
     `;
+
+    document.getElementById("sample-script").addEventListener("click", () => {
+      document.querySelector('[data-module="script"]').click();
+      setTimeout(() => {
+        document.getElementById("script-input").value = "How to save money fast in your 20s";
+        document.getElementById("generate-script").click();
+      }, 300);
+    });
   }
 
   else if (module === "script") {
     contentPanel.innerHTML = `
       <h1>✍️ Script Writer AI</h1>
-      <textarea id="script-input" rows="4" placeholder="Video topic..." style="width:100%;padding:12px;"></textarea>
+      <textarea id="script-input" rows="4" placeholder="Enter your video topic or prompt..."></textarea>
       <button id="generate-script">Generate Script</button>
-      <div id="script-result" style="margin-top:20px;"></div>
+      <pre id="script-output"></pre>
     `;
 
     document.getElementById("generate-script").addEventListener("click", async () => {
-      const prompt = document.getElementById("script-input").value.trim();
-      const apiKey = document.getElementById("api-key").value.trim();
-      const resultBox = document.getElementById("script-result");
+      const prompt = document.getElementById("script-input").value;
+      const apiKey = document.getElementById("api-key").value;
+      const output = document.getElementById("script-output");
 
-      if (!prompt || !apiKey) {
-        resultBox.innerHTML = `<p style="color:red;">Missing input or key.</p>`;
-        return;
-      }
+      if (!prompt || !apiKey) return alert("Please provide both a prompt and your API key.");
 
-      resultBox.innerHTML = `⏳ Generating...`;
+      output.textContent = "🧠 Generating script...";
 
       try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -55,14 +59,14 @@ function displayModule(module) {
           },
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: `Write a YouTube Shorts script: ${prompt}` }],
-            temperature: 0.8
+            messages: [{ role: "user", content: `Write a short, viral video script for: ${prompt}` }],
+            temperature: 0.7
           })
         });
 
-        const data = await res.json();
-        const script = data.choices?.[0]?.message?.content || "No output.";
-        resultBox.innerHTML = `<pre>${script}</pre>`;
+        const data = await response.json();
+        const script = data.choices?.[0]?.message?.content || "⚠️ No script returned.";
+        output.textContent = script;
 
         historyLog.push({
           type: "Script",
@@ -70,163 +74,67 @@ function displayModule(module) {
           output: script,
           timestamp: new Date().toLocaleString()
         });
-      } catch {
-        resultBox.innerHTML = `<p style="color:red;">API error.</p>`;
-      }
-    });
-  }
-
-  else if (module === "voiceover") {
-    contentPanel.innerHTML = `
-      <h1>🎤 Voiceover AI</h1>
-      <textarea id="voice-script" rows="5" placeholder="Paste your script..." style="width:100%;padding:12px;"></textarea>
-      <button id="generate-voiceover">Generate Voiceover</button>
-      <div id="voiceover-result" style="margin-top:20px;"></div>
-    `;
-
-    document.getElementById("generate-voiceover").addEventListener("click", () => {
-      const script = document.getElementById("voice-script").value.trim();
-      const resultBox = document.getElementById("voiceover-result");
-
-      if (!script) {
-        resultBox.innerHTML = `<p style="color:red;">Enter script.</p>`;
-        return;
-      }
-
-      resultBox.innerHTML = `
-        <p>✅ Simulated voiceover ready.</p>
-        <button style="padding:10px;">🔊 Play (Simulated)</button>
-        <p style="font-size:12px;">* Upgrade to real voice API later.</p>
-      `;
-    });
-  }
-
-  else if (module === "upload") {
-    contentPanel.innerHTML = `
-      <h1>📤 Upload Strategy AI</h1>
-      <textarea id="upload-script" rows="5" placeholder="Paste your script..." style="width:100%;padding:12px;"></textarea>
-      <button id="generate-upload">Generate Upload Strategy</button>
-      <div id="upload-result" style="margin-top:20px;"></div>
-    `;
-
-    document.getElementById("generate-upload").addEventListener("click", async () => {
-      const script = document.getElementById("upload-script").value.trim();
-      const apiKey = document.getElementById("api-key").value.trim();
-      const resultBox = document.getElementById("upload-result");
-
-      if (!script || !apiKey) {
-        resultBox.innerHTML = `<p style="color:red;">Missing input or key.</p>`;
-        return;
-      }
-
-      resultBox.innerHTML = `⏳ Generating strategy...`;
-
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{
-              role: "user",
-              content: `Give me platform, title, 3 hashtags, post time, and reasoning for this script:\n\n${script}`
-            }],
-            temperature: 0.7
-          })
-        });
-
-        const data = await res.json();
-        const result = data.choices?.[0]?.message?.content || "No output.";
-        resultBox.innerHTML = `<pre>${result}</pre>`;
-
-        historyLog.push({
-          type: "Upload Strategy",
-          input: script,
-          output: result,
-          timestamp: new Date().toLocaleString()
-        });
-      } catch {
-        resultBox.innerHTML = `<p style="color:red;">API error.</p>`;
-      }
-    });
-  }
-
-  else if (module === "legal") {
-    contentPanel.innerHTML = `
-      <h1>📜 Legal Review AI</h1>
-      <textarea id="legal-script" rows="5" placeholder="Paste your script..." style="width:100%;padding:12px;"></textarea>
-      <button id="run-legal-review">Run Legal Review</button>
-      <div id="legal-result" style="margin-top:20px;"></div>
-    `;
-
-    document.getElementById("run-legal-review").addEventListener("click", async () => {
-      const script = document.getElementById("legal-script").value.trim();
-      const apiKey = document.getElementById("api-key").value.trim();
-      const resultBox = document.getElementById("legal-result");
-
-      if (!script || !apiKey) {
-        resultBox.innerHTML = `<p style="color:red;">Missing input or key.</p>`;
-        return;
-      }
-
-      resultBox.innerHTML = `🔍 Reviewing script...`;
-
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{
-              role: "user",
-              content: `Check this script for copyright, defamation, unsafe content:\n\n${script}`
-            }],
-            temperature: 0.6
-          })
-        });
-
-        const data = await res.json();
-        const result = data.choices?.[0]?.message?.content || "No output.";
-        resultBox.innerHTML = `<pre>${result}</pre>`;
-
-        historyLog.push({
-          type: "Legal Review",
-          input: script,
-          output: result,
-          timestamp: new Date().toLocaleString()
-        });
-      } catch {
-        resultBox.innerHTML = `<p style="color:red;">API error.</p>`;
+        saveHistory();
+      } catch (err) {
+        output.textContent = "❌ Error generating script.";
       }
     });
   }
 
   else if (module === "history") {
-    let content = `<h1>📂 Video History Log</h1>`;
+    let content = "<h1>📂 Video History Log</h1>";
     if (historyLog.length === 0) {
-      content += `<p>No content yet.</p>`;
+      content += "<p class='subtext'>No content generated yet.</p>";
     } else {
       content += historyLog.slice().reverse().map(entry => `
-        <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;border-radius:6px;">
-          <p><strong>${entry.type}</strong> – <em>${entry.timestamp}</em></p>
+        <div style="border:1px solid #ddd;padding:16px;margin-bottom:16px;border-radius:8px;background:#fefefe;">
+          <p><strong>🗂️ ${entry.type}</strong> <span style="color:#888;font-size:13px;">(${entry.timestamp})</span></p>
           <p><strong>Input:</strong> ${entry.input}</p>
-          <pre style="background:#f8f8f8;padding:10px;border-radius:4px;">${entry.output}</pre>
+          <div style="white-space:pre-wrap;background:#f8f8f8;padding:12px;border-radius:6px;margin-top:10px;">
+            ${entry.output}
+          </div>
         </div>
       `).join('');
     }
     contentPanel.innerHTML = content;
   }
+
+  else if (module === "dashboard") {
+    const counts = {
+      Script: 0,
+      Voiceover: 0,
+      "Upload Strategy": 0,
+      "Legal Review": 0,
+      Manager: 1
+    };
+
+    historyLog.forEach(entry => {
+      if (counts[entry.type] !== undefined) {
+        counts[entry.type]++;
+      }
+    });
+
+    contentPanel.innerHTML = `
+      <h1>📊 AI Performance Dashboard</h1>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 20px;">
+        ${Object.entries(counts).map(([type, count]) => `
+          <div style="border: 1px solid #ccc; border-radius: 10px; padding: 20px; background: #fefefe; text-align: center;">
+            <h3>${type}</h3>
+            <p style="font-size: 24px; margin: 8px 0;"><strong>${count}</strong></p>
+            <p style="color: #666; font-size: 13px;">uses</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
 }
 
+// Sidebar toggle
 document.getElementById("toggle-btn").addEventListener("click", () => {
-  const sidebar = document.getElementById("sidebar");
-  const main = document.getElementById("main");
-  sidebar.classList.toggle("hidden");
-  main.style.marginLeft = sidebar.classList.contains("hidden") ? "0" : "240px";
+  document.getElementById("sidebar").classList.toggle("hidden");
+});
+
+// Dark/light mode toggle
+document.getElementById("mode-toggle").addEventListener("change", (e) => {
+  document.body.classList.toggle("dark", e.target.checked);
 });
