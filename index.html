@@ -6,9 +6,7 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -112,7 +110,7 @@
 
     #api-key {
       padding: 14px 18px;
-      font-size: 16px;
+      font-size: 18px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -181,7 +179,7 @@
           legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
           script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
           voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2>
                    <p>This AI analyzes trends to suggest optimal upload times and platforms.</p>
                    <ul style="color: #ccc; font-size: 16px; line-height: 1.6; text-align: left; max-width: 600px; margin: auto;">
                      <li><strong>YouTube:</strong> Tuesdays & Thursdays at 5:00 PM</li>
@@ -199,12 +197,22 @@
                      </video>
                      <p style="margin-top: 10px; color: #ccc; font-size: 14px;">(Preview only. Final upload integration coming soon.)</p>
                    </div>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History Log</h2>
+                    <p>View your latest outputs below. Saved automatically.</p>
+                    <div style="background:#111; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
+                      <ul style="list-style: none; padding: 0; font-size: 14px; color: #ccc;">
+                        <li><strong>📝 Script:</strong> "How to Build Wealth in 2024" <span style="float:right;">✅</span></li>
+                        <li><strong>🎤 Voiceover:</strong> Converted to audio on June 5</li>
+                        <li><strong>📤 Upload Plan:</strong> Scheduled for YouTube - June 6 @ 5PM</li>
+                        <li><strong>📺 Output Video:</strong> 1:00 Short uploaded</li>
+                      </ul>
+                      <p style="color:#888; font-size: 12px; margin-top: 10px;">(This is a simulated history. Save and load features coming soon.)</p>
+                    </div>`,
           settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
         };
 
         main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
+          <div style="max-width: 800px; text-align: left;">
             ${content[module] || ''}
           </div>
         `;
