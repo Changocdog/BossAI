@@ -2,6 +2,20 @@ const contentPanel = document.getElementById("content-panel");
 const apiKeyInput = document.getElementById("api-key");
 const historyLog = JSON.parse(localStorage.getItem("bossHistory")) || [];
 
+// Save theme toggle state
+const themeToggle = document.getElementById("mode-toggle");
+themeToggle.addEventListener("change", () => {
+  document.body.classList.toggle("dark-mode", themeToggle.checked);
+  localStorage.setItem("darkMode", themeToggle.checked ? "true" : "false");
+});
+
+// Load saved theme preference
+if (localStorage.getItem("darkMode") === "true") {
+  themeToggle.checked = true;
+  document.body.classList.add("dark-mode");
+}
+
+// Save task history
 function saveHistory() {
   localStorage.setItem("bossHistory", JSON.stringify(historyLog));
 }
@@ -69,9 +83,9 @@ function displayModule(module) {
     contentPanel.innerHTML = `
       <h1>🎤 Voiceover AI</h1>
       <p><strong>Last Script:</strong></p>
-      <pre style="white-space:pre-wrap;background:#f4f4f4;padding:10px;border-radius:6px;margin-bottom:10px;">${latestScript.output}</pre>
+      <pre>${latestScript.output}</pre>
       <button id="simulate-voice">Simulate Voiceover</button>
-      <pre id="voice-output" style="margin-top:15px;"></pre>
+      <pre id="voice-output"></pre>
     `;
 
     document.getElementById("simulate-voice").addEventListener("click", () => {
@@ -99,7 +113,7 @@ function displayModule(module) {
     contentPanel.innerHTML = `
       <h1>🛡️ Legal Review AI</h1>
       <p>Reviewing your latest content for potential legal risks...</p>
-      <pre style="white-space:pre-wrap;background:#fff3cd;padding:10px;border-radius:6px;">✅ Content appears legally safe for upload.\nNo copyright or violation detected.</pre>
+      <pre>✅ Content appears legally safe for upload.\nNo copyright or violation detected.</pre>
     `;
 
     historyLog.push({
@@ -117,33 +131,32 @@ function displayModule(module) {
     );
 
     if (!lastOutput) {
-      contentPanel.innerHTML = "<h1>🚀 Upload Strategy</h1><p class='subtext'>No content available to generate a strategy. Please create a script or voiceover first.</p>";
+      contentPanel.innerHTML = "<h1>🚀 Upload Strategy</h1><p class='subtext'>No content available to generate a strategy.</p>";
       return;
     }
 
-    const sampleStrategy = `
+    const strategy = `
 Platform: YouTube Shorts & TikTok
-Best Time to Post: 6 PM - 9 PM (peak engagement)
+Best Time to Post: 6 PM - 9 PM
 Hashtags: #moneytips #bossai #shorts
-Caption: "This 30-second tip could change how you invest forever. Watch now."
-Call to Action: "Subscribe for more daily tips."
+Caption: "This tip could change your finances forever."
+CTA: "Subscribe for daily insights."
     `;
 
     contentPanel.innerHTML = `
       <h1>🚀 Upload Strategy AI</h1>
-      <p><strong>Based on your latest content:</strong></p>
-      <pre style="white-space:pre-wrap;background:#f9f9f9;padding:10px;border-radius:6px;margin-bottom:10px;">${lastOutput.output}</pre>
+      <pre>${lastOutput.output}</pre>
       <button id="generate-strategy">Generate Upload Strategy</button>
-      <pre id="strategy-output" style="margin-top:15px;"></pre>
+      <pre id="strategy-output"></pre>
     `;
 
     document.getElementById("generate-strategy").addEventListener("click", () => {
-      document.getElementById("strategy-output").textContent = sampleStrategy;
+      document.getElementById("strategy-output").textContent = strategy;
 
       historyLog.push({
         type: "Upload Strategy",
         input: lastOutput.output,
-        output: sampleStrategy,
+        output: strategy,
         timestamp: new Date().toLocaleString()
       });
       saveHistory();
@@ -154,58 +167,45 @@ Call to Action: "Subscribe for more daily tips."
     contentPanel.innerHTML = "<h1>📂 Video History</h1>";
 
     if (historyLog.length === 0) {
-      contentPanel.innerHTML += "<p class='subtext'>No AI tasks have been completed yet.</p>";
+      contentPanel.innerHTML += "<p class='subtext'>No tasks completed yet.</p>";
       return;
     }
 
     const historyHTML = historyLog.map(entry => `
       <div class="history-entry">
         <strong>${entry.type}</strong> <em>(${entry.timestamp})</em>
-        <pre style="white-space:pre-wrap;background:#f9f9f9;padding:8px;border-radius:6px;margin-top:4px;">${entry.output}</pre>
+        <pre>${entry.output}</pre>
       </div>
     `).join("");
 
-    contentPanel.innerHTML += `
-      <div style="max-height:400px;overflow-y:auto;margin-top:15px;">
-        ${historyHTML}
-      </div>
-    `;
+    contentPanel.innerHTML += `<div style="max-height:400px;overflow-y:auto;margin-top:15px;">${historyHTML}</div>`;
   }
 
   else if (module === "dashboard") {
-    const counts = {
-      "Script": 0,
-      "Voiceover": 0,
-      "Legal Review": 0,
-      "Upload Strategy": 0
-    };
+    const counts = { "Script": 0, "Voiceover": 0, "Legal Review": 0, "Upload Strategy": 0 };
 
     historyLog.forEach(entry => {
-      if (counts[entry.type] !== undefined) {
-        counts[entry.type]++;
-      }
+      if (counts[entry.type] !== undefined) counts[entry.type]++;
     });
 
     contentPanel.innerHTML = `
       <h1>📊 AI Performance Dashboard</h1>
-      <p class="subtext">Total AI tasks completed:</p>
-      <ul style="line-height: 1.8em;">
-        <li>✍️ Scripts: <strong>${counts["Script"]}</strong></li>
-        <li>🎤 Voiceovers: <strong>${counts["Voiceover"]}</strong></li>
-        <li>🛡️ Legal Reviews: <strong>${counts["Legal Review"]}</strong></li>
-        <li>🚀 Upload Strategies: <strong>${counts["Upload Strategy"]}</strong></li>
+      <ul>
+        <li>✍️ Scripts: ${counts.Script}</li>
+        <li>🎤 Voiceovers: ${counts.Voiceover}</li>
+        <li>🛡️ Legal Reviews: ${counts["Legal Review"]}</li>
+        <li>🚀 Upload Strategies: ${counts["Upload Strategy"]}</li>
       </ul>
-      <p class="subtext">Keep creating to grow your channel and optimize your workflow!</p>
     `;
   }
 }
 
-// Toggle sidebar
+// Sidebar toggle
 document.getElementById("toggle-btn").addEventListener("click", () => {
   document.getElementById("sidebar").classList.toggle("collapsed");
 });
 
-// Handle menu clicks
+// Sidebar navigation
 document.querySelectorAll("#sidebar button").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelector("#sidebar .active")?.classList.remove("active");
@@ -214,11 +214,11 @@ document.querySelectorAll("#sidebar button").forEach(btn => {
   });
 });
 
-// Sample script button
+// Sample script
 document.getElementById("sample-script").addEventListener("click", () => {
   document.querySelector('[data-module="script"]').click();
   setTimeout(() => {
-    document.getElementById("script-input").value = "Top 3 passive income tips";
+    document.getElementById("script-input").value = "Top 3 side hustle ideas";
     document.getElementById("generate-script").click();
   }, 300);
 });
