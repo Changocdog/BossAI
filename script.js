@@ -1,6 +1,4 @@
 const apiKeyInput = document.getElementById("api-key");
-const generateBtn = document.getElementById("generate-btn");
-const userPrompt = document.getElementById("user-prompt");
 const contentPanel = document.getElementById("content-panel");
 let currentModule = "manager";
 
@@ -15,7 +13,6 @@ sidebarButtons.forEach(button => {
   });
 });
 
-// All AI Modules
 function displayModule(module) {
   if (module === "manager") {
     contentPanel.innerHTML = `
@@ -91,7 +88,6 @@ function displayModule(module) {
       status.textContent = "⏳ Generating voiceover... (simulated)";
       audio.style.display = "none";
 
-      // Simulate delay
       setTimeout(() => {
         status.textContent = `✅ Voiceover (${voice}) ready!`;
         audio.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
@@ -144,6 +140,29 @@ function displayModule(module) {
         console.error(error);
       }
     });
+  } else if (module === "output") {
+    contentPanel.innerHTML = `
+      <h2>Final Output</h2>
+      <p><strong>Last Generated Script:</strong></p>
+      <pre id="last-script">[This will later auto-populate with the final script]</pre>
+      <hr>
+      <p><strong>Video Preview:</strong></p>
+      <video width="100%" controls>
+        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+        Your browser does not support video playback.
+      </video>
+      <p><a href="#" target="_blank">🔗 Link to Social Post (placeholder)</a></p>
+    `;
+  } else if (module === "history") {
+    contentPanel.innerHTML = `
+      <h2>Video History</h2>
+      <ul>
+        <li>🎬 <strong>How to Budget at 18</strong> — <em>Script + Strategy</em></li>
+        <li>🎬 <strong>3 Side Hustles for Teens</strong> — <em>Script + Strategy</em></li>
+        <li>🎬 <strong>Crypto Explained in 30 Seconds</strong> — <em>Script + Strategy</em></li>
+      </ul>
+      <p><em>Live saving and filtering coming soon.</em></p>
+    `;
   } else if (module === "settings") {
     contentPanel.innerHTML = `
       <h2>Settings & Drafts</h2>
