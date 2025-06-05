@@ -24,13 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Show the requested panel
   function showPanel(module) {
     panels.forEach(panel => panel.style.display = "none");
     document.getElementById(`${module}-panel`).style.display = "block";
   }
 
-  // Submit feedback
+  // Feedback form
   if (feedbackForm) {
     feedbackForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Script Writer AI logic
+  // Script Writer AI
   const generateBtn = document.getElementById("generate-script-btn");
   const scriptInput = document.getElementById("script-input");
   const scriptOutput = document.getElementById("script-output");
@@ -79,12 +78,10 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "user",
-                content: `Create a 60-second short video script based on this prompt: ${prompt}`
-              }
-            ],
+            messages: [{
+              role: "user",
+              content: `Create a 60-second short video script based on this prompt: ${prompt}`
+            }],
             max_tokens: 300,
             temperature: 0.7
           })
@@ -100,6 +97,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Show default panel
+  // Voiceover AI (simulated)
+  const voiceoverBtn = document.getElementById("generate-voiceover-btn");
+  const voiceoverStatus = document.getElementById("voiceover-status");
+
+  if (voiceoverBtn) {
+    voiceoverBtn.addEventListener("click", () => {
+      voiceoverStatus.textContent = "Generating voiceover...";
+      setTimeout(() => {
+        voiceoverStatus.textContent = "✅ Voiceover ready! (simulated)";
+      }, 2000);
+    });
+  }
+
   showPanel("home");
 });
