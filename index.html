@@ -7,17 +7,23 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <!-- Topbar -->
   <div id="topbar">
-    <button id="toggle-btn">☰ Menu</button>
-    <label style="margin-left: auto; margin-right: 10px;">
-      <input type="checkbox" id="mode-toggle" />
-      Dark Mode
-    </label>
-    <input type="text" id="api-key" placeholder="Enter OpenAI API Key..." />
+    <div class="topbar-left">
+      <button id="toggle-btn">☰ Menu</button>
+      <span class="logo">🤖 Boss AI</span>
+    </div>
+    <div class="topbar-right">
+      <label class="mode-toggle">
+        <input type="checkbox" id="mode-toggle" />
+        Dark Mode
+      </label>
+      <input type="text" id="api-key" placeholder="Enter OpenAI API Key..." />
+    </div>
   </div>
 
-  <!-- Container -->
+  <!-- Main Container -->
   <div id="container">
     <!-- Sidebar -->
     <div id="sidebar">
@@ -29,15 +35,15 @@
       <button data-module="dashboard">📊 Performance</button>
     </div>
 
-    <!-- Content -->
+    <!-- Content Panel -->
     <div id="content-panel">
-      <h1>Welcome to Boss AI</h1>
-      <p class="subtext">Choose a module from the menu to get started.</p>
-      <button id="sample-script" style="margin-top: 10px;">🎬 Try Sample Script</button>
+      <h1>👑 Boss AI Manager</h1>
+      <p class="subtext">This is your command center. Use the sidebar to activate AI tools.</p>
+      <button id="sample-script" class="primary">🎬 Try Sample Script</button>
     </div>
   </div>
 
-  <!-- JavaScript -->
+  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
