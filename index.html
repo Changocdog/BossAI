@@ -27,16 +27,29 @@
       padding: 20px;
       box-sizing: border-box;
       transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .sidebar.hidden {
       transform: translateX(-100%);
     }
 
+    #toggle-btn {
+      padding: 10px 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
     .sidebar button {
       display: block;
       width: 100%;
-      margin: 8px 0;
+      margin: 6px 0;
       padding: 12px;
       background: #222;
       color: white;
@@ -63,21 +76,6 @@
       position: relative;
     }
 
-    #toggle-btn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 8px 14px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      z-index: 10;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
     input, textarea, select {
       width: 100%;
       margin-top: 10px;
@@ -87,7 +85,7 @@
       border-radius: 5px;
     }
 
-    button {
+    button:not(#toggle-btn) {
       padding: 10px 16px;
       margin-top: 10px;
       font-size: 15px;
@@ -99,7 +97,7 @@
       transition: background 0.2s ease;
     }
 
-    button:hover {
+    button:not(#toggle-btn):hover {
       background-color: #0056b3;
     }
 
@@ -120,9 +118,8 @@
   </style>
 </head>
 <body>
-  <button id="toggle-btn">☰ Menu</button>
-
   <div class="sidebar" id="sidebar">
+    <button id="toggle-btn">☰ Menu</button>
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
