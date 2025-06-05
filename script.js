@@ -1,102 +1,103 @@
-// Sidebar panel switching
-document.querySelectorAll('.sidebar button').forEach(button => {
-  button.addEventListener('click', () => {
-    // Remove active class from all buttons
-    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+// Toggle sidebar visibility
+document.getElementById("toggle-btn").addEventListener("click", () => {
+  document.querySelector(".sidebar").classList.toggle("hidden");
+});
 
-    // Load corresponding module content
-    const module = button.dataset.module;
+// Module content definitions
+const modules = {
+  manager: `
+    <h2>🤖 General Manager AI</h2>
+    <p>This AI coordinates the sub-AIs and manages workflows.</p>
+  `,
+  legal: `
+    <h2>📜 Legal Review</h2>
+    <p>Scanning generated content for compliance...</p>
+  `,
+  script: `
+    <h2>✍️ Script Writer AI</h2>
+    <input id="script-input" type="text" placeholder="Enter video topic..." />
+    <button id="generate-btn">Generate Script</button>
+    <pre id="script-output">Your script will appear here.</pre>
+  `,
+  voiceover: `
+    <h2>🎤 Voiceover</h2>
+    <p>Coming soon: audio narration features.</p>
+  `,
+  upload: `
+    <h2>📤 Upload Strategy</h2>
+    <p>Tools for posting to YouTube, TikTok, and more.</p>
+  `,
+  output: `
+    <h2>📺 Final Output</h2>
+    <p>View or download generated videos here.</p>
+  `,
+  history: `
+    <h2>🗂️ History</h2>
+    <p>List of past video ideas, scripts, and uploads.</p>
+  `,
+  settings: `
+    <h2>⚙️ Settings</h2>
+    <p>Theme preferences and saved keys will go here.</p>
+  `
+};
+
+// Sidebar button switching
+document.querySelectorAll(".sidebar button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    // Set active state
+    document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // Load content
+    const module = btn.getAttribute("data-module");
     loadModule(module);
   });
 });
 
-// Sidebar toggle
-document.getElementById('toggle-btn').addEventListener('click', () => {
-  document.querySelector('.sidebar').classList.toggle('hidden');
-});
-
-// Module templates
-const modules = {
-  manager: `
-    <h2>🤖 General Manager AI</h2>
-    <p>This AI coordinates all tools and oversees automation.</p>
-  `,
-  legal: `
-    <h2>📜 Legal Review</h2>
-    <p>Reviewing content for compliance...</p>
-  `,
-  script: `
-    <h2>✍️ Script Writer</h2>
-    <input id="script-input" type="text" placeholder="Enter video topic..." />
-    <button id="generate-btn">Generate Video</button>
-    <pre id="script-output">Awaiting input...</pre>
-  `,
-  voiceover: `
-    <h2>🎤 Voiceover AI</h2>
-    <button>Simulate Voiceover</button>
-  `,
-  upload: `
-    <h2>📤 Upload Strategy</h2>
-    <p>Auto-schedule and optimize video posts (coming soon).</p>
-  `,
-  output: `
-    <h2>📺 Final Output</h2>
-    <p>Final generated videos will appear here.</p>
-  `,
-  history: `
-    <h2>🗂️ History</h2>
-    <p>Past scripts and output logs will be listed here.</p>
-  `,
-  settings: `
-    <h2>⚙️ Settings</h2>
-    <p>Theme, preferences, and user configurations go here.</p>
-  `
-};
-
-// Load initial module
+// Initial load
 loadModule("manager");
 
-// Load and render a module into the panel
+// Load module content into main panel
 function loadModule(name) {
-  const panel = document.getElementById('content-panel');
+  const panel = document.getElementById("content-panel");
   panel.innerHTML = modules[name] || "<p>Module not found.</p>";
 
-  // Re-bind script button logic if needed
+  // Attach Script Generator
   if (name === "script") {
-    const keyInput = document.getElementById('api-key');
-    document.getElementById('generate-btn').addEventListener('click', async () => {
-      const topic = document.getElementById('script-input').value;
-      const output = document.getElementById('script-output');
-      const apiKey = keyInput.value;
+    const generateBtn = document.getElementById("generate-btn");
+    generateBtn?.addEventListener("click", async () => {
+      const topic = document.getElementById("script-input").value;
+      const apiKey = document.getElementById("api-key").value;
+      const output = document.getElementById("script-output");
 
       if (!topic || !apiKey) {
-        output.textContent = "❗ Enter topic and API key.";
+        output.textContent = "❗ Please enter a topic and API key.";
         return;
       }
 
-      output.textContent = "⏳ Generating...";
+      output.textContent = "⏳ Generating script...";
 
       try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${apiKey}`
           },
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: `Write a short-form video script about: ${topic}` }],
+            messages: [
+              { role: "user", content: `Write a short, engaging YouTube short script about: ${topic}` }
+            ],
             temperature: 0.7
           })
         });
 
         const data = await response.json();
-        const script = data.choices?.[0]?.message?.content || "⚠️ No response.";
-        output.textContent = script;
-      } catch (error) {
+        output.textContent = data.choices?.[0]?.message?.content || "⚠️ No script returned.";
+      } catch (err) {
         output.textContent = "❌ Error generating script.";
-        console.error(error);
+        console.error(err);
       }
     });
   }
