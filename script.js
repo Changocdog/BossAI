@@ -5,9 +5,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebar = document.getElementById("sidebar");
   const popup = document.getElementById("onboarding-popup");
   const closePopup = document.getElementById("close-popup");
+  const modeToggle = document.getElementById("mode-toggle");
 
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
+  });
+
+  modeToggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark-mode", modeToggle.checked);
   });
 
   closePopup.addEventListener("click", () => {
@@ -74,10 +79,8 @@ Let your money work while you sleep. 💸
             <h2>📝 Send Feedback</h2>
             <label for="name">Your Name</label>
             <input type="text" id="name" placeholder="Optional..." />
-
             <label for="message">Your Feedback</label>
             <textarea id="message" rows="6" placeholder="Share your thoughts..."></textarea>
-
             <button onclick="submitFeedback()" class="primary">Submit</button>
           </div>
         `;
