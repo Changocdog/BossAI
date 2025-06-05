@@ -170,9 +170,16 @@ function displayModule(module) {
   }
 }
 
-// ✅ Sidebar Toggle
+// Sidebar toggle logic
 document.getElementById("toggle-btn").addEventListener("click", () => {
-  document.getElementById("sidebar").classList.toggle("hidden");
+  const sidebar = document.getElementById("sidebar");
+  const main = document.getElementById("main");
+  sidebar.classList.toggle("hidden");
+  if (sidebar.classList.contains("hidden")) {
+    main.style.marginLeft = "0";
+  } else {
+    main.style.marginLeft = "240px";
+  }
 });
 
 // Load default module
