@@ -6,17 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const modeToggle = document.getElementById("mode-toggle");
   const feedbackForm = document.getElementById("feedback-form");
 
-  // Toggle sidebar
+  // Sidebar toggle
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
   });
 
-  // Dark mode
+  // Dark mode toggle
   modeToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark-mode", modeToggle.checked);
   });
 
-  // Navigation
+  // Navigation between panels
   sidebarButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const module = btn.getAttribute("data-module");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (target) target.style.display = "block";
   }
 
-  // Feedback
+  // Feedback form submission
   if (feedbackForm) {
     feedbackForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Script Writer
+  // Script Writer AI
   const generateBtn = document.getElementById("generate-script-btn");
   const scriptInput = document.getElementById("script-input");
   const scriptOutput = document.getElementById("script-output");
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Voiceover (simulated)
+  // Voiceover AI (simulated)
   const voiceoverBtn = document.getElementById("generate-voiceover-btn");
   const voiceoverStatus = document.getElementById("voiceover-status");
 
@@ -157,6 +157,58 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Default load
+  // Legal Review AI
+  const legalBtn = document.createElement("button");
+  legalBtn.id = "run-legal-review-btn";
+  legalBtn.className = "primary";
+  legalBtn.textContent = "Run Legal Review";
+
+  const legalPanel = document.getElementById("legal-panel");
+  if (legalPanel) {
+    legalPanel.appendChild(legalBtn);
+    const output = document.createElement("pre");
+    output.id = "legal-review-output";
+    legalPanel.appendChild(output);
+
+    legalBtn.addEventListener("click", async () => {
+      const apiKey = document.getElementById("api-key").value.trim();
+      const script = document.getElementById("script-output").textContent.trim();
+
+      if (!apiKey || !script) {
+        alert("Please enter your API key and generate a script first.");
+        return;
+      }
+
+      output.textContent = "Running legal review...";
+
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{
+              role: "user",
+              content: `Please review the following script for any copyright or legal issues. Respond with a clear, brief note if there are any problems:\n\n${script}`
+            }],
+            max_tokens: 150,
+            temperature: 0.5
+          })
+        });
+
+        const data = await response.json();
+        const review = data.choices?.[0]?.message?.content;
+        output.textContent = review || "No issues detected.";
+      } catch (err) {
+        output.textContent = "❌ Error during legal review.";
+        console.error(err);
+      }
+    });
+  }
+
+  // Default view
   showPanel("home");
 });
