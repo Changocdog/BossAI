@@ -1,213 +1,119 @@
-/* Reset & Core */
+/* Reset and basics */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", sans-serif;
-  display: flex;
-  height: 100vh;
-  color: #1a1a1a;
-  background-color: #f5f7fa;
-  transition: background 0.3s, color 0.3s;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
-body.dark-mode {
-  background-color: #1e1e1e;
-  color: #f1f1f1;
-}
-
-/* App layout */
 #app {
   display: flex;
-  width: 100%;
   height: 100vh;
 }
 
 /* Sidebar */
 #sidebar {
   width: 220px;
-  background-color: #20232a;
+  background-color: #1e1e2f;
   color: white;
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
+  padding: 20px;
 }
 
-.logo {
-  font-size: 20px;
+#sidebar .logo {
+  font-size: 1.5em;
   font-weight: bold;
-  margin-bottom: 24px;
-  color: #00d0ff;
-}
-
-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .sidebar-btn {
-  background: #2c313c;
-  color: white;
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  margin: 8px 0;
+  background: #2d2d44;
   border: none;
-  padding: 10px 12px;
-  border-radius: 6px;
-  text-align: left;
-  font-size: 15px;
+  color: white;
+  font-size: 1em;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  text-align: left;
+  transition: background 0.3s;
 }
 
 .sidebar-btn:hover {
-  background: #3a3f4b;
-}
-
-/* Main content */
-#main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  background-color: #3c3c5c;
 }
 
 /* Topbar */
 #topbar {
-  padding: 14px 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #ddd;
+  width: 100%;
+  padding: 15px 30px;
+  background: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #ddd;
 }
 
-body.dark-mode #topbar {
-  background: #2c2c2c;
-  border-bottom: 1px solid #444;
-}
-
-#topbar h1 {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-#topbar p {
-  font-size: 13px;
-  color: #666;
+#topbar .left h1 {
+  font-size: 1.4em;
 }
 
 #topbar .right {
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 12px;
 }
 
-#topbar input[type="password"] {
+#api-key {
   padding: 6px 10px;
-  font-size: 14px;
-  border-radius: 4px;
   border: 1px solid #ccc;
-}
-
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  border-radius: 4px;
 }
 
 /* Content panel */
-#content-panel {
+#main {
   flex: 1;
-  padding: 24px;
   overflow-y: auto;
+  background-color: #f9f9fb;
+}
+
+#content-panel {
+  padding: 30px;
 }
 
 .module-panel {
   background: white;
   padding: 20px;
-  margin-bottom: 30px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-body.dark-mode .module-panel {
-  background: #282828;
-  box-shadow: none;
-}
-
-/* Inputs */
-input[type="text"],
-input[type="number"],
-textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 12px;
-  margin-bottom: 16px;
-  font-size: 15px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background: white;
-}
-
-body.dark-mode input,
-body.dark-mode textarea {
-  background: #333;
-  border: 1px solid #555;
-  color: white;
-}
-
-/* Buttons */
-button.primary {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 14px;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-button.primary:hover {
-  background-color: #0056b3;
-}
-
-button.sidebar-btn.active {
-  background-color: #007bff;
-  color: white;
-}
-
-/* Dashboard & Logs */
-.history-entry,
-.ai-log,
-.monetization-section {
-  background: #f1f3f5;
-  padding: 16px;
-  border-left: 4px solid #007bff;
-  border-radius: 6px;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 20px;
 }
 
-body.dark-mode .history-entry,
-body.dark-mode .ai-log,
-body.dark-mode .monetization-section {
-  background: #333;
-  border-left-color: #00aaff;
+input[type="text"] {
+  width: 60%;
+  padding: 10px;
+  margin-right: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-/* Popup */
-.popup {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #28a745;
+button.primary {
+  padding: 10px 16px;
+  background-color: #007acc;
   color: white;
-  padding: 12px 16px;
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  font-size: 1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.popup.hidden {
-  display: none;
+button.primary:hover {
+  background-color: #005f99;
 }
