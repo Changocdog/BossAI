@@ -1,4 +1,3 @@
-// Sidebar navigation logic
 const buttons = document.querySelectorAll(".sidebar button[data-module]");
 const contentPanel = document.getElementById("content-panel");
 
@@ -10,7 +9,6 @@ buttons.forEach(button => {
   });
 });
 
-// Module display logic
 function displayModule(module) {
   if (module === "manager") {
     contentPanel.innerHTML = `
@@ -34,7 +32,7 @@ function displayModule(module) {
   }
 }
 
-// Sidebar toggle logic (button always stays visible)
+// Sidebar toggle logic
 document.getElementById("toggle-btn").addEventListener("click", () => {
   const sidebar = document.getElementById("sidebar");
   const main = document.getElementById("main");
