@@ -23,7 +23,7 @@
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 20px 10px;
+      padding: 60px 10px 20px 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -33,6 +33,7 @@
       top: 0;
       border-right: 1px solid #1a1a1a;
       transition: transform 0.3s ease;
+      z-index: 100;
     }
 
     .sidebar.hidden {
@@ -52,7 +53,7 @@
     }
 
     .sidebar button:hover {
-      background: #007bff33;
+      background: #003366;
       color: #4fc3f7;
     }
 
@@ -80,7 +81,7 @@
     }
 
     #toggle-btn {
-      position: absolute;
+      position: fixed;
       top: 15px;
       left: 15px;
       z-index: 1000;
@@ -92,13 +93,13 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 16px;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+      box-shadow: 0 0 12px #00bfff;
     }
 
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
-      color: #4fc3f7;
+      color: #00bfff;
       letter-spacing: 1px;
     }
 
@@ -106,19 +107,19 @@
       color: #cccccc;
       font-size: 14px;
       letter-spacing: 0.5px;
+      margin-bottom: 20px;
     }
 
     #api-key {
-      margin-top: 15px;
       padding: 14px 18px;
       font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
-      border: 1px solid #007bff;
+      border: 1px solid #00bfff;
       border-radius: 8px;
       color: #ffffff;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+      box-shadow: 0 0 10px #00bfff88;
     }
 
     input::placeholder {
@@ -129,6 +130,11 @@
       .main {
         margin-left: 0;
         width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
       }
     }
   </style>
@@ -171,17 +177,17 @@
 
         const module = button.getAttribute("data-module");
         const content = {
-          manager: `<h2 style="color:#4fc3f7;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-          legal: `<h2 style="color:#4fc3f7;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-          script: `<h2 style="color:#4fc3f7;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
-          voiceover: `<h2 style="color:#4fc3f7;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#4fc3f7;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-          output: `<h2 style="color:#4fc3f7;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
-          history: `<h2 style="color:#4fc3f7;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-          settings: `<h2 style="color:#4fc3f7;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
+          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
         };
 
-        document.getElementById("main").innerHTML = `
+        main.innerHTML = `
           <div style="max-width: 800px; text-align: left;">
             ${content[module] || ''}
           </div>
