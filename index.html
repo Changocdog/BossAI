@@ -9,17 +9,15 @@
     * {
       box-sizing: border-box;
     }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -35,11 +33,9 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-
     .sidebar.hidden {
       transform: translateX(-100%);
     }
-
     .sidebar button {
       background: #121212;
       color: #ffffff;
@@ -51,17 +47,14 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -74,12 +67,10 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
-
     .main.full {
       margin-left: 0;
       width: 100%;
     }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -95,24 +86,21 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-
     h1 {
-      font-size: 30px;
-      margin-bottom: 10px;
+      font-size: 32px;
+      margin-bottom: 12px;
       color: #00bfff;
       letter-spacing: 1px;
     }
-
     p {
       color: #cccccc;
       font-size: 16px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
     #api-key {
-      padding: 16px 20px;
-      font-size: 18px;
+      padding: 14px 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -121,29 +109,14 @@
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     input::placeholder {
       color: #bbbbbb;
     }
-
-    pre {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: left;
-      color: #ddd;
-      width: 100%;
-      max-width: 800px;
-      overflow-x: auto;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
       }
-
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -194,32 +167,9 @@
           script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
           voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
           upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your complete video draft:</p>
-            <pre>
-🎬 Final Render Simulation
-----------------------------
-📜 Script: [Sample script or your latest entry]
-🎤 Voiceover: [Simulated narration based on script]
-📤 Upload Plan: [Optimized platform timing and tags]
-
-[Video file will appear here in future versions]
-            </pre>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past generated scripts and outputs:</p>
-            <pre>
-#1: Script - "Why You’re Broke at 25" (Motivational)
-#2: Voiceover - "Investing in AI Stocks"
-#3: Upload Strategy - TikTok: Post at 6PM
-#4: Final Output - Horror script + voice + upload plan
-#5: Legal Review Passed - All content compliant
-            </pre>`,
-          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize your Boss AI preferences:</p>
-            <pre>
-🔧 Default Voice: Female, Energetic
-🌐 Preferred Platform: YouTube Shorts
-📅 Upload Schedule: Daily at 6 PM PST
-🎨 Theme: Dark Blue (current)
-🔐 API Key: ***************
-            </pre>`
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust preferences, integrations, and account settings here.</p>`
         };
 
         main.innerHTML = `
