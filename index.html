@@ -70,9 +70,9 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      padding: 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
-      height: 100vh;
     }
 
     .main.full {
@@ -111,10 +111,10 @@
     }
 
     #api-key {
-      padding: 16px 22px;
+      padding: 18px;
       font-size: 18px;
       width: 100%;
-      max-width: 550px;
+      max-width: 500px;
       background-color: #1a1a1a;
       border: 1px solid #00bfff;
       border-radius: 8px;
@@ -124,6 +124,31 @@
 
     input::placeholder {
       color: #bbbbbb;
+    }
+
+    select, button {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 6px #00bfff88;
+    }
+
+    pre {
+      background: #111;
+      padding: 14px;
+      border-radius: 6px;
+      margin-top: 20px;
+      color: #00ffff;
+      text-align: left;
+      white-space: pre-wrap;
     }
 
     @media (max-width: 768px) {
@@ -155,11 +180,9 @@
   </div>
 
   <div class="main" id="main">
-    <div>
-      <h1>Boss AI Dashboard</h1>
-      <p>Enter your OpenAI API key to begin:</p>
-      <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-    </div>
+    <h1>Boss AI Dashboard</h1>
+    <p>Enter your OpenAI API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
   </div>
 
   <script>
@@ -178,24 +201,50 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        const content = {
-          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
-          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
-        };
 
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: left;">
-            ${content[module] || ''}
-          </div>
-        `;
+        if (module === "script") {
+          main.innerHTML = `
+            <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+            <p>Generate a short-form video script. Choose your topic and tone:</p>
+            <select id="script-topic">
+              <option value="finance">Finance</option>
+              <option value="motivation">Motivation</option>
+              <option value="tech">Tech</option>
+              <option value="horror">Horror</option>
+            </select>
+            <select id="script-tone" style="margin-top:10px;">
+              <option value="serious">Serious</option>
+              <option value="funny">Funny</option>
+              <option value="dramatic">Dramatic</option>
+            </select>
+            <button onclick="generateScript()">Generate Script</button>
+            <pre id="script-output"></pre>
+          `;
+        } else {
+          const content = {
+            manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+            legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+            voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+            upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+            output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+            history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+            settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+          };
+          main.innerHTML = `
+            <div style="max-width: 800px; text-align: left;">
+              ${content[module] || ''}
+            </div>
+          `;
+        }
       });
     });
+
+    function generateScript() {
+      const topic = document.getElementById("script-topic").value;
+      const tone = document.getElementById("script-tone").value;
+      const result = `Generated a ${tone} video script on the topic of "${topic}".\n\n[This is placeholder text. Future integration will use GPT for real scripts.]`;
+      document.getElementById("script-output").innerText = result;
+    }
   </script>
 
 </body>
