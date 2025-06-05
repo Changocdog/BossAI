@@ -1,4 +1,4 @@
-/* Reset and structure */
+/* Reset and layout */
 * {
   margin: 0;
   padding: 0;
@@ -50,7 +50,7 @@ body {
   color: #ffffff;
 }
 
-/* Main content */
+/* Main area */
 main {
   flex: 1;
   padding: 30px;
@@ -88,14 +88,13 @@ main {
   width: 250px;
 }
 
-/* Module panels */
+/* Panels */
 .module-panel {
-  margin-top: 40px;
+  padding-top: 30px;
 }
 
-.module-panel h2 {
-  color: #3ba9ff;
-  margin-bottom: 10px;
+.hidden {
+  display: none;
 }
 
 input[type="text"],
@@ -131,8 +130,4 @@ pre {
   border-radius: 6px;
   margin-top: 10px;
   border: 1px solid #333;
-}
-
-.hidden {
-  display: none;
 }
