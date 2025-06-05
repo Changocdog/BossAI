@@ -9,6 +9,7 @@ body {
   background: #f4f4f7;
   color: #333;
   min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #topbar {
@@ -165,4 +166,52 @@ pre {
   align-items: center;
   text-align: center;
   height: 100%;
+}
+
+/* DARK MODE */
+body.dark-mode {
+  background: #121212;
+  color: #ddd;
+}
+
+body.dark-mode #sidebar {
+  background: #1b1b2f;
+}
+
+body.dark-mode #sidebar button {
+  background: #2a2a40;
+  color: #eee;
+}
+
+body.dark-mode #sidebar button:hover {
+  background: #3b3b55;
+}
+
+body.dark-mode #sidebar button.active {
+  background: #3390ff;
+}
+
+body.dark-mode #content-panel {
+  background: #181818;
+}
+
+body.dark-mode #topbar {
+  background: #111;
+  color: #eee;
+}
+
+body.dark-mode #api-key {
+  background: #222;
+  border: 1px solid #555;
+  color: #eee;
+}
+
+body.dark-mode textarea,
+body.dark-mode pre {
+  background: #202020;
+  color: #eee;
+}
+
+body.dark-mode .subtext {
+  color: #aaa;
 }
