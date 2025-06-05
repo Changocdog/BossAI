@@ -1,4 +1,3 @@
-<!-- FULL HTML CODE - FINAL OUTPUT MODULE ADDED -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +97,7 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 30px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -106,16 +105,14 @@
 
     p {
       color: #cccccc;
-      font-size: 14px;
+      font-size: 16px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
 
-    #api-key,
-    textarea,
-    select {
-      padding: 14px 18px;
-      font-size: 16px;
+    #api-key {
+      padding: 16px 20px;
+      font-size: 18px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -123,34 +120,22 @@
       border-radius: 8px;
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
-      margin-bottom: 20px;
     }
 
-    input::placeholder,
-    textarea::placeholder {
+    input::placeholder {
       color: #bbbbbb;
     }
 
-    button {
-      font-family: 'Orbitron', sans-serif;
-      padding: 12px 18px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
     pre {
-      background-color: #1a1a1a;
-      padding: 16px;
+      background: #111;
+      border: 1px solid #333;
       border-radius: 8px;
-      color: #00bfff;
-      max-width: 600px;
-      overflow-x: auto;
+      padding: 16px;
       text-align: left;
+      color: #ddd;
+      width: 100%;
+      max-width: 800px;
+      overflow-x: auto;
     }
 
     @media (max-width: 768px) {
@@ -203,49 +188,13 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-
-        if (module === "script") {
-          main.innerHTML = `
-            <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-            <p>Generate a short-form video script. Choose your topic and tone:</p>
-            <select id="script-topic">
-              <option value="finance">Finance</option>
-              <option value="motivation">Motivation</option>
-              <option value="tech">Tech</option>
-              <option value="horror">Horror</option>
-            </select>
-            <select id="script-tone">
-              <option value="serious">Serious</option>
-              <option value="funny">Funny</option>
-              <option value="dramatic">Dramatic</option>
-            </select>
-            <button onclick="generateScript()">Generate Script</button>
-            <pre id="script-output"></pre>
-          `;
-        } else if (module === "voiceover") {
-          main.innerHTML = `
-            <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-            <p>Paste a script below and click to simulate a voiceover:</p>
-            <textarea id="voice-script" rows="6" placeholder="Paste your script here..."></textarea>
-            <button onclick="generateVoice()">Generate Voiceover</button>
-            <pre id="voice-output"></pre>
-          `;
-        } else if (module === "upload") {
-          main.innerHTML = `
-            <h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
-            <p>Select your platform to receive upload advice:</p>
-            <select id="upload-platform">
-              <option value="youtube">YouTube Shorts</option>
-              <option value="tiktok">TikTok</option>
-              <option value="instagram">Instagram Reels</option>
-            </select>
-            <button onclick="generateUpload()">Generate Strategy</button>
-            <pre id="upload-output"></pre>
-          `;
-        } else if (module === "output") {
-          main.innerHTML = `
-            <h2 style="color:#00bfff;">📺 Final Output</h2>
-            <p>Here's your complete video draft:</p>
+        const content = {
+          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
+          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your complete video draft:</p>
             <pre>
 🎬 Final Render Simulation
 ----------------------------
@@ -254,60 +203,25 @@
 📤 Upload Plan: [Optimized platform timing and tags]
 
 [Video file will appear here in future versions]
-            </pre>
-          `;
-        } else {
-          const content = {
-            manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-            legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-            history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-            settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
-          };
-          main.innerHTML = `
-            <div style="max-width: 800px; text-align: left;">
-              ${content[module] || ''}
-            </div>
-          `;
-        }
+            </pre>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past generated scripts and outputs:</p>
+            <pre>
+#1: Script - "Why You’re Broke at 25" (Motivational)
+#2: Voiceover - "Investing in AI Stocks"
+#3: Upload Strategy - TikTok: Post at 6PM
+#4: Final Output - Horror script + voice + upload plan
+#5: Legal Review Passed - All content compliant
+            </pre>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+        };
+
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: left;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
-
-    function generateScript() {
-      const topic = document.getElementById("script-topic").value;
-      const tone = document.getElementById("script-tone").value;
-      const result = `Generated a ${tone} video script on "${topic}".\n\n[This is a placeholder. Future version will generate real content using GPT.]`;
-      document.getElementById("script-output").innerText = result;
-    }
-
-    function generateVoice() {
-      const script = document.getElementById("voice-script").value.trim();
-      const output = script
-        ? `🎤 Simulated voiceover:\n\n"${script}"\n\n[This will become real audio in a future version.]`
-        : "⚠️ Please enter a script to simulate voiceover.";
-      document.getElementById("voice-output").innerText = output;
-    }
-
-    function generateUpload() {
-      const platform = document.getElementById("upload-platform").value;
-      const output = {
-        youtube: `✅ YouTube Shorts Strategy:
-- Post daily between 12–3 PM
-- Use 3-5 relevant hashtags (#FinanceTips)
-- Keep videos under 60s with punchy hooks
-- Use captions to improve retention`,
-        tiktok: `✅ TikTok Strategy:
-- Post 1–3x per day between 9–12 AM or 5–8 PM
-- Use trending sounds and effects
-- Short videos with fast pacing = higher reach
-- Add a clear CTA in the last 5 seconds`,
-        instagram: `✅ Instagram Reels Strategy:
-- Best post time: 11 AM or 6 PM
-- Focus on aesthetics and branding
-- Use engaging covers and reel previews
-- Share to Stories for extra exposure`
-      };
-      document.getElementById("upload-output").innerText = output[platform] || "No strategy available.";
-    }
   </script>
 
 </body>
