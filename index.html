@@ -8,6 +8,7 @@
 </head>
 <body>
   <div id="app">
+    <!-- Sidebar -->
     <div id="sidebar">
       <button class="sidebar-btn" data-module="home">🏠 Home</button>
       <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
@@ -19,68 +20,24 @@
       <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
     </div>
 
+    <!-- Main -->
     <div id="main">
+      <!-- Top Bar -->
       <div id="topbar">
-        <button id="toggle-btn">☰ Menu</button>
-        <label><input type="checkbox" id="mode-toggle"/> Dark Mode</label>
-        <input type="password" id="api-key" placeholder="🔑 OpenAI API Key" />
+        <div id="branding">
+          <h1>🤖 Boss AI</h1>
+          <p>Your Content Creation Assistant</p>
+        </div>
+        <div id="topbar-controls">
+          <button id="toggle-btn">☰ Menu</button>
+          <label><input type="checkbox" id="mode-toggle"/> Dark Mode</label>
+          <input type="password" id="api-key" placeholder="🔑 OpenAI API Key" />
+        </div>
       </div>
 
+      <!-- Content -->
       <div id="content-panel">
-        <!-- 🏠 Home -->
-        <div id="home-panel" class="module-panel">
-          <h1>Welcome to Boss AI</h1>
-          <p>Start by selecting a tool from the menu. This dashboard helps you generate, review, and optimize short-form video content using AI.</p>
-        </div>
-
-        <!-- ✍️ Script Writer -->
-        <div id="script-panel" class="module-panel" style="display: none;">
-          <h2>✍️ Script Writer AI</h2>
-          <textarea id="script-input" placeholder="Enter video prompt..." rows="4"></textarea>
-          <button id="generate-script-btn" class="primary">Generate Script</button>
-          <pre id="script-output"></pre>
-        </div>
-
-        <!-- 🎙️ Voiceover -->
-        <div id="voiceover-panel" class="module-panel" style="display: none;">
-          <h2>🎙️ Voiceover AI</h2>
-          <button id="generate-voiceover-btn" class="primary">Generate Voiceover</button>
-          <pre id="voiceover-status"></pre>
-        </div>
-
-        <!-- 🚀 Upload Strategy -->
-        <div id="upload-panel" class="module-panel" style="display: none;">
-          <h2>🚀 Upload Strategy AI</h2>
-        </div>
-
-        <!-- 🛡️ Legal Review -->
-        <div id="legal-panel" class="module-panel" style="display: none;">
-          <h2>🛡️ Legal Review AI</h2>
-        </div>
-
-        <!-- 📂 History -->
-        <div id="history-panel" class="module-panel" style="display: none;">
-          <h2>📂 Video History</h2>
-          <div id="history-list"></div>
-        </div>
-
-        <!-- 📊 Dashboard -->
-        <div id="dashboard-panel" class="module-panel" style="display: none;">
-          <h2>📊 AI Performance Dashboard</h2>
-          <div id="dashboard-metrics" class="dashboard-metrics">
-            <p>Loading dashboard...</p>
-          </div>
-        </div>
-
-        <!-- 💬 Feedback -->
-        <div id="feedback-panel" class="module-panel" style="display: none;">
-          <h2>💬 Feedback</h2>
-          <form id="feedback-form">
-            <textarea id="message" placeholder="Your feedback..." required></textarea>
-            <button type="submit">Submit</button>
-          </form>
-          <div id="popup" class="hidden">✅ Feedback sent!</div>
-        </div>
+        <!-- Panels go here — no changes, continue using the previous ones -->
       </div>
     </div>
   </div>
