@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (target) target.style.display = "block";
   }
 
-  // Feedback form submission
+  // Feedback form
   if (feedbackForm) {
     feedbackForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -209,6 +209,67 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Default view
+  // History Logging
+  const historyList = document.getElementById("history-list");
+  const historyData = [];
+
+  function saveToHistory(scriptText, uploadPlan, legalNote) {
+    const timestamp = new Date().toLocaleString();
+    const entry = {
+      timestamp,
+      script: scriptText,
+      upload: uploadPlan,
+      legal: legalNote
+    };
+    historyData.unshift(entry); // newest on top
+    updateHistoryUI();
+  }
+
+  function updateHistoryUI() {
+    if (!historyList) return;
+    historyList.innerHTML = "";
+
+    historyData.forEach(entry => {
+      const container = document.createElement("div");
+      container.className = "history-entry";
+
+      const title = document.createElement("h4");
+      title.textContent = `🕒 ${entry.timestamp}`;
+      container.appendChild(title);
+
+      const script = document.createElement("pre");
+      script.textContent = `📝 Script:\n${entry.script}`;
+      container.appendChild(script);
+
+      const upload = document.createElement("pre");
+      upload.textContent = `🚀 Upload Plan:\n${entry.upload}`;
+      container.appendChild(upload);
+
+      const legal = document.createElement("pre");
+      legal.textContent = `🛡️ Legal Review:\n${entry.legal}`;
+      container.appendChild(legal);
+
+      historyList.appendChild(container);
+    });
+  }
+
+  function trySaveHistory() {
+    const script = document.getElementById("script-output")?.textContent || "";
+    const upload = document.getElementById("upload-strategy-output")?.textContent || "";
+    const legal = document.getElementById("legal-review-output")?.textContent || "";
+
+    if (script && upload && legal) {
+      saveToHistory(script, upload, legal);
+    }
+  }
+
+  const legalBtnHook = document.getElementById("run-legal-review-btn");
+  if (legalBtnHook) {
+    legalBtnHook.addEventListener("click", () => {
+      setTimeout(trySaveHistory, 4000);
+    });
+  }
+
+  // Set initial view
   showPanel("home");
 });
