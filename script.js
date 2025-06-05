@@ -2,7 +2,7 @@ const apiKeyInput = document.getElementById("api-key");
 const contentPanel = document.getElementById("content-panel");
 let currentModule = "manager";
 
-const sidebarButtons = document.querySelectorAll(".sidebar button");
+const sidebarButtons = document.querySelectorAll(".sidebar button[data-module]");
 sidebarButtons.forEach(button => {
   button.addEventListener("click", () => {
     sidebarButtons.forEach(btn => btn.classList.remove("active"));
@@ -170,7 +170,7 @@ function displayModule(module) {
   }
 }
 
-// ✅ SIDEBAR TOGGLE FUNCTION
+// ✅ Sidebar Toggle
 document.getElementById("toggle-btn").addEventListener("click", () => {
   document.getElementById("sidebar").classList.toggle("hidden");
 });
