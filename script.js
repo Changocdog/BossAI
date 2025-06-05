@@ -1,9 +1,9 @@
-// Handle sidebar module switching
+// Sidebar module switching
 document.querySelectorAll(".sidebar-btn").forEach(button => {
   button.addEventListener("click", () => {
     const module = button.dataset.module;
 
-    // Toggle sidebar active state
+    // Reset active states
     document.querySelectorAll(".sidebar-btn").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
@@ -12,43 +12,38 @@ document.querySelectorAll(".sidebar-btn").forEach(button => {
       panel.style.display = "none";
     });
 
-    // Show selected panel
-    const target = document.getElementById(`${module}-panel`);
-    if (target) target.style.display = "block";
+    // Show the selected module panel
+    const targetPanel = document.getElementById(`${module}-panel`);
+    if (targetPanel) targetPanel.style.display = "block";
   });
 });
 
-// Dark mode toggle
-document.getElementById("mode-toggle").addEventListener("change", (e) => {
-  document.body.classList.toggle("dark-mode", e.target.checked);
-});
+// Load default module (Dashboard)
+document.querySelector('.sidebar-btn[data-module="manager"]')?.click();
 
-// Script Writer AI (placeholder output)
+// Script Writer (placeholder output)
 document.getElementById("generate-script-btn")?.addEventListener("click", () => {
   const input = document.getElementById("script-input").value.trim();
   const output = document.getElementById("script-output");
 
   if (!input) {
-    output.textContent = "⚠️ Please enter a video topic first.";
+    output.textContent = "⚠️ Please enter a topic.";
     return;
   }
 
-  output.textContent = `🧠 Generating script for:\n"${input}"...\n\n(This is placeholder output.)`;
+  output.textContent = `🎬 Generating video script for:\n"${input}"\n\n(This is simulated output.)`;
 });
 
-// Simulate voiceover generation
+// Voiceover Simulation
 document.getElementById("generate-voiceover-btn")?.addEventListener("click", () => {
-  document.getElementById("voiceover-status").textContent = "🎧 Simulated voiceover generated.";
+  const status = document.getElementById("voiceover-status");
+  status.textContent = "🔊 Simulated voiceover generated!";
 });
 
-// Handle feedback form
+// Feedback popup
 document.getElementById("feedback-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
-  document.getElementById("popup").classList.remove("hidden");
-  setTimeout(() => {
-    document.getElementById("popup").classList.add("hidden");
-  }, 2000);
+  const popup = document.getElementById("popup");
+  popup.classList.remove("hidden");
+  setTimeout(() => popup.classList.add("hidden"), 2000);
 });
-
-// Optional: highlight Manager module by default
-document.querySelector('.sidebar-btn[data-module="manager"]')?.click();
