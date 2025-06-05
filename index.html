@@ -25,6 +25,7 @@
     <div id="sidebar">
       <button class="sidebar-btn" data-module="home">🏠 Home</button>
       <button class="sidebar-btn" data-module="script">📝 Script Writer AI</button>
+      <button class="sidebar-btn" data-module="voiceover">🎤 Voiceover AI</button>
       <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
     </div>
 
@@ -41,6 +42,12 @@
         <input type="text" id="script-input" placeholder="Enter a video topic or prompt..." />
         <button id="generate-script-btn" class="primary">Generate Script</button>
         <pre id="script-output"></pre>
+      </div>
+
+      <div id="voiceover-panel" class="module-panel" style="display:none;">
+        <h2>🎤 Voiceover AI</h2>
+        <button id="generate-voiceover-btn" class="primary">Generate Voiceover</button>
+        <p id="voiceover-status">Waiting to generate voiceover...</p>
       </div>
 
       <div id="feedback-panel" class="module-panel" style="display:none;">
