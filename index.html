@@ -6,26 +6,36 @@
   <title>Boss AI Dashboard</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712107.png" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to bottom right, #0a1729, #122b46);
       display: flex;
       height: 100vh;
-      background-color: #0e0e11;
       color: white;
+    }
+
+    #toggle-btn {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 1001;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
     }
 
     .sidebar {
       width: 240px;
-      background: #0b0b0d;
+      background: #111;
       color: white;
       padding: 20px;
       box-sizing: border-box;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease;
     }
 
     .sidebar.hidden {
@@ -35,118 +45,72 @@
     .sidebar button {
       display: block;
       width: 100%;
-      margin: 8px 0;
+      margin: 10px 0;
       padding: 12px;
-      background: #1b1d22;
+      background: #1e1e1e;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       text-align: left;
       cursor: pointer;
       transition: background 0.2s ease;
-      font-size: 15px;
     }
 
     .sidebar button:hover {
-      background: #2a2d33;
+      background: #2d2d2d;
     }
 
     .sidebar button.active {
-      background: linear-gradient(to right, #007bff, #3399ff);
-      color: white;
+      background: #007bff;
     }
 
     .main {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      background: linear-gradient(to bottom right, #0a1729, #122b46);
     }
 
     .header {
+      background: #000;
       display: flex;
       align-items: center;
-      padding: 12px 20px;
-      background-color: #0d121c;
-      border-bottom: 1px solid #1c1f25;
+      padding: 16px 20px;
+      border-bottom: 1px solid #222;
     }
 
     .header img {
-      height: 36px;
+      height: 40px;
       margin-right: 12px;
     }
 
     .header h1 {
-      font-size: 18px;
+      font-size: 20px;
       margin: 0;
-      color: #fff;
     }
 
     .main-content {
-      padding: 20px;
-      flex-grow: 1;
+      padding: 30px;
     }
 
-    #toggle-btn {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      padding: 8px 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    #api-key {
+    input {
       width: 100%;
-      margin-bottom: 25px;
       padding: 12px;
-      font-size: 16px;
       border: none;
       border-radius: 4px;
-      background: #1c1f24;
+      font-size: 16px;
+      margin-top: 20px;
+      background: #1d1f22;
       color: white;
     }
 
-    textarea, input, select {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      background: #1b1f24;
-      color: white;
+    h2 {
+      margin-top: 30px;
+      color: #66ccff;
     }
 
-    button {
-      padding: 10px 16px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    pre {
-      background-color: #1f1f1f;
-      padding: 12px;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      color: #00ff00;
-      font-size: 14px;
-    }
-
-    video {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-top: 10px;
+    p {
+      font-size: 15px;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -166,21 +130,18 @@
 
   <div class="main">
     <div class="header">
-      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712107.png" alt="Boss AI Logo" />
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712107.png" alt="Logo">
       <h1>Boss AI Dashboard</h1>
     </div>
 
     <div class="main-content">
       <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-      <div id="content-panel">
-        <h2>🤖 General Manager AI</h2>
-        <p>This AI coordinates the sub-AIs and manages workflows.</p>
-      </div>
+      <h2>🤖 General Manager AI</h2>
+      <p>This AI coordinates the sub-AIs and manages workflows.</p>
     </div>
   </div>
 
   <script>
-    // Sidebar toggle
     const toggleBtn = document.getElementById('toggle-btn');
     const sidebar = document.getElementById('sidebar');
 
