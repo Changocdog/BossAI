@@ -19,6 +19,7 @@ body {
   background: #1e1e2f;
   color: white;
   padding: 12px 20px;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .topbar-left {
@@ -40,6 +41,11 @@ body {
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+#toggle-btn:hover {
+  background: #555;
 }
 
 #api-key {
@@ -48,6 +54,7 @@ body {
   border: 1px solid #ccc;
   width: 220px;
   font-size: 14px;
+  transition: background 0.3s ease, border 0.3s ease;
 }
 
 .mode-toggle {
@@ -69,11 +76,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: width 0.3s;
+  transition: width 0.3s ease, opacity 0.3s ease;
 }
 
 #sidebar.collapsed {
   width: 0;
+  opacity: 0;
   overflow: hidden;
 }
 
@@ -86,11 +94,12 @@ body {
   cursor: pointer;
   border-radius: 6px;
   text-align: left;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 #sidebar button:hover {
   background: #444;
+  transform: scale(1.02);
 }
 
 #sidebar button.active {
@@ -101,6 +110,12 @@ body {
   flex-grow: 1;
   padding: 40px;
   transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 #content-panel h1 {
@@ -122,10 +137,12 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .primary:hover {
   background: #005bb5;
+  transform: scale(1.03);
 }
 
 textarea {
@@ -135,6 +152,7 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-bottom: 10px;
+  transition: border 0.2s ease;
 }
 
 button {
