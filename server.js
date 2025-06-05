@@ -221,6 +221,35 @@ function displayModule(module) {
 
     contentPanel.innerHTML = content;
   }
+
+  else if (module === "dashboard") {
+    const counts = {
+      Script: 0,
+      Voiceover: 0,
+      "Upload Strategy": 0,
+      "Legal Review": 0,
+      Manager: 1
+    };
+
+    historyLog.forEach(entry => {
+      if (counts[entry.type] !== undefined) {
+        counts[entry.type]++;
+      }
+    });
+
+    contentPanel.innerHTML = `
+      <h1>📊 AI Performance Dashboard</h1>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 20px;">
+        ${Object.entries(counts).map(([type, count]) => `
+          <div style="border: 1px solid #ccc; border-radius: 10px; padding: 20px; background: #fefefe; text-align: center;">
+            <h3>${type}</h3>
+            <p style="font-size: 24px; margin: 8px 0;"><strong>${count}</strong></p>
+            <p style="color: #666; font-size: 13px;">uses</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
 }
 
 // Sidebar toggle
