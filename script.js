@@ -1,8 +1,7 @@
-// Select all sidebar buttons and main panel
-const buttons = document.querySelectorAll(".sidebar button");
+// Sidebar logic
+const buttons = document.querySelectorAll(".sidebar button[data-module]");
 const contentPanel = document.getElementById("content-panel");
 
-// Highlight active button and load its module
 buttons.forEach(button => {
   button.addEventListener("click", () => {
     buttons.forEach(btn => btn.classList.remove("active"));
@@ -11,7 +10,6 @@ buttons.forEach(button => {
   });
 });
 
-// Display content for selected module
 function displayModule(module) {
   if (module === "manager") {
     contentPanel.innerHTML = `
@@ -32,26 +30,12 @@ function displayModule(module) {
         <p class="subtext">Select a module from the sidebar to get started.</p>
       </div>
     `;
-  } else if (module === "legal") {
-    contentPanel.innerHTML = `<p style="text-align:center;">📜 Legal Review Module – Coming Soon</p>`;
-  } else if (module === "script") {
-    contentPanel.innerHTML = `<p style="text-align:center;">✍️ Script Writer Module – Coming Soon</p>`;
-  } else if (module === "voiceover") {
-    contentPanel.innerHTML = `<p style="text-align:center;">🎤 Voiceover Module – Coming Soon</p>`;
-  } else if (module === "upload") {
-    contentPanel.innerHTML = `<p style="text-align:center;">📤 Upload Strategy Module – Coming Soon</p>`;
-  } else if (module === "output") {
-    contentPanel.innerHTML = `<p style="text-align:center;">📺 Final Output Module – Coming Soon</p>`;
-  } else if (module === "history") {
-    contentPanel.innerHTML = `<p style="text-align:center;">🗂️ History Module – Coming Soon</p>`;
-  } else if (module === "settings") {
-    contentPanel.innerHTML = `<p style="text-align:center;">⚙️ Settings Module – Coming Soon</p>`;
   } else {
-    contentPanel.innerHTML = `<p style="text-align:center;">Module not found.</p>`;
+    contentPanel.innerHTML = `<p style="text-align:center; font-size: 18px;">🔧 ${module.charAt(0).toUpperCase() + module.slice(1)} Module – Coming Soon</p>`;
   }
 }
 
-// Sidebar retract toggle
+// Toggle sidebar
 document.getElementById("toggle-btn").addEventListener("click", () => {
   document.getElementById("sidebar").classList.toggle("hidden");
 });
