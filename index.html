@@ -97,7 +97,7 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 32px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -111,8 +111,8 @@
     }
 
     #api-key {
-      padding: 16px 20px;
-      font-size: 18px;
+      padding: 14px 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -170,31 +170,34 @@
       main.classList.toggle("full");
     });
 
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
-    };
-
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        const moduleHTML = content[module] || `<p style="color: #ccc;">Module not found.</p>`;
+        const content = {
+          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
+          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
+                   <p>This AI analyzes trends to suggest optimal upload times and platforms.</p>
+                   <ul style="color: #ccc; font-size: 16px; line-height: 1.6; text-align: left; max-width: 600px; margin: auto;">
+                     <li><strong>YouTube:</strong> Tuesdays & Thursdays at 5:00 PM</li>
+                     <li><strong>TikTok:</strong> Daily between 11:00 AM – 1:00 PM</li>
+                     <li><strong>Instagram Reels:</strong> Mondays, Wednesdays, and Fridays at 6:00 PM</li>
+                     <li><strong>Peak Engagement Time:</strong> Weekends between 12:00 PM – 3:00 PM</li>
+                   </ul>
+                   <p style="color:#888; font-size: 14px;">(Coming soon: automatic scheduler & cross-platform optimizer)</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+        };
 
         main.innerHTML = `
-          <h1>Boss AI Dashboard</h1>
-          <p>Enter your OpenAI API key to begin:</p>
-          <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-          <div style="max-width: 800px; text-align: left; margin-top: 30px;">
-            ${moduleHTML}
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
           </div>
         `;
       });
