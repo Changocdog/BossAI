@@ -1,3 +1,4 @@
+<!-- FULL HTML CODE - START -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,11 +230,22 @@
             <button onclick="generateVoice()">Generate Voiceover</button>
             <pre id="voice-output"></pre>
           `;
+        } else if (module === "upload") {
+          main.innerHTML = `
+            <h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
+            <p>Select your platform to receive upload advice:</p>
+            <select id="upload-platform">
+              <option value="youtube">YouTube Shorts</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram Reels</option>
+            </select>
+            <button onclick="generateUpload()">Generate Strategy</button>
+            <pre id="upload-output"></pre>
+          `;
         } else {
           const content = {
             manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
             legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-            upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
             output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
             history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
             settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
@@ -261,7 +273,30 @@
         : "⚠️ Please enter a script to simulate voiceover.";
       document.getElementById("voice-output").innerText = output;
     }
+
+    function generateUpload() {
+      const platform = document.getElementById("upload-platform").value;
+      const output = {
+        youtube: `✅ YouTube Shorts Strategy:
+- Post daily between 12–3 PM
+- Use 3-5 relevant hashtags (#FinanceTips)
+- Keep videos under 60s with punchy hooks
+- Use captions to improve retention`,
+        tiktok: `✅ TikTok Strategy:
+- Post 1–3x per day between 9–12 AM or 5–8 PM
+- Use trending sounds and effects
+- Short videos with fast pacing = higher reach
+- Add a clear CTA in the last 5 seconds`,
+        instagram: `✅ Instagram Reels Strategy:
+- Best post time: 11 AM or 6 PM
+- Focus on aesthetics and branding
+- Use engaging covers and reel previews
+- Share to Stories for extra exposure`
+      };
+      document.getElementById("upload-output").innerText = output[platform] || "No strategy available.";
+    }
   </script>
 
 </body>
 </html>
+<!-- FULL HTML CODE - END -->
