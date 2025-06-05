@@ -1,6 +1,10 @@
 const contentPanel = document.getElementById("content-panel");
 const buttons = document.querySelectorAll("#sidebar button");
-const historyLog = [];
+let historyLog = JSON.parse(localStorage.getItem("bossAIHistory") || "[]");
+
+function saveHistory() {
+  localStorage.setItem("bossAIHistory", JSON.stringify(historyLog));
+}
 
 // Handle module switching
 buttons.forEach(btn => {
@@ -61,6 +65,7 @@ function displayModule(module) {
           output: script,
           timestamp: new Date().toLocaleString()
         });
+        saveHistory();
       } catch (err) {
         output.textContent = "❌ Error generating script.";
       }
@@ -81,12 +86,14 @@ function displayModule(module) {
       const output = document.getElementById("voice-output");
       if (!text) return alert("Please paste a script.");
       output.textContent = `🔊 Simulating voiceover...\n\n"${text}"`;
+
       historyLog.push({
         type: "Voiceover",
         input: text,
         output: text,
         timestamp: new Date().toLocaleString()
       });
+      saveHistory();
     });
   }
 
@@ -134,6 +141,7 @@ function displayModule(module) {
           output: result,
           timestamp: new Date().toLocaleString()
         });
+        saveHistory();
       } catch (err) {
         resultBox.textContent = "❌ Error generating strategy.";
       }
@@ -187,6 +195,7 @@ function displayModule(module) {
           output: result,
           timestamp: new Date().toLocaleString()
         });
+        saveHistory();
       } catch (err) {
         resultBox.innerHTML = `<p style="color:red;">❌ Legal review failed. Check your API key.</p>`;
       }
