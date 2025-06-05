@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.classList.toggle("collapsed");
   });
 
-  // Dark mode toggle
+  // Dark mode
   modeToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark-mode", modeToggle.checked);
   });
 
-  // Sidebar navigation
+  // Navigation
   sidebarButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const module = btn.getAttribute("data-module");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (target) target.style.display = "block";
   }
 
-  // Feedback form
+  // Feedback
   if (feedbackForm) {
     feedbackForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Script Writer AI
+  // Script Writer
   const generateBtn = document.getElementById("generate-script-btn");
   const scriptInput = document.getElementById("script-input");
   const scriptOutput = document.getElementById("script-output");
@@ -105,6 +105,58 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Set default panel
+  // Upload Strategy AI
+  const uploadBtn = document.createElement("button");
+  uploadBtn.id = "generate-upload-strategy-btn";
+  uploadBtn.className = "primary";
+  uploadBtn.textContent = "Generate Upload Strategy";
+
+  const uploadPanel = document.getElementById("upload-panel");
+  if (uploadPanel) {
+    uploadPanel.appendChild(uploadBtn);
+    const output = document.createElement("pre");
+    output.id = "upload-strategy-output";
+    uploadPanel.appendChild(output);
+
+    uploadBtn.addEventListener("click", async () => {
+      const apiKey = document.getElementById("api-key").value.trim();
+      const script = document.getElementById("script-output").textContent.trim();
+
+      if (!apiKey || !script) {
+        alert("Please enter API key and generate a script first.");
+        return;
+      }
+
+      output.textContent = "Generating strategy...";
+
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{
+              role: "user",
+              content: `Based on the following video script, suggest the best upload time and platform for maximum reach:\n\n${script}`
+            }],
+            max_tokens: 200,
+            temperature: 0.6
+          })
+        });
+
+        const data = await response.json();
+        const strategy = data.choices?.[0]?.message?.content;
+        output.textContent = strategy || "No response received.";
+      } catch (err) {
+        output.textContent = "❌ Error generating upload strategy.";
+        console.error(err);
+      }
+    });
+  }
+
+  // Default load
   showPanel("home");
 });
