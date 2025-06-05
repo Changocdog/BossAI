@@ -137,6 +137,23 @@
       white-space: pre-wrap;
     }
 
+    ul {
+      text-align: left;
+      padding-left: 0;
+      list-style: none;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    ul li {
+      background: #121212;
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 6px;
+      color: #00bfff;
+      border: 1px solid #007bff;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -179,6 +196,16 @@
       </video>
       <pre>✅ Your video is ready. Click play to preview.</pre>
     </div>
+
+    <div id="history-panel" style="display:none;">
+      <h2 style="color:#00bfff;">🗂️ History</h2>
+      <p>Here’s a log of recent scripts, outputs, or uploads:</p>
+      <ul>
+        <li><strong>Video 1:</strong> “Why AI Will Replace 70% of Jobs”</li>
+        <li><strong>Script 2:</strong> “How to Build Wealth in Your 20s”</li>
+        <li><strong>Voiceover 3:</strong> “AI vs Human Creativity”</li>
+      </ul>
+    </div>
   </div>
 
   <script>
@@ -197,7 +224,6 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-
         document.querySelectorAll('#main > div[id$="-panel"]').forEach(panel => {
           panel.style.display = 'none';
         });
