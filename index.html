@@ -4,220 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      background-color: #f4f6f9;
-      color: #212529;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    /* HEADER BAR */
-    .topbar {
-      width: 100%;
-      height: 60px;
-      background: #ffffff;
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-    }
-
-    .topbar h2 {
-      font-size: 20px;
-      margin: 0;
-      font-weight: 600;
-      color: #007bff;
-    }
-
-    #toggle-btn {
-      margin-right: 16px;
-      padding: 8px 14px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      height: calc(100vh - 60px);
-      width: 240px;
-      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-      color: white;
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 100;
-      transition: transform 0.3s ease;
-      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
-    .sidebar-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sidebar-buttons button {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid transparent;
-      padding: 12px;
-      border-radius: 6px;
-      color: #fff;
-      text-align: left;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .sidebar-buttons button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #00bfff;
-    }
-
-    .sidebar-buttons button.active {
-      background-color: #00bfff;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    /* MAIN CONTENT */
-    .main {
-      margin-top: 60px;
-      margin-left: 240px;
-      padding: 40px 20px;
-      transition: margin-left 0.3s ease;
-      flex-grow: 1;
-      width: 100%;
-    }
-
-    .sidebar.hidden + .main {
-      margin-left: 0;
-    }
-
-    #api-key {
-      display: block;
-      margin: 0 auto 30px auto;
-      padding: 14px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 420px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-
-    #content-panel {
-      background: #fff;
-      padding: 30px;
-      max-width: 800px;
-      margin: 0 auto;
-      margin-top: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    }
-
-    h1 {
-      font-size: 32px;
-      margin-bottom: 8px;
-      color: #007bff;
-    }
-
-    h3 {
-      margin-top: 30px;
-      margin-bottom: 10px;
-      font-size: 20px;
-    }
-
-    ul.status-list {
-      list-style: none;
-      padding: 0;
-      line-height: 1.8;
-      font-size: 15px;
-      color: #333;
-    }
-
-    ul.status-list li span {
-      font-weight: bold;
-      color: green;
-    }
-
-    .emoji {
-      font-size: 36px;
-      margin-top: 20px;
-      color: #555;
-    }
-
-    .subtext {
-      color: #666;
-      font-size: 16px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        padding: 20px;
-        margin-left: 0 !important;
-      }
-
-      #api-key {
-        width: 90%;
-      }
-
-      #content-panel {
-        padding: 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="topbar">
-    <button id="toggle-btn">☰ Menu</button>
-    <h2>Boss AI</h2>
-  </div>
 
-  <div class="sidebar hidden" id="sidebar">
-    <div class="sidebar-buttons">
-      <button data-module="manager" class="active">🤖 Manager AI</button>
-      <button data-module="legal">📜 Legal Review</button>
-      <button data-module="script">✍️ Script Writer</button>
-      <button data-module="voiceover">🎤 Voiceover</button>
-      <button data-module="upload">📤 Upload Strategy</button>
-      <button data-module="output">📺 Final Output</button>
-      <button data-module="history">🗂️ History</button>
-      <button data-module="settings">⚙️ Settings</button>
+  <div id="topbar">
+    <span class="logo">🤖 Boss AI</span>
+    <div>
+      <label class="switch">
+        <input type="checkbox" id="mode-toggle" />
+        <span class="slider"></span>
+      </label>
     </div>
   </div>
 
-  <div class="main" id="main">
-    <input id="api-key" type="password" placeholder="🔑 OpenAI API Key" />
-    <div id="content-panel"></div>
+  <div id="app">
+    <div id="sidebar">
+      <button data-module="manager">🏠 Home</button>
+      <button data-module="script">✍️ Script</button>
+      <button data-module="voiceover">🎤 Voice</button>
+      <button data-module="upload">📤 Upload</button>
+      <button data-module="legal">📜 Legal</button>
+      <button data-module="history">📂 History</button>
+    </div>
+
+    <div id="main">
+      <div id="toolbar">
+        <button id="toggle-btn">☰ Menu</button>
+        <input id="api-key" placeholder="Enter OpenAI API key here..." />
+      </div>
+      <div id="content-panel"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>
