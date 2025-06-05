@@ -13,7 +13,7 @@
     body {
       margin: 0;
       font-family: "Inter", sans-serif;
-      background-color: #f5f6f7;
+      background-color: #f4f6f9;
       color: #212529;
       display: flex;
     }
@@ -77,54 +77,89 @@
 
     .main {
       margin-left: 240px;
-      padding: 20px;
+      padding: 40px 20px;
       transition: margin-left 0.3s ease;
       flex-grow: 1;
       width: 100%;
+      min-height: 100vh;
     }
 
     .sidebar.hidden + .main {
       margin-left: 0;
     }
 
-    input, textarea, select {
+    #api-key {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 14px;
+      font-size: 16px;
       width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      font-size: 15px;
+      max-width: 420px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
-    button:not(#toggle-btn) {
-      padding: 10px 16px;
-      margin-top: 10px;
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #007bff;
+    }
+
+    h3 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    ul.status-list {
+      list-style: none;
+      padding: 0;
+      line-height: 1.8;
       font-size: 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.2s ease;
+      color: #333;
     }
 
-    button:not(#toggle-btn):hover {
-      background-color: #0056b3;
+    ul.status-list li span {
+      font-weight: bold;
+      color: green;
     }
 
-    pre {
-      background-color: #eee;
-      padding: 12px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      font-size: 14px;
+    .dashboard-box {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      text-align: center;
     }
 
-    video {
-      width: 100%;
-      border-radius: 6px;
-      margin-top: 10px;
+    .dashboard-box p.subtext {
+      color: #666;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .emoji {
+      font-size: 36px;
+      margin-top: 20px;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        padding: 20px;
+        margin-left: 0 !important;
+      }
+
+      #api-key {
+        width: 90%;
+      }
+
+      .dashboard-box {
+        padding: 20px;
+      }
     }
   </style>
 </head>
