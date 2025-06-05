@@ -55,13 +55,28 @@ main {
   flex: 1;
   padding: 30px;
   background: #101522;
+  overflow-y: auto;
 }
 
-#topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+#topbar-centered {
+  text-align: center;
+  margin-top: 15vh;
+}
+
+.logo-img {
+  height: 80px;
+  margin-bottom: 15px;
+}
+
+#topbar-centered h1 {
+  font-size: 2.2em;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+#topbar-centered p {
+  color: #b0b0b0;
+  margin-bottom: 20px;
 }
 
 #api-key {
@@ -71,6 +86,11 @@ main {
   border: 1px solid #333;
   border-radius: 6px;
   width: 250px;
+}
+
+/* Module panels */
+.module-panel {
+  margin-top: 40px;
 }
 
 .module-panel h2 {
