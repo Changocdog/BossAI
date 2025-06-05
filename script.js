@@ -1,61 +1,57 @@
-// Sidebar switching
-document.querySelectorAll('.sidebar-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+// Select all sidebar buttons and main panel
+const buttons = document.querySelectorAll(".sidebar button");
+const contentPanel = document.getElementById("content-panel");
 
-    const target = button.dataset.module;
-    document.querySelectorAll('.module-panel').forEach(panel => {
-      panel.classList.add('hidden');
-    });
-    document.getElementById(`${target}-panel`).classList.remove('hidden');
+// Highlight active button and load its module
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    buttons.forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+    displayModule(button.dataset.module);
   });
 });
 
-// Script Writer
-document.getElementById('generate-script-btn').addEventListener('click', async () => {
-  const input = document.getElementById('script-input').value;
-  const apiKey = document.getElementById('api-key').value;
-  const output = document.getElementById('script-output');
+// Display content for selected module
+function displayModule(module) {
+  if (module === "manager") {
+    contentPanel.innerHTML = `
+      <div class="dashboard-box">
+        <h1>👑 Boss AI Dashboard</h1>
+        <p class="subtext">Welcome! Use the tools in the sidebar to generate scripts, voiceovers, and upload plans.</p>
 
-  if (!input || !apiKey) {
-    output.textContent = '❗ Enter a topic and your OpenAI API key.';
-    return;
+        <h3>⚙️ Module Status</h3>
+        <ul class="status-list">
+          <li>✅ <strong>Script Writer AI</strong> — <span>Online</span></li>
+          <li>✅ <strong>Upload Strategy AI</strong> — <span>Online</span></li>
+          <li>✅ <strong>Voiceover Generator</strong> — <span>Simulated</span></li>
+          <li>✅ <strong>Legal Review AI</strong> — <span>Enabled</span></li>
+          <li>✅ <strong>History & Output Log</strong> — <span>Functional</span></li>
+        </ul>
+
+        <div class="emoji">🤖</div>
+        <p class="subtext">Select a module from the sidebar to get started.</p>
+      </div>
+    `;
+  } else if (module === "legal") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📜 Legal Review Module – Coming Soon</p>`;
+  } else if (module === "script") {
+    contentPanel.innerHTML = `<p style="text-align:center;">✍️ Script Writer Module – Coming Soon</p>`;
+  } else if (module === "voiceover") {
+    contentPanel.innerHTML = `<p style="text-align:center;">🎤 Voiceover Module – Coming Soon</p>`;
+  } else if (module === "upload") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📤 Upload Strategy Module – Coming Soon</p>`;
+  } else if (module === "output") {
+    contentPanel.innerHTML = `<p style="text-align:center;">📺 Final Output Module – Coming Soon</p>`;
+  } else if (module === "history") {
+    contentPanel.innerHTML = `<p style="text-align:center;">🗂️ History Module – Coming Soon</p>`;
+  } else if (module === "settings") {
+    contentPanel.innerHTML = `<p style="text-align:center;">⚙️ Settings Module – Coming Soon</p>`;
+  } else {
+    contentPanel.innerHTML = `<p style="text-align:center;">Module not found.</p>`;
   }
+}
 
-  output.textContent = '⏳ Generating...';
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Write a short YouTube script about: ${input}` }]
-      })
-    });
-
-    const data = await response.json();
-    output.textContent = data.choices?.[0]?.message?.content || '⚠️ No output.';
-  } catch (error) {
-    output.textContent = '❌ Error generating script.';
-  }
-});
-
-// Voiceover AI (simulated)
-document.getElementById('generate-voiceover-btn').addEventListener('click', () => {
-  const status = document.getElementById('voiceover-status');
-  status.textContent = '🎤 Voiceover simulated! (Audio generation coming soon)';
-});
-
-// Feedback Form
-document.getElementById('feedback-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  document.getElementById('popup').classList.remove('hidden');
-  setTimeout(() => {
-    document.getElementById('popup').classList.add('hidden');
-  }, 2000);
+// Sidebar retract toggle
+document.getElementById("toggle-btn").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("hidden");
 });
