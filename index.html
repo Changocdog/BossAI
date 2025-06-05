@@ -7,102 +7,78 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="app">
-    <!-- Sidebar -->
-    <aside id="sidebar">
-      <div class="logo">📊 Boss AI</div>
-      <nav>
-        <button class="sidebar-btn" data-module="manager">🏠 Dashboard</button>
-        <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
-        <button class="sidebar-btn" data-module="voiceover">🎙️ Voiceover AI</button>
-        <button class="sidebar-btn" data-module="upload">📤 Video Clipper</button>
-        <button class="sidebar-btn" data-module="legal">⚖️ Legal Checker</button>
-        <button class="sidebar-btn" data-module="history">📂 History</button>
-        <button class="sidebar-btn" data-module="dashboard">📊 Performance</button>
-        <button class="sidebar-btn" data-module="monetization">💰 Monetization</button>
-        <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
-      </nav>
-    </aside>
+  <aside id="sidebar">
+    <div class="logo">🤖 Boss AI</div>
+    <nav>
+      <button class="sidebar-btn active" data-module="manager">🏠 Dashboard</button>
+      <button class="sidebar-btn" data-module="script">✍️ Script Writer</button>
+      <button class="sidebar-btn" data-module="voiceover">🎙️ Voiceover</button>
+      <button class="sidebar-btn" data-module="upload">📤 Upload</button>
+      <button class="sidebar-btn" data-module="legal">⚖️ Legal</button>
+      <button class="sidebar-btn" data-module="history">📂 History</button>
+      <button class="sidebar-btn" data-module="dashboard">📊 Performance</button>
+      <button class="sidebar-btn" data-module="feedback">💬 Feedback</button>
+    </nav>
+  </aside>
 
-    <!-- Main Content -->
-    <main id="main">
-      <!-- Topbar -->
-      <header id="topbar">
-        <div class="left">
-          <h1>Dashboard</h1>
-          <p>Welcome to Boss AI. Enter a command to begin.</p>
-        </div>
-        <div class="right">
-          <input type="password" id="api-key" placeholder="🔑 OpenAI API Key" />
-        </div>
-      </header>
+  <main>
+    <header id="topbar">
+      <div class="left">
+        <h1>Boss AI Dashboard</h1>
+        <p>Start by selecting a module or entering a topic.</p>
+      </div>
+      <div class="right">
+        <input type="password" id="api-key" placeholder="🔑 OpenAI API Key" />
+      </div>
+    </header>
 
-      <!-- Content Area -->
-      <section id="content-panel">
-        <!-- Manager -->
-        <div id="manager-panel" class="module-panel">
-          <h2>🧠 General Manager AI</h2>
-          <p>This AI coordinates all tools and oversees automation.</p>
-        </div>
+    <section id="manager-panel" class="module-panel">
+      <h2>Welcome to Boss AI</h2>
+      <p>This is your dashboard. Use the sidebar to access modules.</p>
+    </section>
 
-        <!-- Script Writer -->
-        <div id="script-panel" class="module-panel" style="display: none;">
-          <h2>✍️ Script Writer AI</h2>
-          <input id="script-input" type="text" placeholder="Enter your command or video topic..." />
-          <button id="generate-script-btn" class="primary">Generate Video</button>
-          <pre id="script-output">⚪ Awaiting input...</pre>
-        </div>
+    <section id="script-panel" class="module-panel hidden">
+      <h2>✍️ Script Writer AI</h2>
+      <input type="text" id="script-input" placeholder="Enter your topic..." />
+      <button id="generate-script-btn">Generate Video</button>
+      <pre id="script-output">Awaiting input...</pre>
+    </section>
 
-        <!-- Voiceover -->
-        <div id="voiceover-panel" class="module-panel" style="display: none;">
-          <h2>🎙️ Voiceover Generator</h2>
-          <button id="generate-voiceover-btn" class="primary">Generate Voiceover</button>
-          <p id="voiceover-status"></p>
-        </div>
+    <section id="voiceover-panel" class="module-panel hidden">
+      <h2>🎙️ Voiceover AI</h2>
+      <button id="generate-voiceover-btn">Simulate Voiceover</button>
+      <p id="voiceover-status"></p>
+    </section>
 
-        <!-- Upload Strategy -->
-        <div id="upload-panel" class="module-panel" style="display: none;">
-          <h2>📤 Upload Strategy</h2>
-          <p>Best times and platforms to post content.</p>
-        </div>
+    <section id="upload-panel" class="module-panel hidden">
+      <h2>📤 Upload Strategy</h2>
+      <p>Auto-schedule and optimize video posts (coming soon).</p>
+    </section>
 
-        <!-- Legal Checker -->
-        <div id="legal-panel" class="module-panel" style="display: none;">
-          <h2>⚖️ Legal Checker</h2>
-          <p>Scans your content for copyright or policy violations.</p>
-        </div>
+    <section id="legal-panel" class="module-panel hidden">
+      <h2>⚖️ Legal Checker</h2>
+      <p>Reviewing content for compliance...</p>
+    </section>
 
-        <!-- History -->
-        <div id="history-panel" class="module-panel" style="display: none;">
-          <h2>📂 History</h2>
-          <p>View logs of all past content generated.</p>
-        </div>
+    <section id="history-panel" class="module-panel hidden">
+      <h2>📂 Video History</h2>
+      <p>Previous video scripts and uploads will appear here.</p>
+    </section>
 
-        <!-- Performance -->
-        <div id="dashboard-panel" class="module-panel" style="display: none;">
-          <h2>📊 Performance Dashboard</h2>
-          <p>Analyze how your videos are performing.</p>
-        </div>
+    <section id="dashboard-panel" class="module-panel hidden">
+      <h2>📊 Performance Dashboard</h2>
+      <p>Analytics and AI usage data will be shown here.</p>
+    </section>
 
-        <!-- Monetization -->
-        <div id="monetization-panel" class="module-panel" style="display: none;">
-          <h2>💰 Monetization Strategy</h2>
-          <input type="number" id="goal-input" placeholder="Enter $ goal..." />
-          <button class="primary">Save Goal</button>
-        </div>
-
-        <!-- Feedback -->
-        <div id="feedback-panel" class="module-panel" style="display: none;">
-          <h2>💬 Feedback</h2>
-          <form id="feedback-form">
-            <textarea placeholder="Your feedback..." rows="4"></textarea>
-            <button type="submit" class="primary">Submit</button>
-          </form>
-          <div id="popup" class="popup hidden">✅ Thanks for the feedback!</div>
-        </div>
-      </section>
-    </main>
-  </div>
+    <section id="feedback-panel" class="module-panel hidden">
+      <h2>💬 Feedback</h2>
+      <form id="feedback-form">
+        <textarea placeholder="Leave your feedback..." required></textarea>
+        <button type="submit">Send</button>
+      </form>
+      <div id="popup" class="popup hidden">✅ Feedback submitted!</div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
