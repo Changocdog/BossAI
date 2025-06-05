@@ -171,6 +171,33 @@ Call to Action: "Subscribe for more daily tips."
       </div>
     `;
   }
+
+  else if (module === "dashboard") {
+    const counts = {
+      "Script": 0,
+      "Voiceover": 0,
+      "Legal Review": 0,
+      "Upload Strategy": 0
+    };
+
+    historyLog.forEach(entry => {
+      if (counts[entry.type] !== undefined) {
+        counts[entry.type]++;
+      }
+    });
+
+    contentPanel.innerHTML = `
+      <h1>📊 AI Performance Dashboard</h1>
+      <p class="subtext">Total AI tasks completed:</p>
+      <ul style="line-height: 1.8em;">
+        <li>✍️ Scripts: <strong>${counts["Script"]}</strong></li>
+        <li>🎤 Voiceovers: <strong>${counts["Voiceover"]}</strong></li>
+        <li>🛡️ Legal Reviews: <strong>${counts["Legal Review"]}</strong></li>
+        <li>🚀 Upload Strategies: <strong>${counts["Upload Strategy"]}</strong></li>
+      </ul>
+      <p class="subtext">Keep creating to grow your channel and optimize your workflow!</p>
+    `;
+  }
 }
 
 // Toggle sidebar
