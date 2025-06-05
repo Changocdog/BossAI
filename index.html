@@ -10,7 +10,8 @@
   <!-- Sidebar -->
   <div id="sidebar">
     <div class="logo">🤖 Boss AI</div>
-    <button class="sidebar-btn active" data-module="manager-panel">Manager AI</button>
+    <button class="sidebar-btn active" data-module="home-panel">Home</button>
+    <button class="sidebar-btn" data-module="manager-panel">Manager AI</button>
     <button class="sidebar-btn" data-module="legal-panel">Legal Review</button>
     <button class="sidebar-btn" data-module="script-panel">Script Writer</button>
     <button class="sidebar-btn" data-module="voice-panel">Voiceover</button>
@@ -20,17 +21,20 @@
     <button class="sidebar-btn" data-module="settings-panel">Settings</button>
   </div>
 
-  <!-- Main content -->
+  <!-- Main -->
   <main>
-    <div id="topbar-centered">
-      <img src="boss-logo.jpeg" alt="Boss AI Logo" class="logo-img" />
-      <h1>Boss AI</h1>
-      <p>Your Content Automation Assistant</p>
-      <input id="api-key" type="text" placeholder="🔑 Enter OpenAI API Key" />
+    <!-- WELCOME PANEL -->
+    <div id="home-panel" class="module-panel">
+      <div id="topbar-centered">
+        <img src="boss-logo.jpeg" alt="Boss AI Logo" class="logo-img" />
+        <h1>Boss AI</h1>
+        <p>Your Content Automation Assistant</p>
+        <input id="api-key" type="text" placeholder="🔑 Enter OpenAI API Key" />
+      </div>
     </div>
 
-    <!-- Module panels -->
-    <div id="manager-panel" class="module-panel">
+    <!-- MODULE PANELS (initially hidden) -->
+    <div id="manager-panel" class="module-panel hidden">
       <h2>🧠 General Manager AI</h2>
       <p>This AI coordinates all tools and oversees automation.</p>
     </div>
