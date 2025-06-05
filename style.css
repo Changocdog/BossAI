@@ -6,6 +6,7 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+/* Topbar */
 #topbar {
   display: flex;
   justify-content: space-between;
@@ -26,7 +27,6 @@ body {
 .logo {
   font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -66,13 +66,12 @@ body {
   font-size: 14px;
 }
 
-/* Container */
+/* Layout */
 #container {
   display: flex;
   height: calc(100vh - 60px);
 }
 
-/* Sidebar */
 #sidebar {
   width: 220px;
   background-color: #27293d;
@@ -81,7 +80,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 
 #sidebar.collapsed {
@@ -98,12 +97,13 @@ body {
   cursor: pointer;
   font-size: 15px;
   border-radius: 4px;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
 #sidebar button:hover,
 #sidebar button.active {
   background: #505273;
+  transform: scale(1.02);
 }
 
 /* Main Content */
@@ -111,7 +111,15 @@ body {
   flex-grow: 1;
   padding: 24px;
   overflow-y: auto;
-  transition: background 0.3s;
+  opacity: 0;
+  animation: fadeIn 0.4s ease-in forwards;
+  transition: background-color 0.3s;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 .centered-panel {
@@ -137,6 +145,7 @@ body {
 
 .primary:hover {
   background-color: #005fa3;
+  transform: scale(1.02);
 }
 
 /* Feedback Form */
