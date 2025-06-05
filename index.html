@@ -16,16 +16,35 @@
       background-color: #f4f6f9;
       color: #212529;
       display: flex;
+      flex-direction: column;
       min-height: 100vh;
     }
 
-    /* Always-visible menu button */
-    #toggle-btn {
+    /* HEADER BAR */
+    .topbar {
+      width: 100%;
+      height: 60px;
+      background: #ffffff;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
       position: fixed;
-      top: 12px;
-      left: 12px;
-      z-index: 999;
-      padding: 10px 16px;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .topbar h2 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 600;
+      color: #007bff;
+    }
+
+    #toggle-btn {
+      margin-right: 16px;
+      padding: 8px 14px;
       background-color: #007bff;
       color: white;
       border: none;
@@ -36,15 +55,16 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
+    /* SIDEBAR */
     .sidebar {
       position: fixed;
-      top: 0;
+      top: 60px;
       left: 0;
-      height: 100vh;
+      height: calc(100vh - 60px);
       width: 240px;
       background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
       color: white;
-      padding: 70px 16px 16px;
+      padding: 20px 16px;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -86,7 +106,9 @@
       font-weight: bold;
     }
 
+    /* MAIN CONTENT */
     .main {
+      margin-top: 60px;
       margin-left: 240px;
       padding: 40px 20px;
       transition: margin-left 0.3s ease;
@@ -110,7 +132,6 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
-    /* Modern module content style */
     #content-panel {
       background: #fff;
       padding: 30px;
@@ -176,7 +197,10 @@
   </style>
 </head>
 <body>
-  <button id="toggle-btn">☰ Menu</button>
+  <div class="topbar">
+    <button id="toggle-btn">☰ Menu</button>
+    <h2>Boss AI</h2>
+  </div>
 
   <div class="sidebar hidden" id="sidebar">
     <div class="sidebar-buttons">
