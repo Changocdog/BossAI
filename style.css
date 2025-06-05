@@ -1,165 +1,176 @@
-body {
+/* General Reset */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  transition: background 0.3s, color 0.3s;
+  padding: 0;
 }
 
+/* Fonts + Body */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+}
+
+/* Dark Mode */
+body.dark-mode {
+  background-color: #111;
+  color: #eee;
+}
+
+/* Top Bar */
 #topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #1e1e2f;
+  padding: 12px 20px;
+  background-color: #1a73e8;
   color: white;
-  padding: 12px 24px;
-  font-size: 18px;
   font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.logo {
-  font-size: 20px;
+#topbar input[type="text"] {
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  width: 250px;
 }
 
-#app {
+/* Layout */
+#container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 50px);
 }
 
+/* Sidebar */
 #sidebar {
   width: 220px;
-  background: #2e2e3e;
+  background-color: #222;
   color: white;
-  padding: 16px;
+  padding: 15px 10px;
   display: flex;
   flex-direction: column;
-  transition: width 0.3s;
+  gap: 10px;
+  transition: transform 0.3s;
 }
 
 #sidebar.hidden {
-  display: none;
+  transform: translateX(-100%);
 }
 
 #sidebar button {
-  background: none;
-  border: none;
+  background: #444;
   color: white;
-  padding: 12px;
-  margin: 6px 0;
-  text-align: left;
-  font-size: 16px;
-  cursor: pointer;
+  border: none;
+  padding: 10px;
   border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
   transition: background 0.2s;
 }
 
 #sidebar button:hover,
 #sidebar button.active {
-  background: #444;
+  background-color: #1a73e8;
 }
 
-#main {
+/* Content Area */
+#content-panel {
   flex-grow: 1;
-  padding: 20px;
-  transition: margin-left 0.3s;
+  padding: 25px;
   overflow-y: auto;
 }
 
-#toolbar {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#toggle-btn {
-  font-size: 18px;
-  padding: 6px 12px;
-}
-
-#api-key {
-  flex-grow: 1;
-  padding: 8px;
-  border-radius: 6px;
+/* Input & Buttons */
+input[type="text"],
+textarea {
+  padding: 10px;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 600px;
+  font-size: 15px;
+  border-radius: 5px;
   border: 1px solid #ccc;
 }
 
-textarea, pre {
-  font-family: monospace;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
 button {
-  background: #007bff;
+  padding: 10px 15px;
+  margin-top: 10px;
+  background-color: #1a73e8;
   color: white;
-  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
 }
 
 button:hover {
-  background: #0056b3;
+  background-color: #0c5dc0;
 }
 
-/* Dark mode styles */
-body.dark {
-  background: #121212;
-  color: #f0f0f0;
+/* Output Styling */
+pre {
+  background: #f1f1f1;
+  padding: 15px;
+  margin-top: 15px;
+  white-space: pre-wrap;
+  border-radius: 5px;
+  overflow-x: auto;
+  max-width: 100%;
+  line-height: 1.4;
 }
 
-body.dark #topbar {
-  background: #1f1f1f;
-}
-
-body.dark #sidebar {
+body.dark-mode pre {
   background: #222;
+  color: #eee;
 }
 
-body.dark #main {
-  background: #121212;
+/* History Entries */
+.history-entry {
+  background: #eee;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
 }
 
-/* Toggle switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 24px;
+body.dark-mode .history-entry {
+  background: #333;
 }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+/* Headings */
+h1 {
+  font-size: 26px;
+  margin-bottom: 10px;
 }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0;
-  right: 0; bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 24px;
+.subtext {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 10px;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
-}
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar {
+    position: absolute;
+    z-index: 2;
+    height: 100%;
+  }
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+  #container {
+    flex-direction: column;
+  }
 
-input:checked + .slider:before {
-  transform: translateX(22px);
+  #topbar {
+    flex-wrap: wrap;
+  }
+
+  #topbar input {
+    width: 100%;
+    margin-top: 10px;
+  }
 }
