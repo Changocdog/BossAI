@@ -48,7 +48,26 @@ document.addEventListener("DOMContentLoaded", () => {
         <p style="color:#4fc3f7;">✅ Final Review Complete</p>
       </div>
     `,
-    history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+    history: `
+      <h2 style="color:#00bfff;">🗂️ History Log</h2>
+      <p>Here are your last few generated video entries:</p>
+      <div style="background:#111; border:1px solid #444; border-radius:8px; padding:10px; max-height:300px; overflow-y:auto;">
+        <ul style="list-style:none; padding-left:0;">
+          <li style="margin-bottom:12px;">
+            <strong style="color:#4fc3f7;">✅ [6/5] Compound Interest</strong><br>
+            <span style="color:#ccc;">Script & Voiceover complete. Uploaded to TikTok.</span>
+          </li>
+          <li style="margin-bottom:12px;">
+            <strong style="color:#4fc3f7;">✅ [6/4] Roth IRA Explained</strong><br>
+            <span style="color:#ccc;">Generated script. Upload strategy pending.</span>
+          </li>
+          <li style="margin-bottom:12px;">
+            <strong style="color:#4fc3f7;">✅ [6/3] Passive Income Myths</strong><br>
+            <span style="color:#ccc;">Fully processed and published.</span>
+          </li>
+        </ul>
+      </div>
+    `,
     settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
   };
 
