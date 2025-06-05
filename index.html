@@ -67,12 +67,12 @@
       margin-left: 240px;
       width: calc(100% - 240px);
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 40px 20px;
+      flex-direction: column;
+      padding: 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
-      overflow-y: auto;
     }
 
     .main.full {
@@ -120,45 +120,21 @@
       border-radius: 8px;
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
-      margin-bottom: 40px;
     }
 
     input::placeholder {
       color: #bbbbbb;
     }
 
-    textarea, input[type="text"] {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      font-size: 16px;
-      margin-bottom: 10px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 6px;
-      color: white;
-    }
-
-    button {
-      background-color: #007bff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      color: white;
-      margin-bottom: 20px;
-    }
-
     pre {
-      background-color: #111;
+      background-color: #1e1e1e;
       padding: 12px;
       border-radius: 6px;
-      width: 100%;
-      max-width: 500px;
+      color: #00bfff;
+      text-align: left;
+      margin-top: 10px;
+      font-size: 14px;
       white-space: pre-wrap;
-      word-wrap: break-word;
-      border: 1px solid #007bff;
     }
 
     @media (max-width: 768px) {
@@ -194,11 +170,14 @@
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
 
-    <div id="voiceover-panel" style="display:none;">
-      <h2 style="color:#00bfff;">🎤 Voiceover Generator</h2>
-      <input id="voiceover-input" type="text" placeholder="Paste your script or text here..." />
-      <button onclick="generateVoiceover()">Generate Voiceover</button>
-      <pre id="voiceover-output">Awaiting input...</pre>
+    <div id="output-panel" style="display:none;">
+      <h2 style="color:#00bfff;">📺 Final Output</h2>
+      <p>Here is your AI-generated video or final content:</p>
+      <video id="final-video" controls width="480">
+        <source src="output.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <pre>✅ Your video is ready. Click play to preview.</pre>
     </div>
   </div>
 
@@ -219,27 +198,15 @@
 
         const module = button.getAttribute("data-module");
 
-        // Hide all modules
-        document.getElementById("voiceover-panel").style.display = "none";
+        document.querySelectorAll('#main > div[id$="-panel"]').forEach(panel => {
+          panel.style.display = 'none';
+        });
 
-        // Show selected
-        if (module === "voiceover") {
-          document.getElementById("voiceover-panel").style.display = "block";
-        }
+        const panelId = `${module}-panel`;
+        const targetPanel = document.getElementById(panelId);
+        if (targetPanel) targetPanel.style.display = 'block';
       });
     });
-
-    function generateVoiceover() {
-      const input = document.getElementById("voiceover-input").value;
-      const output = document.getElementById("voiceover-output");
-
-      if (!input) {
-        output.textContent = "❗ Please enter some text to convert into voice.";
-        return;
-      }
-
-      output.textContent = `🔊 (Simulated voiceover generated for input):\n"${input}"`;
-    }
   </script>
 
 </body>
