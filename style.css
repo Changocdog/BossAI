@@ -271,3 +271,52 @@ body.dark-mode pre {
 body.dark-mode .subtext {
   color: #aaa;
 }
+
+/* Feedback Form Styling */
+.feedback-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.feedback-form h2 {
+  margin-bottom: 16px;
+}
+
+.feedback-form label {
+  font-weight: bold;
+  display: block;
+  margin-top: 12px;
+}
+
+.feedback-form input,
+.feedback-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  resize: vertical;
+}
+
+.feedback-form button {
+  margin-top: 20px;
+  width: 100%;
+}
+
+body.dark-mode .feedback-form {
+  background: #1e1e1e;
+  color: #eee;
+}
+
+body.dark-mode .feedback-form input,
+body.dark-mode .feedback-form textarea {
+  background: #2a2a2a;
+  border: 1px solid #555;
+  color: #eee;
+}
