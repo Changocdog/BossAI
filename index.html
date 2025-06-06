@@ -6,9 +6,7 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,7 +21,7 @@
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 60px 10px 20px 10px;
+      padding: 60px 10px 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -122,8 +120,29 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    input::placeholder {
-      color: #bbbbbb;
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #00bfff;
+      background-color: #1a1a1a;
+      color: white;
+    }
+
+    button.generate-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 10px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 0 10px #00bfff88;
     }
 
     @media (max-width: 768px) {
@@ -171,14 +190,14 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates all tasks, assigns roles, and oversees automation flows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scan all scripts and content for legal risks and copyright issues.</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate viral short-form video scripts for YouTube/TikTok automatically.</p>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts to high-quality AI voiceovers using ElevenLabs.</p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose optimal upload time and platform based on trends.</p>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview the completed video, review quality, and finalize post.</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>View a complete archive of past scripts, videos, and performance logs.</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust font size, visual theme, and API key access here.</p>`
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This is where your final video or result will appear.</p><br><button class="generate-btn">Render Final Video</button>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -188,7 +207,7 @@
 
         const module = button.getAttribute("data-module");
         main.innerHTML = `
-          <div style="max-width: 800px; text-align: left; padding: 30px;">
+          <div style="max-width: 800px; text-align: center;">
             ${content[module] || ''}
           </div>
         `;
