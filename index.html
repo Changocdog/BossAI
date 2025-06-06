@@ -13,8 +13,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -23,7 +23,7 @@
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 60px 10px 20px 10px;
+      padding: 60px 10px 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -44,7 +44,7 @@
       background: #121212;
       color: #ffffff;
       border: none;
-      padding: 14px;
+      padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
@@ -73,6 +73,7 @@
       padding: 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
+      overflow-y: auto;
     }
 
     .main.full {
@@ -97,7 +98,7 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 32px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -105,14 +106,14 @@
 
     p {
       color: #cccccc;
-      font-size: 14px;
+      font-size: 16px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
 
     #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
+      padding: 16px 20px;
+      font-size: 18px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
@@ -126,6 +127,23 @@
       color: #bbbbbb;
     }
 
+    .output-box {
+      max-width: 800px;
+      text-align: left;
+      padding: 20px;
+      background-color: #111;
+      border: 1px solid #00bfff55;
+      border-radius: 8px;
+      box-shadow: 0 0 12px #007bff44;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -136,16 +154,6 @@
         position: fixed;
         z-index: 999;
       }
-    }
-
-    .output-box {
-      background-color: #111;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      padding: 20px;
-      max-width: 700px;
-      text-align: left;
-      box-shadow: 0 0 12px #00bfff44;
     }
   </style>
 </head>
@@ -186,7 +194,7 @@
       script: `<div class="output-box"><h2 style="color:#00bfff;">✍️ Script Writer</h2><p>"Are you tired of living paycheck to paycheck? Here's one powerful habit that millionaires swear by..."</p></div>`,
       voiceover: `<div class="output-box"><h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Voiceover generation in progress... (simulated)</p></div>`,
       upload: `<div class="output-box"><h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Suggested upload time: <strong>Tuesday at 9AM PST</strong><br>Strategy: Post daily Shorts, add 3 relevant hashtags, and cross-post to TikTok.</p></div>`,
-      output: `<div class="output-box"><h2 style="color:#00bfff;">📺 Final Output</h2><p>Your completed video and caption will appear here.</p></div>`,
+      output: `<div class="output-box"><h2 style="color:#00bfff;">📺 Final Output</h2><p><strong>Video Title:</strong> Millionaire Habits Revealed<br><strong>Caption:</strong> Learn the ONE daily habit millionaires never skip. #FinanceTips #MoneyHacks</p><video controls><source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">Your browser does not support the video tag.</video></div>`,
       history: `<div class="output-box"><h2 style="color:#00bfff;">🗂️ History</h2><p>Recent scripts and uploads:</p><ul><li>Finance Hook 1 - 6/3</li><li>Motivation Short - 6/4</li><li>Horror Story Intro - 6/5</li></ul></div>`,
       settings: `<div class="output-box"><h2 style="color:#00bfff;">⚙️ Settings</h2><p>Theme: Dark<br>Font: Orbitron<br>Key Access: Unlimited</p></div>`
     };
