@@ -70,7 +70,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      padding: 20px;
+      padding: 40px 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
     }
@@ -97,16 +97,14 @@
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+      font-size: 32px;
+      margin-bottom: 12px;
       color: #00bfff;
-      letter-spacing: 1px;
     }
 
     p {
       color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
+      font-size: 16px;
       margin-bottom: 20px;
     }
 
@@ -122,38 +120,8 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    textarea {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      background: #1a1a1a;
-      color: #ffffff;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      resize: vertical;
-    }
-
     input::placeholder {
       color: #bbbbbb;
-    }
-
-    button.generate {
-      margin-top: 10px;
-      padding: 12px 20px;
-      background-color: #00bfff;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #script-output {
-      margin-top: 20px;
-      padding: 14px;
-      background: #0d0d0d;
-      border: 1px solid #007bff;
-      border-radius: 8px;
     }
 
     @media (max-width: 768px) {
@@ -188,8 +156,10 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <div id="main-content" style="margin-top: 40px; width: 100%; max-width: 800px;"></div>
   </div>
 
+  <script src="script.js"></script>
   <script>
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
@@ -199,58 +169,6 @@
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
     });
-
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-
-        const modules = {
-          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-          script: `
-            <div style="max-width: 800px; margin: 0 auto; color: #ffffff;">
-              <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-              <p>Enter a video topic or idea below and click generate to receive a full short-form script.</p>
-              <textarea id="script-input" rows="4" placeholder="e.g., How to save $10,000 in 6 months..."></textarea>
-              <button class="generate" onclick="generateScript()">Generate Script</button>
-              <div id="script-output"></div>
-            </div>
-          `,
-          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
-          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
-          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
-          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
-        };
-
-        main.innerHTML = modules[module] || '';
-      });
-    });
-
-    function generateScript() {
-      const prompt = document.getElementById('script-input').value;
-      const outputDiv = document.getElementById('script-output');
-
-      if (!prompt.trim()) {
-        outputDiv.innerHTML = "<p style='color: orange;'>Please enter a video idea first.</p>";
-        return;
-      }
-
-      outputDiv.innerHTML = "<p><em>Generating script...</em></p>";
-
-      setTimeout(() => {
-        outputDiv.innerHTML = `
-          <h3 style="color:#00bfff;">Generated Script:</h3>
-          <p><strong>Hook:</strong> Want to save $10,000 in 6 months?</p>
-          <p><strong>Body:</strong> Cut unnecessary expenses, automate savings, and track your progress weekly. Small consistent changes = big results.</p>
-          <p><strong>Call to Action:</strong> Follow for more tips!</p>
-        `;
-      }, 1000);
-    }
   </script>
-
 </body>
 </html>
