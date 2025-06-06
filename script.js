@@ -1,144 +1,88 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-  const main = document.getElementById("main");
+const moduleContent = {
+  manager: `
+    <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
+    <p>This AI coordinates the sub-AIs and manages workflows.</p>
+  `,
+  legal: `
+    <h2 style="color:#00bfff;">📜 Legal Review</h2>
+    <p>Reviewing content for compliance...</p>
+  `,
+  script: `
+    <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+    <p>Generate and edit video scripts here.</p>
+    <input id="script-input" type="text" placeholder="Enter a video topic..." style="margin-top:10px; padding:10px; width:100%; max-width:400px;" />
+    <button id="generate-script-btn" style="margin-top:10px;">Generate Script</button>
+    <pre id="script-output" style="margin-top:20px;"></pre>
+  `,
+  voiceover: `
+    <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+    <p>Convert scripts into audio narration.</p>
+  `,
+  upload: `
+    <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
+    <p>Optimize upload timing and strategy.</p>
+  `,
+  output: `
+    <h2 style="color:#00bfff;">📺 Final Output</h2>
+    <p>See the complete video or content result here.</p>
+  `,
+  history: `
+    <h2 style="color:#00bfff;">🗂️ History</h2>
+    <p>Review past scripts and outputs.</p>
+  `,
+  settings: `
+    <h2 style="color:#00bfff;">⚙️ Settings</h2>
+    <p>Configure preferences and integrations.</p>
+  `
+};
 
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("hidden");
-    main.classList.toggle("full");
-  });
+// Sidebar button click behavior
+document.querySelectorAll(".sidebar button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
 
-  const moduleContent = {
-    manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-    legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-    script: `
-      <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-      <p>Enter a topic and generate a short script:</p>
-      <textarea id="script-input" placeholder="Enter video topic..."></textarea>
-      <button onclick="generateScript()">Generate Script</button>
-      <pre id="script-output"></pre>
-    `,
-    voiceover: `
-      <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-      <p>Convert script text into voiceover audio (simulated):</p>
-      <textarea id="voiceover-text" placeholder="Paste script here..."></textarea>
-      <button onclick="generateVoiceover()">Generate Voiceover</button>
-      <pre id="voiceover-output"></pre>
-    `,
-    upload: `
-      <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-      <p>Get platform-specific upload recommendations:</p>
-      <select id="platform-select">
-        <option value="">Select a platform</option>
-        <option value="YouTube">YouTube</option>
-        <option value="TikTok">TikTok</option>
-        <option value="Instagram">Instagram</option>
-      </select>
-      <button onclick="generateUploadStrategy()">Generate Strategy</button>
-      <pre id="upload-output"></pre>
-    `,
-    output: `
-      <h2 style="color:#00bfff;">📺 Final Output</h2>
-      <p>Here is a preview of your generated video content:</p>
-      <div style="background:#1a1a1a; border:1px solid #00bfff; padding:16px; border-radius:8px; max-width:600px;">
-        <h3 style="color:#4fc3f7;">🎬 "The Power of Compound Interest"</h3>
-        <p style="color:#ccc;">Script: "In just 60 seconds, you’ll learn how saving small amounts consistently can turn into massive returns..."</p>
-        <p style="color:#ccc;">Voiceover: ✅ Ready (Simulated)</p>
-        <p style="color:#ccc;">Upload Strategy: Post to TikTok at 6PM with tags #finance #growth</p>
-        <p style="color:#4fc3f7;">✅ Final Review Complete</p>
-      </div>
-    `,
-    history: `
-      <h2 style="color:#00bfff;">🗂️ History Log</h2>
-      <p>Here are your last few generated video entries:</p>
-      <div style="background:#111; border:1px solid #444; border-radius:8px; padding:10px; max-height:300px; overflow-y:auto;">
-        <ul style="list-style:none; padding-left:0;">
-          <li style="margin-bottom:12px;">
-            <strong style="color:#4fc3f7;">✅ [6/5] Compound Interest</strong><br>
-            <span style="color:#ccc;">Script & Voiceover complete. Uploaded to TikTok.</span>
-          </li>
-          <li style="margin-bottom:12px;">
-            <strong style="color:#4fc3f7;">✅ [6/4] Roth IRA Explained</strong><br>
-            <span style="color:#ccc;">Generated script. Upload strategy pending.</span>
-          </li>
-          <li style="margin-bottom:12px;">
-            <strong style="color:#4fc3f7;">✅ [6/3] Passive Income Myths</strong><br>
-            <span style="color:#ccc;">Fully processed and published.</span>
-          </li>
-        </ul>
-      </div>
-    `,
-    settings: `
-      <h2 style="color:#00bfff;">⚙️ Settings</h2>
-      <p>Adjust your Boss AI preferences:</p>
-      <label style="display:block; margin-top:10px;">
-        <input type="checkbox" id="dark-mode-toggle" checked disabled>
-        <span style="margin-left:8px;">Dark Mode (default)</span>
-      </label>
-      <label style="display:block; margin-top:10px;">
-        <input type="checkbox" id="show-key-toggle">
-        <span style="margin-left:8px;">Show API Key</span>
-      </label>
-    `
-  };
+    const module = button.getAttribute("data-module");
+    const content = moduleContent[module] || "";
+    const container = document.getElementById("main-content");
 
-  document.querySelectorAll(".sidebar button").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-      button.classList.add("active");
-      const module = button.getAttribute("data-module");
-      main.innerHTML = `<div style="max-width: 800px; text-align: left;">${moduleContent[module] || ''}</div>`;
+    if (container) {
+      container.innerHTML = content;
+    }
 
-      // Special settings behavior
-      if (module === "settings") {
-        const toggle = document.getElementById("show-key-toggle");
-        toggle?.addEventListener("change", () => {
-          const input = document.getElementById("api-key");
-          if (input) input.type = toggle.checked ? "text" : "password";
-        });
-      }
-    });
+    // Activate Script Writer AI logic
+    if (module === "script") {
+      document.getElementById("generate-script-btn")?.addEventListener("click", async () => {
+        const input = document.getElementById("script-input").value;
+        const apiKey = document.getElementById("api-key").value;
+        const output = document.getElementById("script-output");
+
+        if (!input || !apiKey) {
+          output.textContent = "⚠️ Please enter a topic and your OpenAI API key.";
+          return;
+        }
+
+        output.textContent = "Generating...";
+        try {
+          const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: [{ role: "user", content: `Write a short video script about: ${input}` }],
+              max_tokens: 300
+            })
+          });
+
+          const data = await response.json();
+          output.textContent = data.choices?.[0]?.message?.content?.trim() || "No output.";
+        } catch (err) {
+          output.textContent = "❌ Error generating script.";
+        }
+      });
+    }
   });
 });
-
-function generateScript() {
-  const topic = document.getElementById("script-input").value;
-  const output = document.getElementById("script-output");
-  if (topic.trim() === "") {
-    output.textContent = "❗ Please enter a topic to generate a script.";
-    return;
-  }
-
-  output.textContent = `📝 Script on "${topic}":
-Welcome to Boss AI! In today’s short, we’re diving into "${topic}" — let’s break it down in 60 seconds... [sample content here]`;
-}
-
-function generateVoiceover() {
-  const script = document.getElementById("voiceover-text").value;
-  const output = document.getElementById("voiceover-output");
-  if (script.trim() === "") {
-    output.textContent = "❗ Please paste a script first.";
-    return;
-  }
-
-  output.textContent = `🔊 Simulated voiceover:
-"${script}" [This is a placeholder. Real audio coming in future version.]`;
-}
-
-function generateUploadStrategy() {
-  const platform = document.getElementById("platform-select").value;
-  const output = document.getElementById("upload-output");
-
-  const strategies = {
-    YouTube: `📅 Best time: Weekdays at 2–4 PM\n📈 Tags: #shorts, #trending\n📝 Tips: Use strong thumbnails, short titles, and post consistently.`,
-    TikTok: `📅 Best time: Evenings & weekends\n📈 Tags: #fyp, #viral\n📝 Tips: Hook viewers in first 2s, use trending audio, and post 1–2x daily.`,
-    Instagram: `📅 Best time: Mornings (Tue–Thu)\n📈 Tags: #reels, #explore\n📝 Tips: Use hashtags, cross-promote stories, and reply to comments fast.`
-  };
-
-  if (!platform) {
-    output.textContent = "❗ Please select a platform.";
-    return;
-  }
-
-  output.textContent = strategies[platform] || "No strategy available for selected platform.";
-}
