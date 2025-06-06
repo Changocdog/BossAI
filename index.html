@@ -13,8 +13,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -70,7 +70,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      padding: 40px 20px;
+      padding: 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
     }
@@ -97,14 +97,16 @@
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 12px;
+      font-size: 30px;
+      margin-bottom: 10px;
       color: #00bfff;
+      letter-spacing: 1px;
     }
 
     p {
       color: #cccccc;
       font-size: 16px;
+      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
 
@@ -122,6 +124,28 @@
 
     input::placeholder {
       color: #bbbbbb;
+    }
+
+    #module-content {
+      margin-top: 40px;
+      max-width: 800px;
+      width: 100%;
+      text-align: left;
+    }
+
+    textarea {
+      width: 100%;
+      background: #111;
+      color: #fff;
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
     }
 
     @media (max-width: 768px) {
@@ -156,20 +180,10 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-    <div id="main-content" style="margin-top: 40px; width: 100%; max-width: 800px;"></div>
+    <div id="module-content"></div>
   </div>
 
   <script src="script.js"></script>
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
 
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-  </script>
 </body>
 </html>
-<script src="script.js"></script>
