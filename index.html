@@ -21,7 +21,7 @@
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 60px 10px 20px;
+      padding: 60px 10px 20px 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -120,29 +120,8 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    textarea {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
-    }
-
-    button.generate-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      font-size: 15px;
-      box-shadow: 0 0 10px #00bfff88;
+    input::placeholder {
+      color: #bbbbbb;
     }
 
     @media (max-width: 768px) {
@@ -189,15 +168,15 @@
       main.classList.toggle("full");
     });
 
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This is where your final video or result will appear.</p><br><button class="generate-btn">Render Final Video</button>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+    const moduleContent = {
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates all other AI modules.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Running legal compliance check...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Drafting content scripts...</p>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Creating audio narration...</p>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimizing posting schedules...</p>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Compiling final media asset...</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Viewing previous generated content logs...</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust preferences, tokens, integrations...</p>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -206,11 +185,7 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        main.innerHTML = `<div style="max-width: 800px; text-align: left; margin-top: 40px;">${moduleContent[module] || ""}</div>`;
       });
     });
   </script>
