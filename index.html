@@ -6,7 +6,9 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -168,24 +170,29 @@
       main.classList.toggle("full");
     });
 
-    const moduleContent = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates all other AI modules.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Running legal compliance check...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Drafting content scripts...</p>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Creating audio narration...</p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimizing posting schedules...</p>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Compiling final media asset...</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Viewing previous generated content logs...</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust preferences, tokens, integrations...</p>`
-    };
-
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: left; margin-top: 40px;">${moduleContent[module] || ""}</div>`;
+
+        const content = {
+          manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+          legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p><strong>Result:</strong> ✅ This content appears legally compliant with current copyright and community guidelines.</p><p>✅ No flagged terms<br>✅ No restricted media<br>✅ Greenlight for upload</p>`,
+          script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate and edit video scripts here.</p>`,
+          voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts into audio narration.</p>`,
+          upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
+          output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>See the complete video or content result.</p>`,
+          history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
+          settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+        };
+
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: left;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
   </script>
