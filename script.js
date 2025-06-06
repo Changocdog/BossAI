@@ -1,4 +1,4 @@
-const adminKey = "changosecretkey"; // ✅ ONLY YOU KNOW THIS KEY
+const adminKey = "changosecretkey"; // Set your secret key here
 
 const toggleBtn = document.getElementById("toggle-btn");
 const sidebar = document.getElementById("sidebar");
@@ -45,7 +45,13 @@ function loadModule(module) {
       <button onclick="generateScript()">Generate Script</button>
       <pre id="script-output">🧠 Awaiting input...</pre>
     `,
-    voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>This module will convert text to voice. (Coming soon!)</p>`,
+    voiceover: `
+      <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+      <p>Paste a script below and simulate voiceover output:</p>
+      <textarea id="voice-input" placeholder="Paste script here..."></textarea>
+      <button onclick="generateVoiceover()">Simulate Voiceover</button>
+      <pre id="voice-output">🔊 Awaiting input...</pre>
+    `,
     upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Plan optimal times and platforms for uploads.</p>`,
     output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Review and export completed content.</p>`,
     history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
@@ -106,4 +112,16 @@ function runLegalCheck() {
   if (/violence|hate/i.test(content)) warning += "⚠️ Inappropriate language detected.\n";
 
   result.textContent = warning || "✅ No issues detected. Content is likely compliant.";
+}
+
+function generateVoiceover() {
+  const input = document.getElementById("voice-input").value.trim();
+  const output = document.getElementById("voice-output");
+
+  if (!input) {
+    output.textContent = "⚠️ Please paste a script to simulate voiceover.";
+    return;
+  }
+
+  output.textContent = `🎤 Simulating voiceover for: "${input}"\n\n✅ Voiceover generated (mock).`;
 }
