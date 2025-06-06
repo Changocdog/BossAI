@@ -7,17 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -33,31 +31,28 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-
-    .sidebar.hidden { transform: translateX(-100%); }
-
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
     .sidebar button {
       background: #121212;
       color: #ffffff;
       border: none;
-      padding: 14px;
-      font-size: 16px;
+      padding: 12px;
+      font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -70,12 +65,10 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
-
     .main.full {
       margin-left: 0;
       width: 100%;
     }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -84,28 +77,25 @@
       background-color: #007bff;
       color: white;
       border: none;
-      padding: 12px 18px;
+      padding: 10px 16px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
     }
-
     p {
       color: #cccccc;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
     #api-key {
       padding: 14px 18px;
       font-size: 16px;
@@ -117,45 +107,44 @@
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     input::placeholder {
       color: #bbbbbb;
     }
-
-    textarea, select {
+    textarea {
       width: 100%;
       max-width: 600px;
+      height: 120px;
       background: #121212;
-      color: #00bfff;
+      color: #fff;
       border: 1px solid #007bff;
       border-radius: 8px;
-      padding: 12px;
-      margin-top: 15px;
-      font-size: 14px;
+      padding: 10px;
+      font-family: monospace;
     }
-
-    button.generate-voice,
-    button.schedule-btn {
-      margin-top: 15px;
+    button.generate-btn {
+      margin-top: 10px;
+      padding: 10px 18px;
       background: #007bff;
       border: none;
-      padding: 12px 24px;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 0 8px #00bfff;
     }
-
-    button:hover {
-      background: #005bb5;
+    pre {
+      text-align: left;
+      max-width: 600px;
+      margin-top: 15px;
+      background: #000000;
+      padding: 15px;
+      border: 1px solid #007bff;
+      border-radius: 8px;
+      font-size: 13px;
+      white-space: pre-wrap;
     }
-
     @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
+      .main { margin-left: 0; width: 100%; }
+      .sidebar { position: fixed; z-index: 999; }
     }
   </style>
 </head>
@@ -184,66 +173,39 @@
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
-    const masterKey = "changomasterkey123";
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
     });
 
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2>
+                <textarea placeholder="Enter your prompt here..."></textarea>
+                <br><button class="generate-btn" onclick="generateScript()">Generate Script</button>
+                <pre id="script-output"></pre>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Voice synthesis will be available soon.</p>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Upload timing and optimization panel.</p>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here is where your final AI-generated content appears.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script: “How AI Builds Wealth”</li><li>Script: “Why You Should Invest in 2025”</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and API access here.</p>`
+    };
+
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
-        const key = document.getElementById("api-key").value.trim();
-        let content = "";
-
-        if (module === "legal") {
-          if (key === masterKey) {
-            content = `<h2 style="color:#00bfff;">📜 Legal Review AI</h2><p>Internal Legal AI is activated. Reviewing outputs...</p>`;
-          } else {
-            content = `<h2 style="color:red;">Access Denied</h2><p>This module is restricted to authorized users.</p>`;
-          }
-        } else if (module === "voiceover") {
-          content = `
-            <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-            <p>Paste your script and simulate voice generation:</p>
-            <textarea id="voice-script" placeholder="Paste your script here..."></textarea>
-            <button class="generate-voice" onclick="alert('Simulated voiceover created!')">🔊 Generate Voiceover</button>
-          `;
-        } else if (module === "upload") {
-          content = `
-            <h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
-            <p>Select platform and get optimized upload time:</p>
-            <select>
-              <option>YouTube Shorts</option>
-              <option>TikTok</option>
-              <option>Instagram Reels</option>
-              <option>X (Twitter)</option>
-            </select>
-            <button class="schedule-btn" onclick="alert('Scheduled at optimal time!')">📆 Schedule Post</button>
-          `;
-        } else if (module === "manager") {
-          content = `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`;
-        } else if (module === "script") {
-          content = `<h2 style="color:#00bfff;">✍️ Script Writer AI</h2><p>Generate short-form video scripts automatically.</p>`;
-        } else if (module === "output") {
-          content = `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Review your AI-generated content here.</p>`;
-        } else if (module === "history") {
-          content = `<h2 style="color:#00bfff;">🗂️ History Log</h2><p>Past scripts and content are shown here.</p>`;
-        } else if (module === "settings") {
-          content = `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure user preferences and integrations.</p>`;
-        }
-
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: left;">
-            ${content}
-          </div>
-        `;
+        main.innerHTML = `<h1 style="color: #00bfff;">Boss AI Dashboard</h1>${content[module] || ""}`;
       });
     });
+
+    function generateScript() {
+      const output = document.getElementById("script-output");
+      output.textContent = "Here's a sample script:\n\n1. Grab attention.\n2. Deliver value.\n3. Call to action.";
+    }
   </script>
 
 </body>
