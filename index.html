@@ -6,9 +6,7 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -110,7 +108,7 @@
       margin-bottom: 20px;
     }
 
-    #api-key, textarea, input {
+    #api-key {
       padding: 14px 18px;
       font-size: 16px;
       width: 100%;
@@ -122,25 +120,26 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    button.primary {
-      margin-top: 10px;
-      padding: 12px 24px;
-      background-color: #007bff;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 14px;
-      cursor: pointer;
+    input::placeholder {
+      color: #bbbbbb;
     }
 
-    .output-box {
+    #content-panel {
+      margin-top: 30px;
+      max-width: 800px;
+    }
+
+    .panel-section {
       background: #111;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      padding: 20px;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #007bff;
+      box-shadow: 0 0 8px #007bff55;
       margin-top: 20px;
-      color: #ffffff;
-      max-width: 600px;
+    }
+
+    .panel-section h2 {
+      color: #00bfff;
     }
 
     @media (max-width: 768px) {
@@ -175,8 +174,10 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <div id="content-panel"></div>
   </div>
 
   <script src="script.js"></script>
+
 </body>
 </html>
