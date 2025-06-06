@@ -6,7 +6,9 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -34,7 +36,9 @@
       z-index: 100;
     }
 
-    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
 
     .sidebar button {
       background: #121212;
@@ -93,7 +97,7 @@
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -101,12 +105,12 @@
 
     p {
       color: #cccccc;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
 
-    input, textarea {
+    #api-key, textarea, input {
       padding: 14px 18px;
       font-size: 16px;
       width: 100%;
@@ -115,28 +119,27 @@
       border: 1px solid #00bfff;
       border-radius: 8px;
       color: #ffffff;
-      margin-top: 10px;
+      box-shadow: 0 0 10px #00bfff88;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 14px;
-      margin-top: 16px;
+    button.primary {
+      margin-top: 10px;
+      padding: 12px 24px;
       background-color: #007bff;
-      color: white;
       border: none;
       border-radius: 6px;
+      color: white;
+      font-size: 14px;
       cursor: pointer;
     }
 
-    pre {
+    .output-box {
       background: #111;
-      color: #00bfff;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 16px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      color: #ffffff;
       max-width: 600px;
     }
 
@@ -145,6 +148,7 @@
         margin-left: 0;
         width: 100%;
       }
+
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -171,10 +175,8 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-    <div id="module-content" style="margin-top: 30px;"></div>
   </div>
 
   <script src="script.js"></script>
-
 </body>
 </html>
