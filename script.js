@@ -68,7 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       </div>
     `,
-    settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+    settings: `
+      <h2 style="color:#00bfff;">⚙️ Settings</h2>
+      <p>Adjust your Boss AI preferences:</p>
+      <label style="display:block; margin-top:10px;">
+        <input type="checkbox" id="dark-mode-toggle" checked disabled>
+        <span style="margin-left:8px;">Dark Mode (default)</span>
+      </label>
+      <label style="display:block; margin-top:10px;">
+        <input type="checkbox" id="show-key-toggle">
+        <span style="margin-left:8px;">Show API Key</span>
+      </label>
+    `
   };
 
   document.querySelectorAll(".sidebar button").forEach(button => {
@@ -77,6 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
       button.classList.add("active");
       const module = button.getAttribute("data-module");
       main.innerHTML = `<div style="max-width: 800px; text-align: left;">${moduleContent[module] || ''}</div>`;
+
+      // Special settings behavior
+      if (module === "settings") {
+        const toggle = document.getElementById("show-key-toggle");
+        toggle?.addEventListener("change", () => {
+          const input = document.getElementById("api-key");
+          if (input) input.type = toggle.checked ? "text" : "password";
+        });
+      }
     });
   });
 });
