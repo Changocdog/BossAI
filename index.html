@@ -122,6 +122,35 @@
       color: #bbbbbb;
     }
 
+    textarea, select {
+      width: 100%;
+      max-width: 600px;
+      background: #121212;
+      color: #00bfff;
+      border: 1px solid #007bff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    button.generate-voice,
+    button.schedule-btn {
+      margin-top: 15px;
+      background: #007bff;
+      border: none;
+      padding: 12px 24px;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00bfff;
+    }
+
+    button:hover {
+      background: #005bb5;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -177,14 +206,29 @@
           } else {
             content = `<h2 style="color:red;">Access Denied</h2><p>This module is restricted to authorized users.</p>`;
           }
+        } else if (module === "voiceover") {
+          content = `
+            <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+            <p>Paste your script and simulate voice generation:</p>
+            <textarea id="voice-script" placeholder="Paste your script here..."></textarea>
+            <button class="generate-voice" onclick="alert('Simulated voiceover created!')">🔊 Generate Voiceover</button>
+          `;
+        } else if (module === "upload") {
+          content = `
+            <h2 style="color:#00bfff;">📤 Upload Strategy AI</h2>
+            <p>Select platform and get optimized upload time:</p>
+            <select>
+              <option>YouTube Shorts</option>
+              <option>TikTok</option>
+              <option>Instagram Reels</option>
+              <option>X (Twitter)</option>
+            </select>
+            <button class="schedule-btn" onclick="alert('Scheduled at optimal time!')">📆 Schedule Post</button>
+          `;
         } else if (module === "manager") {
           content = `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`;
         } else if (module === "script") {
           content = `<h2 style="color:#00bfff;">✍️ Script Writer AI</h2><p>Generate short-form video scripts automatically.</p>`;
-        } else if (module === "voiceover") {
-          content = `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Turn scripts into narrated voice audio.</p>`;
-        } else if (module === "upload") {
-          content = `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimizing post time and platform...</p>`;
         } else if (module === "output") {
           content = `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Review your AI-generated content here.</p>`;
         } else if (module === "history") {
