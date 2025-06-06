@@ -1,127 +1,73 @@
-const adminKey = "changosecretkey"; // Set your secret key here
-
 const toggleBtn = document.getElementById("toggle-btn");
 const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("main");
+const apiKeyInput = document.getElementById("api-key");
 
+const adminKey = "my-secret-key"; // Replace with your own
+
+// Restore access if already granted
+if (localStorage.getItem("access_granted") === "true") {
+  apiKeyInput.style.display = "none";
+}
+
+// Toggle sidebar
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("hidden");
   main.classList.toggle("full");
 });
 
+// Handle sidebar button clicks
 document.querySelectorAll(".sidebar button").forEach(button => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
     const module = button.getAttribute("data-module");
-    loadModule(module);
+
+    if (module === "legal" && localStorage.getItem("access_granted") !== "true") {
+      const userKey = prompt("Enter access key:");
+      if (userKey === adminKey) {
+        localStorage.setItem("access_granted", "true");
+        apiKeyInput.style.display = "none";
+        showContent(module);
+      } else {
+        alert("Incorrect key. Access denied.");
+        return;
+      }
+    } else {
+      showContent(module);
+    }
   });
 });
 
-function loadModule(module) {
-  if (module === "legal" && !localStorage.getItem("hasLegalAccess")) {
-    const attempt = prompt("🔐 Enter admin key to access Legal AI:");
-    if (attempt !== adminKey) {
-      alert("❌ Access denied.");
-      return;
-    } else {
-      localStorage.setItem("hasLegalAccess", "true");
-    }
-  }
-
+// Main content function
+function showContent(module) {
+  const baseStyle = "font-size:18px; line-height:1.6;";
   const contentMap = {
-    manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-    legal: `
-      <h2 style="color:#00bfff;">📜 Legal Review</h2>
-      <p>Enter content below to simulate a compliance review:</p>
-      <textarea id="legal-input" placeholder="Paste your script or content here..."></textarea>
-      <button onclick="runLegalCheck()">Run Legal Check</button>
-      <pre id="legal-result">🧠 Waiting for input...</pre>
-    `,
+    manager: `<h2 style="font-size: 24px; color:#00bfff;">🤖 General Manager AI</h2><p style="${baseStyle}">This AI coordinates the sub-AIs and manages workflows.</p>`,
+    legal: `<h2 style="font-size: 24px; color:#00bfff;">📜 Legal Review</h2><p style="${baseStyle}">Running legal compliance checks...</p>`,
     script: `
-      <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-      <textarea id="script-input" placeholder="Enter video topic..."></textarea>
-      <button onclick="generateScript()">Generate Script</button>
-      <pre id="script-output">🧠 Awaiting input...</pre>
+      <h2 style="font-size: 24px; color:#00bfff;">✍️ Script Writer</h2>
+      <textarea style="width:100%; height:200px; font-size:16px; background:#111; color:#fff; border:1px solid #00bfff; border-radius:8px;" placeholder="Write your script here..."></textarea>
     `,
-    voiceover: `
-      <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-      <p>Paste a script below and simulate voiceover output:</p>
-      <textarea id="voice-input" placeholder="Paste script here..."></textarea>
-      <button onclick="generateVoiceover()">Simulate Voiceover</button>
-      <pre id="voice-output">🔊 Awaiting input...</pre>
+    voiceover: `<h2 style="font-size: 24px; color:#00bfff;">🎤 Voiceover AI</h2><p style="${baseStyle}">Upload your script or type below:</p>
+      <textarea style="width:100%; height:150px; font-size:16px; background:#111; color:#fff; border:1px solid #00bfff; border-radius:8px;"></textarea>`,
+    upload: `<h2 style="font-size: 24px; color:#00bfff;">📤 Upload Strategy</h2><p style="${baseStyle}">We'll suggest platforms, titles, and times based on your audience.</p>`,
+    output: `<h2 style="font-size: 24px; color:#00bfff;">📺 Final Output</h2><p style="${baseStyle}">Your rendered video or content will appear here.</p>`,
+    history: `
+      <h2 style="font-size: 24px; color:#00bfff;">🗂️ History</h2>
+      <ul style="${baseStyle} list-style-type:none; padding-left:0;">
+        <li><strong>5/25:</strong> "How to Start Investing at 18"</li>
+        <li><strong>5/26:</strong> "Top 3 Passive Income Myths"</li>
+        <li><strong>5/27:</strong> "Is Crypto Dead? Here's What You Need to Know"</li>
+      </ul>
     `,
-    upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Plan optimal times and platforms for uploads.</p>`,
-    output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Review and export completed content.</p>`,
-    history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past scripts and outputs.</p>`,
-    settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
+    settings: `<h2 style="font-size: 24px; color:#00bfff;">⚙️ Settings</h2><p style="${baseStyle}">Coming soon: voice options, platform integrations, and app preferences.</p>`
   };
 
-  document.getElementById("main").innerHTML = `
-    <div style="max-width: 800px; margin: auto; text-align: left;">
-      ${contentMap[module] || ""}
+  main.innerHTML = `
+    <div style="max-width: 800px; text-align: left; margin-top: 40px;">
+      ${contentMap[module] || "<p>Module not found.</p>"}
     </div>
   `;
-}
-
-async function generateScript() {
-  const input = document.getElementById("script-input").value.trim();
-  const apiKey = document.getElementById("api-key").value.trim();
-  const output = document.getElementById("script-output");
-
-  if (!input || !apiKey) {
-    output.textContent = "⚠️ Please provide a topic and OpenAI API key.";
-    return;
-  }
-
-  output.textContent = "🌀 Generating script...";
-
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Write a short script on: ${input}` }],
-        temperature: 0.7
-      })
-    });
-
-    const data = await response.json();
-    output.textContent = data.choices[0].message.content;
-  } catch (error) {
-    output.textContent = "❌ Error generating script.";
-  }
-}
-
-function runLegalCheck() {
-  const content = document.getElementById("legal-input").value.trim();
-  const result = document.getElementById("legal-result");
-
-  if (!content) {
-    result.textContent = "⚠️ Please paste content to review.";
-    return;
-  }
-
-  let warning = "";
-  if (/copyright/i.test(content)) warning += "⚠️ Possible copyright issue.\n";
-  if (/violence|hate/i.test(content)) warning += "⚠️ Inappropriate language detected.\n";
-
-  result.textContent = warning || "✅ No issues detected. Content is likely compliant.";
-}
-
-function generateVoiceover() {
-  const input = document.getElementById("voice-input").value.trim();
-  const output = document.getElementById("voice-output");
-
-  if (!input) {
-    output.textContent = "⚠️ Please paste a script to simulate voiceover.";
-    return;
-  }
-
-  output.textContent = `🎤 Simulating voiceover for: "${input}"\n\n✅ Voiceover generated (mock).`;
 }
