@@ -6,15 +6,13 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -23,7 +21,7 @@
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 60px 10px 20px;
+      padding: 60px 10px 20px 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -36,9 +34,7 @@
       z-index: 100;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar button {
       background: #121212;
@@ -73,7 +69,6 @@
       padding: 20px;
       text-align: center;
       transition: margin-left 0.3s ease;
-      overflow-y: auto;
     }
 
     .main.full {
@@ -111,37 +106,38 @@
       margin-bottom: 20px;
     }
 
-    #api-key {
-      padding: 16px 20px;
-      font-size: 18px;
+    input, textarea {
+      padding: 14px 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
       background-color: #1a1a1a;
       border: 1px solid #00bfff;
       border-radius: 8px;
       color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
+      margin-top: 10px;
     }
 
-    input::placeholder {
-      color: #bbbbbb;
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      margin-top: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
-    .output-box {
-      max-width: 800px;
-      text-align: left;
-      padding: 20px;
-      background-color: #111;
-      border: 1px solid #00bfff55;
-      border-radius: 8px;
-      box-shadow: 0 0 12px #007bff44;
-    }
-
-    video {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-top: 12px;
+    pre {
+      background: #111;
+      color: #00bfff;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 16px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-width: 600px;
     }
 
     @media (max-width: 768px) {
@@ -149,7 +145,6 @@
         margin-left: 0;
         width: 100%;
       }
-
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -176,39 +171,10 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <div id="module-content" style="margin-top: 30px;"></div>
   </div>
 
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    const content = {
-      manager: `<div class="output-box"><h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p></div>`,
-      legal: `<div class="output-box"><h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p></div>`,
-      script: `<div class="output-box"><h2 style="color:#00bfff;">✍️ Script Writer</h2><p>"Are you tired of living paycheck to paycheck? Here's one powerful habit that millionaires swear by..."</p></div>`,
-      voiceover: `<div class="output-box"><h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Voiceover generation in progress... (simulated)</p></div>`,
-      upload: `<div class="output-box"><h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Suggested upload time: <strong>Tuesday at 9AM PST</strong><br>Strategy: Post daily Shorts, add 3 relevant hashtags, and cross-post to TikTok.</p></div>`,
-      output: `<div class="output-box"><h2 style="color:#00bfff;">📺 Final Output</h2><p><strong>Video Title:</strong> Millionaire Habits Revealed<br><strong>Caption:</strong> Learn the ONE daily habit millionaires never skip. #FinanceTips #MoneyHacks</p><video controls><source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">Your browser does not support the video tag.</video></div>`,
-      history: `<div class="output-box"><h2 style="color:#00bfff;">🗂️ History</h2><p>Recent scripts and uploads:</p><ul><li>Finance Hook 1 - 6/3</li><li>Motivation Short - 6/4</li><li>Horror Story Intro - 6/5</li></ul></div>`,
-      settings: `<div class="output-box"><h2 style="color:#00bfff;">⚙️ Settings</h2><p>Theme: Dark<br>Font: Orbitron<br>Key Access: Unlimited</p></div>`
-    };
-
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        main.innerHTML = content[module] || '';
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 
 </body>
 </html>
