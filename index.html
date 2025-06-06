@@ -6,7 +6,9 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -124,24 +126,6 @@
       color: #bbbbbb;
     }
 
-    #content-panel {
-      margin-top: 30px;
-      max-width: 800px;
-    }
-
-    .panel-section {
-      background: #111;
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #007bff;
-      box-shadow: 0 0 8px #007bff55;
-      margin-top: 20px;
-    }
-
-    .panel-section h2 {
-      color: #00bfff;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -174,10 +158,43 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-    <div id="content-panel"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("toggle-btn");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
+
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates all tasks, assigns roles, and oversees automation flows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scan all scripts and content for legal risks and copyright issues.</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate viral short-form video scripts for YouTube/TikTok automatically.</p>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Convert scripts to high-quality AI voiceovers using ElevenLabs.</p>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose optimal upload time and platform based on trends.</p>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview the completed video, review quality, and finalize post.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>View a complete archive of past scripts, videos, and performance logs.</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust font size, visual theme, and API key access here.</p>`
+    };
+
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const module = button.getAttribute("data-module");
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: left; padding: 30px;">
+            ${content[module] || ''}
+          </div>
+        `;
+      });
+    });
+  </script>
 
 </body>
 </html>
