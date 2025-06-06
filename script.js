@@ -4,18 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let elevenLabsKey = "";
 
-  // Module click handling
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       buttons.forEach(btn => btn.classList.remove("active"));
       button.classList.add("active");
-
       const module = button.getAttribute("data-module");
       loadModule(module);
     });
   });
 
-  // Toggle sidebar
   const toggleBtn = document.getElementById("toggle-btn");
   const sidebar = document.getElementById("sidebar");
   toggleBtn.addEventListener("click", () => {
@@ -31,13 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <h2 style="color:#00bfff;">✍️ Script Writer</h2>
         <input type="text" id="script-input" placeholder="Enter video topic..." />
         <button id="generate-script">Generate Script</button>
-        <pre id="script-output"></pre>
+        <pre id="script-output">Awaiting script...</pre>
       `,
       voiceover: `
         <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
         <input type="password" id="voice-api-key" placeholder="🔑 Enter ElevenLabs API Key" />
         <button id="simulate-voice">Generate Voiceover</button>
-        <pre id="voiceover-output">Awaiting voiceover request...</pre>
+        <pre id="voiceover-output" style="margin-top: 10px;">Awaiting voiceover input...</pre>
       `,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize upload timing and strategy.</p>`,
       output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Your rendered video or content will appear here.</p>`,
@@ -45,11 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences and integrations.</p>`
     };
 
-    main.innerHTML = `
-      <div style="max-width: 800px; margin-top: 40px; text-align: left;">
-        ${content[module] || ""}
-      </div>
-    `;
+    main.innerHTML = `<div style="max-width: 800px; margin-top: 40px; text-align: left;">${content[module] || ""}</div>`;
 
     if (module === "script") activateScriptWriter();
     if (module === "voiceover") activateVoiceover();
@@ -61,11 +54,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("generate-script");
 
     button.addEventListener("click", async () => {
-      output.textContent = "Generating...";
+      output.textContent = "⏳ Generating script...";
       const topic = input.value.trim();
 
       if (!topic) {
-        output.textContent = "Please enter a topic.";
+        output.textContent = "❗ Please enter a topic.";
         return;
       }
 
@@ -87,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const script = data.choices?.[0]?.message?.content;
         output.textContent = script || "No output.";
       } catch (err) {
-        output.textContent = "Error: " + err.message;
+        output.textContent = "⚠️ Error: " + err.message;
       }
     });
   }
@@ -100,16 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", async () => {
       const apiKey = keyInput.value.trim();
       if (!apiKey) {
-        output.textContent = "Missing ElevenLabs API key.";
+        output.textContent = "❗ Missing ElevenLabs API key.";
         return;
       }
 
       elevenLabsKey = apiKey;
-
-      output.textContent = "Generating voiceover...";
+      output.textContent = "🎙️ Generating voiceover...";
 
       try {
-        const sampleText = "Welcome to Boss AI. This is your voiceover assistant.";
+        const sampleText = "This is Boss AI. Voiceover generation successful.";
         const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/default/audio", {
           method: "POST",
           headers: {
@@ -130,9 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const audio = new Audio(url);
         audio.play();
 
-        output.textContent = "Voiceover complete. Playing now...";
+        output.textContent = "✅ Voiceover played successfully.";
       } catch (err) {
-        output.textContent = "Error: " + err.message;
+        output.textContent = "⚠️ Error: " + err.message;
       }
     });
   }
