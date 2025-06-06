@@ -3,20 +3,21 @@ const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("main");
 const apiKeyInput = document.getElementById("api-key");
 
-const adminKey = "my-secret-key"; // Replace with your own
+// Protected admin key
+const adminKey = "my-secret-key"; // ← replace with your own
 
-// Restore access if already granted
+// If access previously granted, hide the key box
 if (localStorage.getItem("access_granted") === "true") {
   apiKeyInput.style.display = "none";
 }
 
-// Toggle sidebar
+// Sidebar toggle
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("hidden");
   main.classList.toggle("full");
 });
 
-// Handle sidebar button clicks
+// Handle sidebar clicks
 document.querySelectorAll(".sidebar button").forEach(button => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
@@ -29,45 +30,50 @@ document.querySelectorAll(".sidebar button").forEach(button => {
       if (userKey === adminKey) {
         localStorage.setItem("access_granted", "true");
         apiKeyInput.style.display = "none";
-        showContent(module);
+        updateContent(module);
       } else {
-        alert("Incorrect key. Access denied.");
+        alert("Incorrect key.");
         return;
       }
     } else {
-      showContent(module);
+      updateContent(module);
     }
   });
 });
 
-// Main content function
-function showContent(module) {
-  const baseStyle = "font-size:18px; line-height:1.6;";
-  const contentMap = {
-    manager: `<h2 style="font-size: 24px; color:#00bfff;">🤖 General Manager AI</h2><p style="${baseStyle}">This AI coordinates the sub-AIs and manages workflows.</p>`,
-    legal: `<h2 style="font-size: 24px; color:#00bfff;">📜 Legal Review</h2><p style="${baseStyle}">Running legal compliance checks...</p>`,
+// Core logic for loading module-specific content
+function updateContent(module) {
+  const base = document.getElementById("module-content");
+  if (!base) return;
+
+  const style = "font-size: 18px; color: #ccc; line-height: 1.6;";
+  const modules = {
+    manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p style="${style}">This AI coordinates the sub-AIs and manages workflows.</p>`,
+    legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p style="${style}">Running compliance and copyright safety checks...</p>`,
     script: `
-      <h2 style="font-size: 24px; color:#00bfff;">✍️ Script Writer</h2>
-      <textarea style="width:100%; height:200px; font-size:16px; background:#111; color:#fff; border:1px solid #00bfff; border-radius:8px;" placeholder="Write your script here..."></textarea>
+      <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
+      <textarea placeholder="Enter your script here..." style="width:100%; height:200px; background:#111; color:#fff; font-size:16px; border:1px solid #00bfff; border-radius:8px;"></textarea>
     `,
-    voiceover: `<h2 style="font-size: 24px; color:#00bfff;">🎤 Voiceover AI</h2><p style="${baseStyle}">Upload your script or type below:</p>
-      <textarea style="width:100%; height:150px; font-size:16px; background:#111; color:#fff; border:1px solid #00bfff; border-radius:8px;"></textarea>`,
-    upload: `<h2 style="font-size: 24px; color:#00bfff;">📤 Upload Strategy</h2><p style="${baseStyle}">We'll suggest platforms, titles, and times based on your audience.</p>`,
-    output: `<h2 style="font-size: 24px; color:#00bfff;">📺 Final Output</h2><p style="${baseStyle}">Your rendered video or content will appear here.</p>`,
+    voiceover: `
+      <h2 style="color:#00bfff;">🎤 Voiceover Generator</h2>
+      <p style="${style}">Convert your script to audio. (Coming soon!)</p>
+      <textarea placeholder="Paste script..." style="width:100%; height:160px; background:#111; color:#fff; font-size:16px; border:1px solid #00bfff; border-radius:8px;"></textarea>
+    `,
+    upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p style="${style}">We’ll analyze your video and suggest posting times and hashtags. (Coming soon!)</p>`,
+    output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p style="${style}">Your rendered video or image summary will appear here. (Coming soon!)</p>`,
     history: `
-      <h2 style="font-size: 24px; color:#00bfff;">🗂️ History</h2>
-      <ul style="${baseStyle} list-style-type:none; padding-left:0;">
-        <li><strong>5/25:</strong> "How to Start Investing at 18"</li>
-        <li><strong>5/26:</strong> "Top 3 Passive Income Myths"</li>
-        <li><strong>5/27:</strong> "Is Crypto Dead? Here's What You Need to Know"</li>
+      <h2 style="color:#00bfff;">🗂️ History</h2>
+      <ul style="padding-left: 1.2em; ${style}">
+        <li><strong>6/01:</strong> "Top AI Tools for Content Creators"</li>
+        <li><strong>6/02:</strong> "Boss AI Explained in 60 Seconds"</li>
+        <li><strong>6/03:</strong> "Why Automation Matters Now"</li>
       </ul>
     `,
-    settings: `<h2 style="font-size: 24px; color:#00bfff;">⚙️ Settings</h2><p style="${baseStyle}">Coming soon: voice options, platform integrations, and app preferences.</p>`
+    settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p style="${style}">Change preferences, voice style, and integrations. (Coming soon!)</p>`
   };
 
-  main.innerHTML = `
-    <div style="max-width: 800px; text-align: left; margin-top: 40px;">
-      ${contentMap[module] || "<p>Module not found.</p>"}
-    </div>
-  `;
+  base.innerHTML = modules[module] || "<p>Unknown module.</p>";
 }
+
+// Show Script Writer module by default
+updateContent("script");
