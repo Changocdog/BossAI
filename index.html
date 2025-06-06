@@ -6,9 +6,7 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -36,20 +34,18 @@
       z-index: 100;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar button {
       background: #121212;
       color: #ffffff;
       border: none;
-      padding: 12px;
-      font-size: 14px;
+      padding: 14px;
+      font-size: 16px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: background 0.2s ease;
     }
 
     .sidebar button:hover {
@@ -88,16 +84,16 @@
       background-color: #007bff;
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 12px 18px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       box-shadow: 0 0 12px #00bfff;
     }
 
     h1 {
-      font-size: 30px;
+      font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
@@ -126,37 +122,10 @@
       color: #bbbbbb;
     }
 
-    #module-content {
-      margin-top: 40px;
-      max-width: 800px;
-      width: 100%;
-      text-align: left;
-    }
-
-    textarea {
-      width: 100%;
-      background: #111;
-      color: #fff;
-      font-size: 16px;
-      padding: 10px;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
       }
     }
   </style>
@@ -180,10 +149,58 @@
     <h1>Boss AI Dashboard</h1>
     <p>Enter your OpenAI API key to begin:</p>
     <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-    <div id="module-content"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("toggle-btn");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+    const masterKey = "changomasterkey123";
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
+
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const module = button.getAttribute("data-module");
+        const key = document.getElementById("api-key").value.trim();
+        let content = "";
+
+        if (module === "legal") {
+          if (key === masterKey) {
+            content = `<h2 style="color:#00bfff;">📜 Legal Review AI</h2><p>Internal Legal AI is activated. Reviewing outputs...</p>`;
+          } else {
+            content = `<h2 style="color:red;">Access Denied</h2><p>This module is restricted to authorized users.</p>`;
+          }
+        } else if (module === "manager") {
+          content = `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`;
+        } else if (module === "script") {
+          content = `<h2 style="color:#00bfff;">✍️ Script Writer AI</h2><p>Generate short-form video scripts automatically.</p>`;
+        } else if (module === "voiceover") {
+          content = `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Turn scripts into narrated voice audio.</p>`;
+        } else if (module === "upload") {
+          content = `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimizing post time and platform...</p>`;
+        } else if (module === "output") {
+          content = `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Review your AI-generated content here.</p>`;
+        } else if (module === "history") {
+          content = `<h2 style="color:#00bfff;">🗂️ History Log</h2><p>Past scripts and content are shown here.</p>`;
+        } else if (module === "settings") {
+          content = `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure user preferences and integrations.</p>`;
+        }
+
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: left;">
+            ${content}
+          </div>
+        `;
+      });
+    });
+  </script>
 
 </body>
 </html>
