@@ -193,14 +193,8 @@
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea id="voiceover-text" placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="speakVoiceover()">🔊 Generate Voiceover</button>`,
-      upload: `
-        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-        <p>Describe your video or goals:</p>
-        <textarea id="upload-text" placeholder='E.g., Finance tip for teens...'></textarea><br>
-        <button class="generate-btn" onclick="simulateUploadStrategy()">📈 Generate Strategy</button>
-        <div id="upload-result" style="margin-top:20px; color:#4fc3f7;"></div>
-      `,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
         <p>Here's your final video preview:</p>
@@ -211,7 +205,20 @@
         <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
         <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      history: `
+        <h2 style="color:#00bfff;">🗂️ History</h2>
+        <p>Your recent generated items:</p>
+        <div style="max-height: 300px; overflow-y: auto; background:#121212; padding: 12px; border-radius: 8px; border: 1px solid #00bfff;">
+          <ul style="list-style-type:none; padding-left:0; text-align:left;">
+            <li><strong>📜 Script:</strong> "3 Ways to Save $1000 as a Teen"</li>
+            <li><strong>🎤 Voiceover:</strong> "Learn how to make money online..."</li>
+            <li><strong>📤 Upload Strategy:</strong> Best at 5PM PST on TikTok</li>
+            <li><strong>📜 Script:</strong> "Side Hustles You Can Start Now"</li>
+            <li><strong>🎤 Voiceover:</strong> "Don't wait to invest..."</li>
+          </ul>
+        </div>
+        <button class="generate-btn" onclick="alert('Exporting full history (coming soon)')">📁 Export All</button>
+      `,
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
@@ -228,26 +235,6 @@
         `;
       });
     });
-
-    function speakVoiceover() {
-      const text = document.getElementById("voiceover-text").value;
-      if (!text) return alert("Please enter a script first.");
-      const utterance = new SpeechSynthesisUtterance(text);
-      speechSynthesis.speak(utterance);
-    }
-
-    function simulateUploadStrategy() {
-      const input = document.getElementById("upload-text").value;
-      if (!input) return alert("Please enter your video goal first.");
-
-      const result = `
-        🧠 Recommended Strategy:<br>
-        • Post on <strong>YouTube Shorts</strong> and <strong>Instagram Reels</strong><br>
-        • Best time: <strong>4:00 PM – 6:00 PM (PST)</strong><br>
-        • Use hashtags: <code>#finance #teentips #bossai</code>
-      `;
-      document.getElementById("upload-result").innerHTML = result;
-    }
   </script>
 
 </body>
