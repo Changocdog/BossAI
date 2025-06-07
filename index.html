@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -34,9 +34,7 @@
       z-index: 100;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar button {
       background: #121212;
@@ -108,35 +106,22 @@
       margin-bottom: 20px;
     }
 
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
-    textarea {
-      width: 100%;
-      max-width: 500px;
+    input, textarea {
       padding: 12px;
-      margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
       color: white;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 15px;
     }
 
     button.generate-btn {
       background-color: #007bff;
       color: white;
       border: none;
-      margin-top: 10px;
       padding: 10px 16px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
@@ -145,16 +130,15 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
+    .saved-alert {
+      margin-top: 10px;
+      color: #00ffcc;
+      font-size: 14px;
+    }
 
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
+    @media (max-width: 768px) {
+      .main { margin-left: 0; width: 100%; }
+      .sidebar { position: fixed; z-index: 999; }
     }
   </style>
 </head>
@@ -194,45 +178,40 @@
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
         <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg"
             title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
         </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
+        <p style="color:#ccc;">This is a demo preview. Real generation coming soon.</p>
+        <button class="generate-btn" onclick="alert('Simulated video rendering...')">🔁 Render Again</button>
       `,
-      history: `
-        <h2 style="color:#00bfff;">🗂️ History</h2>
-        <p>Your recent generated items:</p>
-        <div style="max-height: 300px; overflow-y: auto; background:#121212; padding: 12px; border-radius: 8px; border: 1px solid #00bfff;">
-          <ul style="list-style-type:none; padding-left:0; text-align:left;">
-            <li><strong>📜 Script:</strong> "3 Ways to Save $1000 as a Teen"</li>
-            <li><strong>🎤 Voiceover:</strong> "Learn how to make money online..."</li>
-            <li><strong>📤 Upload Strategy:</strong> Best at 5PM PST on TikTok</li>
-            <li><strong>📜 Script:</strong> "Side Hustles You Can Start Now"</li>
-            <li><strong>🎤 Voiceover:</strong> "Don't wait to invest..."</li>
-          </ul>
-        </div>
-        <button class="generate-btn" onclick="alert('Exporting full history (coming soon)')">📁 Export All</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Strategy 3</li></ul>`,
+      settings: `
+        <h2 style="color:#00bfff;">⚙️ Settings</h2>
+        <label for="voice">Voice Preference:</label>
+        <input id="voice" type="text" placeholder="e.g., Male, Calm, Energetic" /><br>
+        <label for="theme">Theme:</label>
+        <input id="theme" type="text" placeholder="e.g., Dark, Light" /><br>
+        <button class="generate-btn" onclick="saveSettings()">💾 Save Settings</button>
+        <div id="save-alert" class="saved-alert"></div>
+      `
     };
+
+    function saveSettings() {
+      const voice = document.getElementById("voice")?.value;
+      const theme = document.getElementById("theme")?.value;
+      document.getElementById("save-alert").innerText = `Settings saved: ${voice}, ${theme}`;
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module] || ''}</div>`;
       });
     });
   </script>
