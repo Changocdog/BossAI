@@ -1,32 +1,21 @@
-// Sidebar switching
-document.querySelectorAll('.sidebar button').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+<script>
+  const toggleBtn = document.getElementById("toggle-btn");
+  const sidebar = document.getElementById("sidebar");
+  const main = document.getElementById("main");
+  let apiKey = "";
 
-    const module = button.getAttribute('data-module');
-    renderModuleContent(module);
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("hidden");
+    main.classList.toggle("full");
   });
-});
 
-// Toggle sidebar visibility
-const toggleBtn = document.getElementById("toggle-btn");
-const sidebar = document.getElementById("sidebar");
-const main = document.getElementById("main");
+  document.getElementById("api-key").addEventListener("input", (e) => {
+    apiKey = e.target.value.trim();
+  });
 
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("hidden");
-  main.classList.toggle("full");
-});
-
-// Module renderer
-function renderModuleContent(module) {
-  const output = document.getElementById("main");
-  const apiKeyInput = document.getElementById("api-key")?.value || "";
-
-  const contentMap = {
+  const content = {
     manager: `
-      <h2 style="color:#00bfff;">🤖 Manager AI</h2>
+      <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
       <p>This AI coordinates the sub-AIs and manages workflows.</p>
     `,
     legal: `
@@ -35,110 +24,76 @@ function renderModuleContent(module) {
     `,
     script: `
       <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-      <input id="script-input" type="text" placeholder="Enter video topic..." style="margin: 10px 0; width: 100%; max-width: 400px; padding: 10px;"/>
-      <button onclick="generateScript()">Generate Script</button>
-      <pre id="script-output" style="margin-top: 20px;"></pre>
+      <textarea id="script-input" placeholder="Write your topic here..."></textarea><br>
+      <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+      <div id="script-result" style="margin-top:20px;"></div>
     `,
     voiceover: `
       <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-      <input id="voiceover-key" type="password" value="${apiKeyInput}" placeholder="Enter ElevenLabs API Key" style="margin: 10px 0; width: 100%; max-width: 400px; padding: 10px;"/>
-      <button onclick="generateVoiceover()">Generate Voiceover</button>
-      <pre id="voiceover-output" style="margin-top: 20px;">Voiceover generation in progress... (simulated)</pre>
+      <textarea placeholder='Paste your script here...'></textarea><br>
+      <button class="generate-btn">Generate Voiceover</button>
     `,
     upload: `
       <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-      <p>Auto-schedule and optimize video posts.</p>
+      <textarea placeholder='Describe your video goals...'></textarea><br>
+      <button class="generate-btn">Optimize Upload Plan</button>
     `,
     output: `
       <h2 style="color:#00bfff;">📺 Final Output</h2>
-      <p>Your rendered content will appear here.</p>
+      <p>This is where your final video or result will appear.</p>
+      <br><button class="generate-btn">Render Final Video</button>
     `,
     history: `
       <h2 style="color:#00bfff;">🗂️ History</h2>
-      <p>Review past scripts and outputs.</p>
+      <p>Review your past content outputs.</p>
+      <ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>
     `,
     settings: `
       <h2 style="color:#00bfff;">⚙️ Settings</h2>
-      <p>Configure preferences and integrations.</p>
+      <textarea placeholder="Set custom preferences here..."></textarea><br>
+      <button class="generate-btn">Save Settings</button>
     `
   };
 
-  output.innerHTML = `
-    <div style="max-width: 800px; text-align: center;">
-      ${contentMap[module] || ""}
-    </div>
-  `;
-}
+  document.querySelectorAll(".sidebar button").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+      const module = button.getAttribute("data-module");
+      main.innerHTML = `
+        <div style="max-width: 800px; text-align: center;">
+          ${content[module] || ''}
+        </div>
+      `;
+    });
+  });
 
-// Script Generator
-async function generateScript() {
-  const input = document.getElementById('script-input').value;
-  const key = document.getElementById('api-key').value;
-  const output = document.getElementById('script-output');
+  async function generateScript() {
+    const input = document.getElementById("script-input").value;
+    const resultDiv = document.getElementById("script-result");
 
-  if (!input || !key) {
-    output.textContent = '⚠️ Please enter a topic and your OpenAI API key.';
-    return;
-  }
+    if (!apiKey || !input) {
+      resultDiv.innerHTML = "<p style='color: orange;'>Please enter your API key and a script topic.</p>";
+      return;
+    }
 
-  output.textContent = 'Generating script...';
+    resultDiv.innerHTML = "<p style='color: #00bfff;'>Generating script...</p>";
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta3/models/gemini-pro:generateContent?key=" + apiKey, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${key}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Write a short viral YouTube script about: ${input}` }],
-        max_tokens: 300
+        contents: [{ parts: [{ text: input }] }]
       })
     });
 
     const data = await response.json();
-    output.textContent = data.choices[0].message.content.trim();
-  } catch (err) {
-    output.textContent = "⚠️ Error: " + err.message;
+    if (data.candidates && data.candidates.length > 0) {
+      resultDiv.innerHTML = "<pre style='text-align:left; white-space:pre-wrap;'>" + data.candidates[0].content.parts[0].text + "</pre>";
+    } else {
+      resultDiv.innerHTML = "<p style='color: red;'>Failed to generate script. Please try again.</p>";
+    }
   }
-}
-
-// Voiceover Generator
-async function generateVoiceover() {
-  const key = document.getElementById('voiceover-key').value;
-  const output = document.getElementById('voiceover-output');
-  const sample = "This is your Boss AI voiceover test script.";
-
-  if (!key) {
-    output.textContent = "⚠️ Please enter your ElevenLabs API key.";
-    return;
-  }
-
-  output.textContent = "🎧 Generating voiceover...";
-
-  try {
-    const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/exAVnOWVOZtPPpB6CEQj", {
-      method: "POST",
-      headers: {
-        "xi-api-key": key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        text: sample,
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.5
-        }
-      })
-    });
-
-    const blob = await response.blob();
-    const audioURL = URL.createObjectURL(blob);
-    const audio = new Audio(audioURL);
-    audio.play();
-    output.textContent = "✅ Voiceover played successfully.";
-  } catch (err) {
-    output.textContent = "❌ Error: " + err.message;
-  }
-}
+</script>
