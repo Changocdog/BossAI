@@ -144,22 +144,6 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-
-    .voiceover-result {
-      margin-top: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
-    }
   </style>
 </head>
 <body>
@@ -203,7 +187,12 @@
         <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
         <div class="voiceover-result" id="voiceover-result"></div>
       `,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      upload: `
+        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
+        <textarea id="upload-goals" placeholder='Describe your video goals...'></textarea><br>
+        <button class="generate-btn" onclick="generateUploadPlan()">Optimize Upload Plan</button>
+        <div id="upload-result" style="margin-top:20px;"></div>
+      `,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
         <p>Here's your final video preview:</p>
@@ -227,8 +216,7 @@
         main.innerHTML = `
           <div style="max-width: 800px; text-align: center;">
             ${content[module] || ''}
-          </div>
-        `;
+          </div>`;
       });
     });
 
@@ -246,7 +234,26 @@
            download="voiceover.mp3" style="color:#00ffff;">🔊 Download Voiceover (Simulated)</a>
       `;
     }
-  </script>
 
+    function generateUploadPlan() {
+      const input = document.getElementById("upload-goals").value.trim();
+      const result = document.getElementById("upload-result");
+
+      if (!input) {
+        result.innerHTML = `<p style="color:red;">⚠️ Please enter video goals first.</p>`;
+        return;
+      }
+
+      result.innerHTML = `
+        <p>📊 <strong>Upload Strategy:</strong></p>
+        <ul style="text-align:left; color:#00ffff;">
+          <li>🕓 Best Time: 4–6 PM PST</li>
+          <li>📅 Best Day: Thursday or Sunday</li>
+          <li>📱 Platform: YouTube Shorts, TikTok</li>
+          <li>🔥 Strategy: Add trending hashtags, keep video under 60 sec, high hook in first 3 sec</li>
+        </ul>
+      `;
+    }
+  </script>
 </body>
 </html>
