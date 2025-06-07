@@ -198,7 +198,7 @@
 
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
 
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your video goal:</p><textarea placeholder='Upload strategy...'></textarea><br><button class="generate-btn">Optimize Plan</button>`,
 
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
@@ -207,26 +207,24 @@
           <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
             title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
         </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming soon.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
+        <p style="color: #aaa;">This is a simulated preview. Rendering pipeline in progress.</p>
+        <button class="generate-btn" onclick="alert('🔄 Simulating render...')">Render Again</button>
       `,
 
       history: `
         <h2 style="color:#00bfff;">🗂️ History</h2>
-        <p>Your past content outputs:</p>
-        <ul id="history-list" style="text-align:left;"></ul>
-        <script>
-          const histData = JSON.parse(localStorage.getItem("boss_history") || "[]");
-          const list = document.getElementById("history-list");
-          list.innerHTML = histData.length ? histData.map(i => '<li>' + i + '</li>').join('') : "<li>No history yet.</li>";
-        </script>
+        <ul style="text-align:left;">
+          <li>✅ Script: "Intro to Passive Income"</li>
+          <li>✅ Voiceover: Generated</li>
+          <li>📤 Upload: Scheduled to YouTube</li>
+        </ul>
       `,
 
       settings: `
         <h2 style="color:#00bfff;">⚙️ Settings</h2>
         <p>Configure your preferences:</p>
-        <textarea id="settings-text" placeholder="Set custom preferences here..."></textarea><br>
-        <button class="generate-btn" onclick="saveSettings()">Save Settings</button>
+        <textarea id="settings-text" placeholder="Set your preferences..."></textarea><br>
+        <button class="generate-btn" id="save-settings-btn">Save Settings</button>
         <div id="settings-msg" style="margin-top: 10px; color: lightgreen;"></div>
       `
     };
@@ -237,14 +235,19 @@
         button.classList.add("active");
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+
+        if (module === "settings") {
+          const saveBtn = document.getElementById("save-settings-btn");
+          if (saveBtn) {
+            saveBtn.addEventListener("click", () => {
+              const val = document.getElementById("settings-text").value;
+              localStorage.setItem("boss_settings", val);
+              document.getElementById("settings-msg").innerText = "✅ Settings saved!";
+            });
+          }
+        }
       });
     });
-
-    function saveSettings() {
-      const val = document.getElementById("settings-text").value;
-      localStorage.setItem("boss_settings", val);
-      document.getElementById("settings-msg").innerText = "✅ Settings saved!";
-    }
   </script>
 
 </body>
