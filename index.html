@@ -108,18 +108,6 @@
       margin-bottom: 20px;
     }
 
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
     textarea {
       width: 100%;
       max-width: 500px;
@@ -132,7 +120,7 @@
       color: white;
     }
 
-    button.generate-btn {
+    input, button.generate-btn {
       background-color: #007bff;
       color: white;
       border: none;
@@ -143,6 +131,17 @@
       cursor: pointer;
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
+    }
+
+    #api-key {
+      padding: 14px 18px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 500px;
+      background-color: #1a1a1a;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      color: #ffffff;
     }
 
     @media (max-width: 768px) {
@@ -175,8 +174,8 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Enter your ElevenLabs API key:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter API Key here" />
   </div>
 
   <script>
@@ -191,64 +190,65 @@
 
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your video goal:</p><textarea placeholder='Upload strategy...'></textarea><br><button class="generate-btn">Optimize Plan</button>`,
-
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated preview. Rendering pipeline in progress.</p>
-        <button class="generate-btn" onclick="alert('🔄 Simulating render...')">Render Again</button>
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder="Write your script here..."></textarea><br><button class="generate-btn">Save Script</button>`,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <textarea id="voice-script" placeholder="Paste your script here or load from Script tab..."></textarea><br>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
+        <p id="voice-result" style="color:#00ff99; margin-top: 10px;"></p>
       `,
-
-      history: `
-        <h2 style="color:#00bfff;">🗂️ History</h2>
-        <ul style="text-align:left;">
-          <li>✅ Script: "Intro to Passive Income"</li>
-          <li>✅ Voiceover: Generated</li>
-          <li>📤 Upload: Scheduled to YouTube</li>
-        </ul>
-      `,
-
-      settings: `
-        <h2 style="color:#00bfff;">⚙️ Settings</h2>
-        <p>Configure your preferences:</p>
-        <textarea id="settings-text" placeholder="Set your preferences..."></textarea><br>
-        <button class="generate-btn" id="save-settings-btn">Save Settings</button>
-        <div id="settings-msg" style="margin-top: 10px; color: lightgreen;"></div>
-      `
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Describe your video goals..."></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This is where your final video will appear.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>View your previous content logs.</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set your preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
-
-        if (module === "settings") {
-          const saveBtn = document.getElementById("save-settings-btn");
-          if (saveBtn) {
-            saveBtn.addEventListener("click", () => {
-              const val = document.getElementById("settings-text").value;
-              localStorage.setItem("boss_settings", val);
-              document.getElementById("settings-msg").innerText = "✅ Settings saved!";
-            });
-          }
-        }
       });
     });
-  </script>
 
+    async function generateVoice() {
+      const apiKey = document.getElementById("api-key").value.trim();
+      const text = document.getElementById("voice-script").value.trim();
+      const resultBox = document.getElementById("voice-result");
+
+      if (!apiKey || !text) {
+        resultBox.innerText = "Please enter both API key and script text.";
+        return;
+      }
+
+      try {
+        const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/Rachel/stream', {
+          method: 'POST',
+          headers: {
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text,
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75
+            }
+          })
+        });
+
+        const audioBlob = await response.blob();
+        const audioURL = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioURL);
+        audio.play();
+        resultBox.innerText = "✅ Voiceover played successfully.";
+      } catch (err) {
+        resultBox.innerText = "❌ Error generating voiceover.";
+      }
+    }
+  </script>
 </body>
 </html>
