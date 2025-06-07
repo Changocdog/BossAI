@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -34,13 +34,11 @@
       z-index: 100;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar button {
       background: #121212;
-      color: #ffffff;
+      color: #fff;
       border: none;
       padding: 12px;
       font-size: 14px;
@@ -102,9 +100,8 @@
     }
 
     p {
-      color: #cccccc;
+      color: #ccc;
       font-size: 14px;
-      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
 
@@ -116,7 +113,7 @@
       background-color: #1a1a1a;
       border: 1px solid #00bfff;
       border-radius: 8px;
-      color: #ffffff;
+      color: #fff;
       box-shadow: 0 0 10px #00bfff88;
     }
 
@@ -146,15 +143,8 @@
     }
 
     @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
+      .main { margin-left: 0; width: 100%; }
+      .sidebar { position: fixed; z-index: 999; }
     }
   </style>
 </head>
@@ -189,37 +179,32 @@
       main.classList.toggle("full");
     });
 
+    const logAction = (module, action, notes) => {
+      const webhookURL = "YOUR_WEBHOOK_URL_HERE"; // 👈 REPLACE THIS
+      fetch(webhookURL, {
+        method: "POST",
+        body: JSON.stringify({ module, action, notes }),
+        headers: { "Content-Type": "application/json" }
+      });
+    };
+
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><button class="generate-btn" onclick="alert('Running legal review...')">Run Legal Review</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="alert('Generating script...')">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="alert('Generating voiceover...')">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn" onclick="alert('Optimizing upload strategy...')">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script 1 - <em>Generated 6/7</em></li><li>Voiceover 2 - <em>Generated 6/7</em></li><li>Upload Plan 3 - <em>Generated 6/7</em></li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences below:</p><textarea placeholder="Set preferences here..."></textarea><br><button class="generate-btn" onclick="alert('Settings saved!')">Save Settings</button>`
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><br><button class="generate-btn" onclick="logAction('Legal', 'Run Review', 'Checked for legal violations')">Run Legal Review</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Script Writer', 'Generate', document.getElementById('script-text').value)">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea id="voice-text" placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Voiceover', 'Generate Voice', document.getElementById('voice-text').value)">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea id="upload-text" placeholder='Describe your video goals...'></textarea><br><button class="generate-btn" onclick="logAction('Upload Strategy', 'Optimize', document.getElementById('upload-text').value)">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview your final video:</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe></div><br><button class="generate-btn" onclick="logAction('Final Output', 'Render Again', 'User re-rendered')">Render Again</button>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past entries logged to Google Sheets.</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set preferences..."></textarea><br><button class="generate-btn" onclick="logAction('Settings', 'Save', 'User updated settings')">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
       });
     });
   </script>
