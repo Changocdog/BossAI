@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
@@ -16,6 +17,7 @@
       height: 100vh;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -31,9 +33,9 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+
+    .sidebar.hidden { transform: translateX(-100%); }
+
     .sidebar button {
       background: #121212;
       color: #ffffff;
@@ -45,14 +47,17 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
+
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
+
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
+
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -65,10 +70,12 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
+
     .main.full {
       margin-left: 0;
       width: 100%;
     }
+
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -84,29 +91,7 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
+
     textarea {
       width: 100%;
       max-width: 500px;
@@ -118,6 +103,7 @@
       background-color: #1a1a1a;
       color: white;
     }
+
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -130,6 +116,7 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
+
     @media (max-width: 768px) {
       .main { margin-left: 0; width: 100%; }
       .sidebar { position: fixed; z-index: 999; }
@@ -153,54 +140,8 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Welcome. Use the menu to get started.</p>
   </div>
-
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    const historyLogs = [
-      "✅ Script: How to save $1000 in 30 days",
-      "✅ Voiceover: Recorded and saved",
-      "✅ Upload Strategy: YouTube Shorts, 6PM PST"
-    ];
-
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scanning for content compliance...</p><button class="generate-btn">Run Legal Check</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your content goal:</p><textarea placeholder='Target audience, platform, etc.'></textarea><br><button class="generate-btn">Optimize Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Preview of your final result:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg"
-            title="Boss AI Final Output" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <button class="generate-btn" onclick="alert('Re-rendering Final Video...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History Log</h2><ul style="text-align: left;">${historyLogs.map(item => `<li>${item}</li>`).join('')}</ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize your experience:</p><textarea placeholder="Set custom preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
-    };
-
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
-      });
-    });
-  </script>
 
 </body>
 </html>
