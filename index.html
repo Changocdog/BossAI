@@ -130,27 +130,9 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-    ul.history-list {
-      text-align: left;
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 0;
-    }
-    ul.history-list li {
-      background: #111;
-      padding: 8px;
-      margin: 5px 0;
-      border-left: 4px solid #00bfff;
-    }
     @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
+      .main { margin-left: 0; width: 100%; }
+      .sidebar { position: fixed; z-index: 999; }
     }
   </style>
 </head>
@@ -185,20 +167,29 @@
       main.classList.toggle("full");
     });
 
-    const logAction = (module, action, notes) => {
-      console.log(`[LOG] ${module} → ${action}: ${notes}`);
-      // You can replace this with Google Sheets webhook
-    };
+    const historyLogs = [
+      "✅ Script: How to save $1000 in 30 days",
+      "✅ Voiceover: Recorded and saved",
+      "✅ Upload Strategy: YouTube Shorts, 6PM PST"
+    ];
 
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><br><button class="generate-btn" onclick="logAction('Legal', 'Run Review', 'Checked for legal violations')">Run Legal Review</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Script', 'Generate', document.getElementById('script-text').value)">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea id="voice-text" placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Voiceover', 'Generate Voice', document.getElementById('voice-text').value)">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea id="upload-text" placeholder='Describe your video goals...'></textarea><br><button class="generate-btn" onclick="logAction('Upload Strategy', 'Optimize', document.getElementById('upload-text').value)">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your final video preview:</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe></div><br><button class="generate-btn" onclick="logAction('Final Output', 'Render Again', 'User re-rendered')">🔁 Render Again</button>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Recent AI activity:</p><ul class="history-list"><li>Script Generated</li><li>Voiceover Created</li><li>Upload Plan Suggested</li><li>Final Output Previewed</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Customize your preferences..."></textarea><br><button class="generate-btn" onclick="logAction('Settings', 'Save', 'Preferences updated')">Save Settings</button>`
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scanning for content compliance...</p><button class="generate-btn">Run Legal Check</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your content goal:</p><textarea placeholder='Target audience, platform, etc.'></textarea><br><button class="generate-btn">Optimize Plan</button>`,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Preview of your final result:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg"
+            title="Boss AI Final Output" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <button class="generate-btn" onclick="alert('Re-rendering Final Video...')">🔁 Render Again</button>
+      `,
+      history: `<h2 style="color:#00bfff;">🗂️ History Log</h2><ul style="text-align: left;">${historyLogs.map(item => `<li>${item}</li>`).join('')}</ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize your experience:</p><textarea placeholder="Set custom preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
