@@ -145,10 +145,6 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    iframe {
-      border-radius: 8px;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -179,14 +175,15 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Enter your Gemini API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter Gemini API Key" />
   </div>
 
   <script>
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
+    let geminiKey = "";
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
@@ -196,28 +193,56 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder='Write your topic here...'></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <pre id="script-output" style="margin-top: 20px; white-space: pre-wrap; text-align:left;"></pre>
+      `,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your upload goals:</p><textarea placeholder='e.g., max reach, TikTok focus...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
         <p>Here's your final video preview:</p>
         <div style="margin: 20px auto; max-width: 560px;">
           <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Output Preview" frameborder="0" allowfullscreen></iframe>
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
         </div>
-        <p style="color: #aaa;">This is a placeholder. Real rendering will appear here.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video... (simulated)')">🔁 Render Again</button>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review past actions:</p><ul><li>Script 1</li><li>Voiceover A</li><li>Final Output Preview</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure preferences:</p><textarea placeholder='Change app settings here...'></textarea><br><button class="generate-btn">Save Settings</button>`
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
+
+    function generateScript() {
+      geminiKey = document.getElementById("api-key").value.trim();
+      const prompt = document.getElementById("script-input").value.trim();
+      const output = document.getElementById("script-output");
+      if (!geminiKey || !prompt) {
+        alert("Please enter your Gemini API key and a topic.");
+        return;
+      }
+      output.innerText = "Generating script...";
+      fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + geminiKey, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: "Write a short YouTube script about: " + prompt }] }] })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const result = data.candidates?.[0]?.content?.parts?.[0]?.text || "No output generated.";
+        output.innerText = result;
+      })
+      .catch(err => {
+        output.innerText = "Error generating script: " + err.message;
+      });
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
         main.innerHTML = `
           <div style="max-width: 800px; text-align: center;">
