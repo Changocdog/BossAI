@@ -190,40 +190,54 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      manager: `
+        <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
+        <p>This AI oversees coordination of all sub-AIs, monitors workflows, and ensures optimal performance.</p>
+        <textarea placeholder='Describe your goal or task...'></textarea><br>
+        <button class="generate-btn">Run Manager AI</button>
+      `,
+      legal: `
+        <h2 style="color:#00bfff;">📜 Legal Review</h2>
+        <p>This module checks your generated content for legal compliance, copyright, and platform policy issues.</p>
+        <textarea placeholder='Paste your content for review...'></textarea><br>
+        <button class="generate-btn">Run Legal Check</button>
+      `,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea placeholder='Write your script here...'></textarea><br>
+        <button class="generate-btn">Generate Script</button>
+      `,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <textarea placeholder='Paste your script here...'></textarea><br>
+        <button class="generate-btn">Generate Voiceover</button>
+      `,
+      upload: `
+        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
+        <textarea placeholder='Describe your content goals...'></textarea><br>
+        <button class="generate-btn">Optimize Upload</button>
+      `,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn">🔁 Render Again</button>
+        <p>Here is your generated video preview:</p>
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg"
+          title="Final Output Preview" frameborder="0" allowfullscreen></iframe>
+        <button class="generate-btn" onclick="alert('Simulated re-render...')">🔁 Render Again</button>
       `,
       history: `
         <h2 style="color:#00bfff;">🗂️ History</h2>
-        <p>Review your past content outputs:</p>
-        <ul style="list-style:none;padding-left:0;">
-          <li>✔️ Script: "Top 5 Finance Hacks"</li>
-          <li>✔️ Voiceover: "June 6 Upload"</li>
-          <li>✔️ Strategy: "Scheduled for 8PM"</li>
+        <ul>
+          <li>✅ Script 1 — "Why Passive Income Wins"</li>
+          <li>✅ Voiceover 2 — Uploaded on Jun 6</li>
+          <li>⏳ Strategy 3 — In Progress</li>
         </ul>
       `,
       settings: `
         <h2 style="color:#00bfff;">⚙️ Settings</h2>
-        <p>Configure your Boss AI preferences below:</p>
-        <textarea placeholder="Set custom preferences here..."></textarea><br>
+        <p>Customize your preferences below:</p>
+        <textarea placeholder="Set preferences, API keys, or integrations..."></textarea><br>
         <button class="generate-btn">Save Settings</button>
       `
-    };
-
-    const updateContent = (module) => {
-      main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -232,7 +246,11 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        updateContent(module);
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
   </script>
