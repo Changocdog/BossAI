@@ -34,9 +34,7 @@
       z-index: 100;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
+    .sidebar.hidden { transform: translateX(-100%); }
 
     .sidebar button {
       background: #121212;
@@ -47,7 +45,6 @@
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .sidebar button:hover {
@@ -94,67 +91,30 @@
       box-shadow: 0 0 12px #00bfff;
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-
-    #api-key, #elevenKey {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
-    textarea {
+    textarea, input {
       width: 100%;
       max-width: 500px;
       padding: 12px;
-      margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
       color: white;
+      margin: 10px auto;
+      display: block;
     }
 
     button.generate-btn {
       background-color: #007bff;
       color: white;
       border: none;
-      margin-top: 10px;
       padding: 10px 16px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -190,79 +150,62 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="scriptInput" placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `
-        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voiceText" placeholder='Paste your script here...'></textarea><br>
-        <input id="elevenKey" type="password" placeholder="🔑 Enter your ElevenLabs API Key" /><br>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
-        <div id="audioOutput" style="margin-top:20px;"></div>
+      manager: `<h2>🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2>📜 Legal Review</h2><p>Checking for content compliance...</p>`,
+      script: `<h2>✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2>🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `
+        <h2>📤 Upload Strategy</h2>
+        <textarea id="upload-input" placeholder="Describe your video goals or niche..."></textarea>
+        <button class="generate-btn" onclick="generateUploadStrategy()">Optimize Upload Plan</button>
+        <div id="upload-result" style="margin-top:20px;"></div>
       `,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      output: `<h2>📺 Final Output</h2><p>This is where your video result will appear.</p>`,
+      history: `<h2>🗂️ History</h2><ul id="history-list"><li>No history yet.</li></ul>`,
+      settings: `<h2>⚙️ Settings</h2><p>Adjust system preferences.</p>`
     };
+
+    function generateUploadStrategy() {
+      const input = document.getElementById("upload-input").value.trim();
+      const output = document.getElementById("upload-result");
+
+      if (!input) {
+        output.innerHTML = "<p style='color:red;'>Please describe your video.</p>";
+        return;
+      }
+
+      // Simulated logic
+      const strategy = `
+        <p><strong>📆 Best Time to Upload:</strong> Wednesday 5 PM (based on finance audience trends)</p>
+        <p><strong>📱 Platform:</strong> YouTube Shorts + TikTok</p>
+        <p><strong>🧠 Hook Suggestion:</strong> "How to Grow $100 into $1000: Fast Strategy!"</p>
+      `;
+
+      output.innerHTML = strategy;
+
+      // Save to localStorage for history
+      const history = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
+      history.unshift({ prompt: input, result: strategy });
+      localStorage.setItem("uploadHistory", JSON.stringify(history));
+    }
+
+    function loadHistory() {
+      const historyData = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
+      const list = document.getElementById("history-list");
+      list.innerHTML = historyData.map(entry => `<li><b>Prompt:</b> ${entry.prompt}<br/>${entry.result}</li>`).join('');
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+
+        if (module === "history") loadHistory();
       });
     });
-
-    async function generateVoice() {
-      const text = document.getElementById("voiceText").value;
-      const key = document.getElementById("elevenKey").value;
-      const audioBox = document.getElementById("audioOutput");
-
-      if (!text || !key) {
-        audioBox.innerHTML = `<p style="color:red;">Please enter both script and API key.</p>`;
-        return;
-      }
-
-      audioBox.innerHTML = `<p style="color:#00bfff;">Generating voiceover...</p>`;
-
-      const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          text: text,
-          voice_settings: { stability: 0.5, similarity_boost: 0.5 }
-        })
-      });
-
-      if (!response.ok) {
-        audioBox.innerHTML = `<p style="color:red;">Error generating voice. Check API key and try again.</p>`;
-        return;
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-
-      audioBox.innerHTML = `
-        <audio controls style="margin-top:15px;">
-          <source src="${url}" type="audio/mpeg">
-          Your browser does not support audio playback.
-        </audio>
-      `;
-    }
   </script>
 
 </body>
