@@ -145,18 +145,6 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    .response-box {
-      margin-top: 15px;
-      color: #00ddff;
-      white-space: pre-wrap;
-      text-align: left;
-      border: 1px solid #00bfff44;
-      background-color: #111;
-      padding: 12px;
-      border-radius: 6px;
-      max-width: 700px;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -187,8 +175,8 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your Gemini API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your Gemini API Key" />
+    <p>Enter your OpenAI API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
   </div>
 
   <script>
@@ -196,63 +184,46 @@
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
 
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `
-        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-        <textarea id="script-input" placeholder='Describe the video you want a script for...'></textarea><br>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <div id="script-result" class="response-box"></div>
-      `,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><p>Coming soon...</p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Coming soon...</p>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Coming soon...</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Coming soon...</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Coming soon...</p>`
-    };
-
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
     });
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
+      `,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+    };
+
+    const moduleButtons = document.querySelectorAll(".sidebar button");
+
+    moduleButtons.forEach(button => {
       button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        moduleButtons.forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
-
-    async function generateScript() {
-      const prompt = document.getElementById("script-input").value.trim();
-      const apiKey = document.getElementById("api-key").value.trim();
-      const resultDiv = document.getElementById("script-result");
-
-      if (!prompt || !apiKey) {
-        resultDiv.innerText = "❗ Please enter both a prompt and API key.";
-        return;
-      }
-
-      resultDiv.innerText = "⏳ Generating script...";
-      try {
-        const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apiKey, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        });
-
-        const data = await res.json();
-        const output = data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ No response from Gemini.";
-        resultDiv.innerText = output;
-      } catch (err) {
-        resultDiv.innerText = "❌ Error: " + err.message;
-      }
-    }
   </script>
 
 </body>
