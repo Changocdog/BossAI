@@ -189,57 +189,22 @@
       main.classList.toggle("full");
     });
 
-    function generateVoiceover() {
-      const input = document.querySelector("#main textarea")?.value;
-      const resultDiv = document.createElement("div");
-      resultDiv.style.marginTop = "20px";
-
-      if (!input || input.trim() === "") {
-        resultDiv.innerHTML = "<p style='color: orange;'>Please enter a script first.</p>";
-      } else {
-        resultDiv.innerHTML = `
-          <p style="color:#00bfff;">Simulated Voiceover Output:</p>
-          <audio controls style="margin-top:10px;">
-            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-          <p style="font-size:13px;color:#aaa;">(This is a placeholder audio. Real voice generation can be added next.)</p>
-        `;
-      }
-
-      document.getElementById("main").appendChild(resultDiv);
-    }
-
-    function optimizeUploadPlan() {
-      const input = document.querySelector("#main textarea")?.value;
-      const resultDiv = document.createElement("div");
-      resultDiv.style.marginTop = "20px";
-
-      if (!input || input.trim() === "") {
-        resultDiv.innerHTML = "<p style='color: orange;'>Please describe your video goal.</p>";
-      } else {
-        resultDiv.innerHTML = `
-          <h3 style="color:#00bfff;">📈 Upload Plan Suggestions:</h3>
-          <ul style="text-align:left; font-size:14px; color:#ddd;">
-            <li><strong>Platform:</strong> TikTok, YouTube Shorts</li>
-            <li><strong>Best Time to Post:</strong> 5:00 PM – 7:00 PM (local time)</li>
-            <li><strong>Hashtag Strategy:</strong> #finance #moneymindset #bossmoves</li>
-            <li><strong>Frequency:</strong> 1–2 times per day, 6 days/week</li>
-          </ul>
-          <p style="font-size:13px;color:#aaa;">(Simulated plan. AI-powered strategy coming next!)</p>
-        `;
-      }
-
-      document.getElementById("main").appendChild(resultDiv);
-    }
-
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn" onclick="optimizeUploadPlan()">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This is where your final video or result will appear.</p><br><button class="generate-btn">Render Final Video</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
+      `,
       history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
