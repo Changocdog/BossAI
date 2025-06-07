@@ -192,7 +192,12 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder='Write your video topic here...'></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <div id="script-result" style="margin-top: 20px; white-space: pre-wrap;"></div>
+      `,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
@@ -222,6 +227,25 @@
         `;
       });
     });
+
+    async function generateScript() {
+      const input = document.getElementById("script-input").value;
+      const resultBox = document.getElementById("script-result");
+      resultBox.innerText = "⏳ Generating script...";
+
+      try {
+        const response = await fetch("https://your-backend-url.com/generate-script", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: input })
+        });
+
+        const data = await response.json();
+        resultBox.innerText = data.script || "⚠️ No script returned.";
+      } catch (error) {
+        resultBox.innerText = "❌ Error generating script.";
+      }
+    }
   </script>
 
 </body>
