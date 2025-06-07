@@ -145,6 +145,10 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
+    .voiceover-result {
+      margin-top: 20px;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -190,39 +194,28 @@
     });
 
     const content = {
-      manager: `
-        <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
-        <p>Enter a prompt to delegate to sub-AIs:</p>
-        <textarea id="manager-input" placeholder="e.g., Write a 30-sec finance script..."></textarea>
-        <br>
-        <button class="generate-btn" onclick="runManagerAI()">Run Manager AI</button>
-        <div id="manager-output" style="margin-top:20px; color:#4fc3f7;"></div>
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <textarea id="voiceover-text" placeholder='Paste your script here...'></textarea><br>
+        <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
+        <div class="voiceover-result" id="voiceover-result"></div>
       `,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Performing content compliance review...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-input" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="runScriptWriter()">Generate Script</button><div id="script-output" style="margin-top: 20px;"></div>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Plan best time and platform to post:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here’s your final video preview:</p>
+        <p>Here's your final video preview:</p>
         <div style="margin: 20px auto; max-width: 560px;">
           <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
             title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
         </div>
         <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn">🔁 Render Again</button>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      history: `
-        <h2 style="color:#00bfff;">🗂️ History</h2>
-        <p>Recent content outputs:</p>
-        <ul><li>✔️ Script #12 - "Investing in 2025"</li><li>✔️ Voiceover #10 - "Budget Hacks"</li><li>✔️ Upload Plan - TikTok, 8PM</li></ul>
-      `,
-      settings: `
-        <h2 style="color:#00bfff;">⚙️ Settings</h2>
-        <p>App preferences & integrations:</p>
-        <textarea placeholder="API keys, voice settings, platform toggles..."></textarea><br>
-        <button class="generate-btn">Save Settings</button>
-      `
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -231,58 +224,27 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
 
-    async function runManagerAI() {
-      const input = document.getElementById("manager-input").value;
-      const key = document.getElementById("api-key").value;
-      const output = document.getElementById("manager-output");
+    function generateVoiceover() {
+      const text = document.getElementById("voiceover-text").value.trim();
+      const resultBox = document.getElementById("voiceover-result");
+      if (!text) {
+        resultBox.innerHTML = `<p style="color: red;">⚠️ Please enter text to generate voiceover.</p>`;
+        return;
+      }
 
-      if (!key || !input) return alert("API key and prompt required.");
-      output.innerHTML = "⏳ Thinking...";
-
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: input }],
-          temperature: 0.7
-        })
-      });
-
-      const data = await response.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ No response.";
-    }
-
-    async function runScriptWriter() {
-      const input = document.getElementById("script-input").value;
-      const key = document.getElementById("api-key").value;
-      const output = document.getElementById("script-output");
-
-      if (!key || !input) return alert("API key and prompt required.");
-      output.innerHTML = "⏳ Writing script...";
-
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: input }],
-          temperature: 0.7
-        })
-      });
-
-      const data = await response.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ No response.";
+      resultBox.innerHTML = `
+        <p>✅ Voiceover generated!</p>
+        <a href="https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" 
+           download="voiceover.mp3" style="color:#00ffff;">🔊 Download Voiceover (Simulated)</a>
+      `;
     }
   </script>
 
