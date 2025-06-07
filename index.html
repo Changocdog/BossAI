@@ -132,6 +132,18 @@
       color: white;
     }
 
+    .response-box {
+      margin-top: 16px;
+      text-align: left;
+      max-width: 500px;
+      font-size: 15px;
+      background: #111;
+      padding: 12px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      border: 1px solid #007bff;
+    }
+
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -143,18 +155,6 @@
       cursor: pointer;
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
-    }
-
-    .response-box {
-      margin-top: 20px;
-      background: #121212;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      padding: 15px;
-      max-width: 600px;
-      white-space: pre-wrap;
-      color: #4fc3f7;
-      font-size: 14px;
     }
 
     @media (max-width: 768px) {
@@ -187,77 +187,6 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Enter your Gemini API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter your Google Gemini API Key" />
   </div>
-
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `
-        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-        <p>Describe your video and goals to get a smart upload plan:</p>
-        <textarea id="upload-input" placeholder='e.g. “A 30-sec finance tip video targeting TikTok audience.”'></textarea>
-        <br>
-        <button class="generate-btn" onclick="generateUploadPlan()">Optimize Upload Plan</button>
-        <div id="upload-response" class="response-box"></div>
-      `,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
-    };
-
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
-      });
-    });
-
-    async function generateUploadPlan() {
-      const input = document.getElementById("upload-input").value.trim();
-      const responseBox = document.getElementById("upload-response");
-      if (!input) return alert("Please describe your video.");
-
-      responseBox.innerHTML = "⏳ Generating upload plan...";
-
-      // Simulated plan (replace with Gemini API call later)
-      setTimeout(() => {
-        responseBox.innerHTML = `
-        ✅ <b>Upload Plan</b><br>
-        • Platform: TikTok, Instagram Reels<br>
-        • Time: 6–9 PM (most engagement)<br>
-        • Hashtags: #FinanceTips #BossAI #MoneyMoves<br>
-        • Title: “3 Finance Hacks in 30 Seconds!”<br>
-        • Strategy: Post daily for 7 days to test performance.
-        `;
-      }, 1200);
-    }
-  </script>
-
-</body>
-</html>
