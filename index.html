@@ -206,7 +206,13 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      manager: `
+        <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
+        <p>This AI coordinates the sub-AIs and manages content workflows.</p>
+        <textarea placeholder="Describe your current project goal..."></textarea><br>
+        <button class="generate-btn" onclick="generateManagerStrategy()">Generate Strategy</button>
+        <div id="manager-output" style="margin-top: 15px; color: #4fc3f7;"></div>
+      `,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
@@ -246,6 +252,20 @@
       `;
     }
 
+    function generateManagerStrategy() {
+      const output = document.getElementById("manager-output");
+      output.innerHTML = `
+        <strong>📋 Strategy Generated:</strong><br>
+        1. Identify trending niche for this week.<br>
+        2. Generate 3 finance scripts using Script Writer AI.<br>
+        3. Run voiceover generation for each.<br>
+        4. Create upload schedule using Upload AI.<br>
+        5. Review all results in History.<br>
+        6. Legal AI to verify each post before publishing.<br>
+        <em>Tip: Use the Trends module to enhance your visibility.</em>
+      `;
+    }
+
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
@@ -258,40 +278,6 @@
           </div>
         `;
       });
-    });
-
-    // Voiceover AI functionality
-    document.addEventListener("click", async function(event) {
-      if (event.target && event.target.classList.contains("generate-btn") && event.target.textContent.includes("Generate Voiceover")) {
-        const textarea = event.target.previousElementSibling;
-        const script = textarea.value.trim();
-
-        if (!script) {
-          alert("Please paste your script first.");
-          return;
-        }
-
-        event.target.textContent = "Generating Voiceover...";
-        event.target.disabled = true;
-
-        const audioURL = `https://api.voicerss.org/?key=8d0b4c4034424a309b4df6a05e9a06d4&hl=en-us&src=${encodeURIComponent(script)}`;
-
-        const audio = new Audio(audioURL);
-        audio.controls = true;
-        audio.style.marginTop = "20px";
-        audio.style.maxWidth = "400px";
-
-        setTimeout(() => {
-          event.target.textContent = "Generate Voiceover";
-          event.target.disabled = false;
-        }, 3000);
-
-        const prevAudio = textarea.parentElement.querySelector("audio");
-        if (prevAudio) prevAudio.remove();
-
-        textarea.parentElement.appendChild(audio);
-        audio.play();
-      }
     });
   </script>
 
