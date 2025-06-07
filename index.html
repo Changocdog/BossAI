@@ -7,17 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -33,12 +31,12 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-
-    .sidebar.hidden { transform: translateX(-100%); }
-
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
     .sidebar button {
       background: #121212;
-      color: #fff;
+      color: #ffffff;
       border: none;
       padding: 12px;
       font-size: 14px;
@@ -47,17 +45,14 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -70,12 +65,10 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
-
     .main.full {
       margin-left: 0;
       width: 100%;
     }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -91,20 +84,18 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
     }
-
     p {
-      color: #ccc;
+      color: #cccccc;
       font-size: 14px;
+      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
     #api-key {
       padding: 14px 18px;
       font-size: 16px;
@@ -113,10 +104,9 @@
       background-color: #1a1a1a;
       border: 1px solid #00bfff;
       border-radius: 8px;
-      color: #fff;
+      color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     textarea {
       width: 100%;
       max-width: 500px;
@@ -128,7 +118,6 @@
       background-color: #1a1a1a;
       color: white;
     }
-
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -141,10 +130,27 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-
+    ul.history-list {
+      text-align: left;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0;
+    }
+    ul.history-list li {
+      background: #111;
+      padding: 8px;
+      margin: 5px 0;
+      border-left: 4px solid #00bfff;
+    }
     @media (max-width: 768px) {
-      .main { margin-left: 0; width: 100%; }
-      .sidebar { position: fixed; z-index: 999; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -180,23 +186,19 @@
     });
 
     const logAction = (module, action, notes) => {
-      const webhookURL = "YOUR_WEBHOOK_URL_HERE"; // 👈 REPLACE THIS
-      fetch(webhookURL, {
-        method: "POST",
-        body: JSON.stringify({ module, action, notes }),
-        headers: { "Content-Type": "application/json" }
-      });
+      console.log(`[LOG] ${module} → ${action}: ${notes}`);
+      // You can replace this with Google Sheets webhook
     };
 
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><br><button class="generate-btn" onclick="logAction('Legal', 'Run Review', 'Checked for legal violations')">Run Legal Review</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Script Writer', 'Generate', document.getElementById('script-text').value)">Generate Script</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Script', 'Generate', document.getElementById('script-text').value)">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea id="voice-text" placeholder='Paste your script here...'></textarea><br><button class="generate-btn" onclick="logAction('Voiceover', 'Generate Voice', document.getElementById('voice-text').value)">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea id="upload-text" placeholder='Describe your video goals...'></textarea><br><button class="generate-btn" onclick="logAction('Upload Strategy', 'Optimize', document.getElementById('upload-text').value)">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview your final video:</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe></div><br><button class="generate-btn" onclick="logAction('Final Output', 'Render Again', 'User re-rendered')">Render Again</button>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past entries logged to Google Sheets.</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set preferences..."></textarea><br><button class="generate-btn" onclick="logAction('Settings', 'Save', 'User updated settings')">Save Settings</button>`
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your final video preview:</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe></div><br><button class="generate-btn" onclick="logAction('Final Output', 'Render Again', 'User re-rendered')">🔁 Render Again</button>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Recent AI activity:</p><ul class="history-list"><li>Script Generated</li><li>Voiceover Created</li><li>Upload Plan Suggested</li><li>Final Output Previewed</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Customize your preferences..."></textarea><br><button class="generate-btn" onclick="logAction('Settings', 'Save', 'Preferences updated')">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
