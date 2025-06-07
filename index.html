@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
@@ -17,7 +16,6 @@
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -33,11 +31,9 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-
     .sidebar.hidden {
       transform: translateX(-100%);
     }
-
     .sidebar button {
       background: #121212;
       color: #ffffff;
@@ -49,17 +45,14 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -72,12 +65,10 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
-
     .main.full {
       margin-left: 0;
       width: 100%;
     }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -93,21 +84,18 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
     }
-
     p {
       color: #cccccc;
       font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
     #api-key {
       padding: 14px 18px;
       font-size: 16px;
@@ -119,7 +107,6 @@
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     textarea {
       width: 100%;
       max-width: 500px;
@@ -131,7 +118,6 @@
       background-color: #1a1a1a;
       color: white;
     }
-
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -144,13 +130,11 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
       }
-
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -175,8 +159,8 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Enter your Gemini API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter your Gemini API Key" />
   </div>
 
   <script>
@@ -192,7 +176,12 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder='Write your video topic or prompt here...'></textarea>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <pre id="script-output" style="text-align:left; margin-top:15px; white-space:pre-wrap;"></pre>
+      `,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
@@ -213,15 +202,31 @@
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
       });
     });
+
+    async function generateScript() {
+      const key = document.getElementById("api-key").value.trim();
+      const prompt = document.getElementById("script-input").value.trim();
+      const output = document.getElementById("script-output");
+      if (!key || !prompt) {
+        output.textContent = "Please provide your API key and a script prompt.";
+        return;
+      }
+
+      output.textContent = "⏳ Generating script with Gemini...";
+
+      const result = await fetch("https://generativelanguage.googleapis.com/v1beta3/models/gemini-pro:generateContent?key=" + key, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+
+      const data = await result.json();
+      output.textContent = data?.candidates?.[0]?.content?.parts?.[0]?.text || "❌ Failed to generate script.";
+    }
   </script>
 
 </body>
