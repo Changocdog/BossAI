@@ -260,53 +260,37 @@
       });
     });
 
-    // GPT Script Writer
+    // Voiceover AI functionality
     document.addEventListener("click", async function(event) {
-      if (event.target && event.target.classList.contains("generate-btn") && event.target.textContent.includes("Generate Script")) {
-        const apiKey = document.getElementById("api-key").value.trim();
-        if (!apiKey) {
-          alert("Please enter your OpenAI API key first.");
+      if (event.target && event.target.classList.contains("generate-btn") && event.target.textContent.includes("Generate Voiceover")) {
+        const textarea = event.target.previousElementSibling;
+        const script = textarea.value.trim();
+
+        if (!script) {
+          alert("Please paste your script first.");
           return;
         }
 
-        const textarea = event.target.previousElementSibling;
-        const userPrompt = textarea.value.trim() || "Write a 60-second YouTube short script about making money online using AI tools.";
-
-        event.target.textContent = "Generating...";
+        event.target.textContent = "Generating Voiceover...";
         event.target.disabled = true;
 
-        try {
-          const response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              messages: [
-                { role: "system", content: "You are a YouTube Shorts script writer that writes viral, fast-paced, engaging finance content." },
-                { role: "user", content: userPrompt }
-              ],
-              max_tokens: 400,
-              temperature: 0.7
-            })
-          });
+        const audioURL = `https://api.voicerss.org/?key=8d0b4c4034424a309b4df6a05e9a06d4&hl=en-us&src=${encodeURIComponent(script)}`;
 
-          const data = await response.json();
-          const result = data.choices?.[0]?.message?.content?.trim();
+        const audio = new Audio(audioURL);
+        audio.controls = true;
+        audio.style.marginTop = "20px";
+        audio.style.maxWidth = "400px";
 
-          if (result) {
-            textarea.value = result;
-          } else {
-            textarea.value = "⚠️ Failed to generate script. Please try again.";
-          }
-        } catch (err) {
-          textarea.value = "❌ Error: " + err.message;
-        }
+        setTimeout(() => {
+          event.target.textContent = "Generate Voiceover";
+          event.target.disabled = false;
+        }, 3000);
 
-        event.target.textContent = "Generate Script";
-        event.target.disabled = false;
+        const prevAudio = textarea.parentElement.querySelector("audio");
+        if (prevAudio) prevAudio.remove();
+
+        textarea.parentElement.appendChild(audio);
+        audio.play();
       }
     });
   </script>
