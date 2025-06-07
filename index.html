@@ -122,7 +122,7 @@
 
     textarea {
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -143,6 +143,18 @@
       cursor: pointer;
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -180,38 +192,23 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `
-        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voiceover-text" placeholder='Paste your script here...'></textarea><br>
-        <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
-        <div class="voiceover-result" id="voiceover-result"></div>
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-prompt" placeholder='Enter a topic for your video script...'></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <pre id="script-result" style="margin-top:20px; text-align:left; max-width:600px; white-space:pre-wrap;"></pre>
       `,
-      upload: `
-        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-        <textarea id="upload-goals" placeholder='Describe your video goals...'></textarea><br>
-        <button class="generate-btn" onclick="generateUploadPlan()">Optimize Upload Plan</button>
-        <div id="upload-result" style="margin-top:20px;"></div>
-      `,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Final video will appear here (placeholder).</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past results and outputs will be listed here.</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure custom preferences and integrations.</p>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
         main.innerHTML = `
           <div style="max-width: 800px; text-align: center;">
@@ -220,39 +217,41 @@
       });
     });
 
-    function generateVoiceover() {
-      const text = document.getElementById("voiceover-text").value.trim();
-      const resultBox = document.getElementById("voiceover-result");
-      if (!text) {
-        resultBox.innerHTML = `<p style="color: red;">⚠️ Please enter text to generate voiceover.</p>`;
+    async function generateScript() {
+      const prompt = document.getElementById("script-prompt").value.trim();
+      const apiKey = document.getElementById("api-key").value.trim();
+      const output = document.getElementById("script-result");
+
+      if (!prompt || !apiKey) {
+        output.textContent = "⚠️ Please enter a topic and your API key.";
         return;
       }
 
-      resultBox.innerHTML = `
-        <p>✅ Voiceover generated!</p>
-        <a href="https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" 
-           download="voiceover.mp3" style="color:#00ffff;">🔊 Download Voiceover (Simulated)</a>
-      `;
-    }
+      output.textContent = "⏳ Generating script...";
 
-    function generateUploadPlan() {
-      const input = document.getElementById("upload-goals").value.trim();
-      const result = document.getElementById("upload-result");
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: `Write a 60-second video script about: ${prompt}` }],
+            temperature: 0.7,
+          }),
+        });
 
-      if (!input) {
-        result.innerHTML = `<p style="color:red;">⚠️ Please enter video goals first.</p>`;
-        return;
+        const data = await response.json();
+        if (data.choices && data.choices.length > 0) {
+          output.textContent = data.choices[0].message.content.trim();
+        } else {
+          output.textContent = "❌ Failed to get a response from GPT.";
+        }
+      } catch (error) {
+        output.textContent = "❌ Error: " + error.message;
       }
-
-      result.innerHTML = `
-        <p>📊 <strong>Upload Strategy:</strong></p>
-        <ul style="text-align:left; color:#00ffff;">
-          <li>🕓 Best Time: 4–6 PM PST</li>
-          <li>📅 Best Day: Thursday or Sunday</li>
-          <li>📱 Platform: YouTube Shorts, TikTok</li>
-          <li>🔥 Strategy: Add trending hashtags, keep video under 60 sec, high hook in first 3 sec</li>
-        </ul>
-      `;
     }
   </script>
 </body>
