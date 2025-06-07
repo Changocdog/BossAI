@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -34,7 +34,9 @@
       z-index: 100;
     }
 
-    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
 
     .sidebar button {
       background: #121212;
@@ -106,22 +108,35 @@
       margin-bottom: 20px;
     }
 
-    input, textarea {
+    #api-key {
+      padding: 14px 18px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 500px;
+      background-color: #1a1a1a;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      color: #ffffff;
+      box-shadow: 0 0 10px #00bfff88;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 500px;
       padding: 12px;
+      margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
       color: white;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 15px;
     }
 
     button.generate-btn {
       background-color: #007bff;
       color: white;
       border: none;
+      margin-top: 10px;
       padding: 10px 16px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
@@ -130,15 +145,16 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    .saved-alert {
-      margin-top: 10px;
-      color: #00ffcc;
-      font-size: 14px;
-    }
-
     @media (max-width: 768px) {
-      .main { margin-left: 0; width: 100%; }
-      .sidebar { position: fixed; z-index: 999; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -176,7 +192,12 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder='Describe your video idea...'></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <div id="script-result" style="margin-top: 20px; text-align: left;"></div>
+      `,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
@@ -204,6 +225,37 @@
       const voice = document.getElementById("voice")?.value;
       const theme = document.getElementById("theme")?.value;
       document.getElementById("save-alert").innerText = `Settings saved: ${voice}, ${theme}`;
+    }
+
+    function generateScript() {
+      const prompt = document.getElementById("script-input").value;
+      const apiKey = document.getElementById("api-key").value;
+      const resultBox = document.getElementById("script-result");
+      
+      resultBox.innerHTML = `<p style="color:#888;">Generating script...</p>`;
+
+      fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: `Write a short, viral YouTube short script based on this idea: ${prompt}` }],
+          max_tokens: 300,
+          temperature: 0.8
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const script = data.choices?.[0]?.message?.content || "No response.";
+        resultBox.innerHTML = `<pre style="white-space:pre-wrap; font-size: 15px; color:#00ffcc;">${script}</pre>`;
+      })
+      .catch(err => {
+        console.error(err);
+        resultBox.innerHTML = `<p style="color:red;">Failed to generate script. Please check your API key.</p>`;
+      });
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
