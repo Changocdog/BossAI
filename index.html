@@ -7,258 +7,146 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
+      background: linear-gradient(to right, #000428, #004e92);
       color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
-      background: #0d0d0d;
+      background: #0a0a0a;
       padding: 60px 10px 20px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      height: 100vh;
       position: fixed;
       left: 0;
       top: 0;
-      border-right: 1px solid #1a1a1a;
-      transition: transform 0.3s ease;
+      height: 100vh;
+      border-right: 2px solid #1a1a1a;
       z-index: 100;
     }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
     .sidebar button {
-      background: #121212;
-      color: #ffffff;
+      background: #111;
+      color: white;
       border: none;
       padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
     }
-
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-    }
-
     .sidebar button.active {
-      background-color: #007bff;
-      color: white;
+      background: #005bea;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
+      padding: 40px 20px;
+      overflow-y: auto;
       width: calc(100% - 240px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 20px;
-      text-align: center;
-      transition: margin-left 0.3s ease;
     }
-
-    .main.full {
-      margin-left: 0;
+    h1, h2 { color: #00bfff; }
+    textarea, input {
       width: 100%;
-    }
-
-    #toggle-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0 0 12px #00bfff;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
-    textarea {
-      width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
+      margin: 10px 0;
+      border-radius: 8px;
       border: 1px solid #00bfff;
-      background-color: #1a1a1a;
+      background: #121212;
       color: white;
     }
-
-    button.generate-btn {
-      background-color: #007bff;
+    .generate-btn {
+      padding: 10px 16px;
+      background: #00bfff;
       color: white;
       border: none;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 15px;
+      font-family: 'Orbitron', sans-serif;
       box-shadow: 0 0 10px #00bfff88;
     }
-
-    ul.trend-list {
-      list-style: none;
-      padding-left: 0;
-      max-width: 500px;
-      margin: auto;
-    }
-
-    ul.trend-list li {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: left;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
-    }
+    ul { list-style: none; padding-left: 0; }
+    li { margin: 6px 0; }
   </style>
 </head>
 <body>
 
-  <button id="toggle-btn">☰ Menu</button>
-
-  <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
+  <div class="sidebar">
+    <button class="active" data-module="manager">🤖 Manager AI</button>
     <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
-    <button data-module="trends">📈 Trends AI</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <p>Welcome to the full-featured Boss AI app.</p>
   </div>
 
   <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
+    const logs = [];
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Here are the latest trending topics:</p>
-        <ul class="trend-list" id="trend-list">
-          <li>#MakeMoneyOnline</li>
-          <li>#AIContent</li>
-          <li>#PassiveIncome</li>
-        </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      manager: `<h2>🤖 General Manager AI</h2><p>This AI oversees and coordinates all other modules.</p>`,
+      legal: `<h2>📜 Legal Review</h2><p>Checking compliance with current guidelines and copyright rules...</p>`,
+      script: `<h2>✍️ Script Writer</h2><textarea id="scriptInput" placeholder="Enter your idea or topic..."></textarea><button class="generate-btn" onclick="generateScript()">Generate Script</button>`,
+      voiceover: `<h2>🎤 Voiceover AI</h2><textarea id="voiceInput" placeholder="Paste your script here..."></textarea><button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>`,
+      upload: `<h2>📤 Upload Strategy</h2><textarea placeholder="Describe your video goals..."></textarea><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2>📺 Final Output</h2><p>Here’s your generated video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2>🗂️ History</h2><ul id="historyList">${logs.map(item => `<li>${item}</li>`).join("")}</ul>`,
+      settings: `<h2>⚙️ Settings</h2><textarea placeholder="Set preferences (e.g. voice type, language)..."></textarea><button class="generate-btn">Save Settings</button>`
     };
 
-    function updateTrends() {
-      const list = document.getElementById("trend-list");
-      list.innerHTML = `
-        <li>#FinanceTips</li>
-        <li>#ContentAutomation</li>
-        <li>#ViralShorts</li>
-        <li>#Crypto2025</li>
-        <li>#BossAI</li>
-      `;
+    function setActive(module) {
+      document.querySelectorAll(".sidebar button").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.dataset.module === module) btn.classList.add("active");
+      });
+      main.innerHTML = content[module];
+      if (module === 'history') updateHistory();
+    }
+
+    function generateScript() {
+      const input = document.getElementById('scriptInput').value.trim();
+      if (!input) return alert("Enter a topic first.");
+      logs.push(`Script generated: "${input}"`);
+      alert("Script generated (placeholder).");
+      updateHistory();
+    }
+
+    function generateVoice() {
+      const input = document.getElementById('voiceInput').value.trim();
+      if (!input) return alert("Paste a script first.");
+      logs.push(`Voiceover generated.`);
+      alert("Voiceover generated (placeholder).");
+      updateHistory();
+    }
+
+    function updateHistory() {
+      const list = logs.map(item => `<li>${item}</li>`).join('');
+      const ul = `<ul id="historyList">${list}</ul>`;
+      main.innerHTML = `<h2>🗂️ History</h2>${ul}`;
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        const module = button.dataset.module;
+        setActive(module);
       });
     });
+
+    setActive("manager");
   </script>
 
 </body>
