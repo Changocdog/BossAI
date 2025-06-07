@@ -34,7 +34,9 @@
       z-index: 100;
     }
 
-    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
 
     .sidebar button {
       background: #121212;
@@ -45,6 +47,7 @@
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .sidebar button:hover {
@@ -91,30 +94,67 @@
       box-shadow: 0 0 12px #00bfff;
     }
 
-    textarea, input {
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #00bfff;
+      letter-spacing: 1px;
+    }
+
+    p {
+      color: #cccccc;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    #api-key {
+      padding: 14px 18px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 500px;
+      background-color: #1a1a1a;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      color: #ffffff;
+      box-shadow: 0 0 10px #00bfff88;
+    }
+
+    textarea {
       width: 100%;
       max-width: 500px;
       padding: 12px;
+      margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
       color: white;
-      margin: 10px auto;
-      display: block;
     }
 
     button.generate-btn {
       background-color: #007bff;
       color: white;
       border: none;
+      margin-top: 10px;
       padding: 10px 16px;
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
-      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -150,62 +190,61 @@
     });
 
     const content = {
-      manager: `<h2>🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2>📜 Legal Review</h2><p>Checking for content compliance...</p>`,
-      script: `<h2>✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2>🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `
-        <h2>📤 Upload Strategy</h2>
-        <textarea id="upload-input" placeholder="Describe your video goals or niche..."></textarea>
-        <button class="generate-btn" onclick="generateUploadStrategy()">Optimize Upload Plan</button>
-        <div id="upload-result" style="margin-top:20px;"></div>
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming soon.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      output: `<h2>📺 Final Output</h2><p>This is where your video result will appear.</p>`,
-      history: `<h2>🗂️ History</h2><ul id="history-list"><li>No history yet.</li></ul>`,
-      settings: `<h2>⚙️ Settings</h2><p>Adjust system preferences.</p>`
+
+      history: `
+        <h2 style="color:#00bfff;">🗂️ History</h2>
+        <p>Your past content outputs:</p>
+        <ul id="history-list" style="text-align:left;"></ul>
+        <script>
+          const histData = JSON.parse(localStorage.getItem("boss_history") || "[]");
+          const list = document.getElementById("history-list");
+          list.innerHTML = histData.length ? histData.map(i => '<li>' + i + '</li>').join('') : "<li>No history yet.</li>";
+        </script>
+      `,
+
+      settings: `
+        <h2 style="color:#00bfff;">⚙️ Settings</h2>
+        <p>Configure your preferences:</p>
+        <textarea id="settings-text" placeholder="Set custom preferences here..."></textarea><br>
+        <button class="generate-btn" onclick="saveSettings()">Save Settings</button>
+        <div id="settings-msg" style="margin-top: 10px; color: lightgreen;"></div>
+      `
     };
-
-    function generateUploadStrategy() {
-      const input = document.getElementById("upload-input").value.trim();
-      const output = document.getElementById("upload-result");
-
-      if (!input) {
-        output.innerHTML = "<p style='color:red;'>Please describe your video.</p>";
-        return;
-      }
-
-      // Simulated logic
-      const strategy = `
-        <p><strong>📆 Best Time to Upload:</strong> Wednesday 5 PM (based on finance audience trends)</p>
-        <p><strong>📱 Platform:</strong> YouTube Shorts + TikTok</p>
-        <p><strong>🧠 Hook Suggestion:</strong> "How to Grow $100 into $1000: Fast Strategy!"</p>
-      `;
-
-      output.innerHTML = strategy;
-
-      // Save to localStorage for history
-      const history = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
-      history.unshift({ prompt: input, result: strategy });
-      localStorage.setItem("uploadHistory", JSON.stringify(history));
-    }
-
-    function loadHistory() {
-      const historyData = JSON.parse(localStorage.getItem("uploadHistory") || "[]");
-      const list = document.getElementById("history-list");
-      list.innerHTML = historyData.map(entry => `<li><b>Prompt:</b> ${entry.prompt}<br/>${entry.result}</li>`).join('');
-    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
-
-        if (module === "history") loadHistory();
       });
     });
+
+    function saveSettings() {
+      const val = document.getElementById("settings-text").value;
+      localStorage.setItem("boss_settings", val);
+      document.getElementById("settings-msg").innerText = "✅ Settings saved!";
+    }
   </script>
 
 </body>
