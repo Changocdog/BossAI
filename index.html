@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -34,17 +34,20 @@
       z-index: 100;
     }
 
-    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
 
     .sidebar button {
       background: #121212;
-      color: #fff;
+      color: #ffffff;
       border: none;
       padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .sidebar button:hover {
@@ -91,16 +94,42 @@
       box-shadow: 0 0 12px #00bfff;
     }
 
-    input, textarea {
-      background-color: #1a1a1a;
-      color: #fff;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 15px;
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #00bfff;
+      letter-spacing: 1px;
+    }
+
+    p {
+      color: #cccccc;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    #api-key {
+      padding: 14px 18px;
+      font-size: 16px;
       width: 100%;
       max-width: 500px;
+      background-color: #1a1a1a;
+      border: 1px solid #00bfff;
+      border-radius: 8px;
+      color: #ffffff;
+      box-shadow: 0 0 10px #00bfff88;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
       margin-top: 10px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #00bfff;
+      background-color: #1a1a1a;
+      color: white;
     }
 
     button.generate-btn {
@@ -116,21 +145,15 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    #output-box {
-      margin-top: 20px;
-      max-width: 600px;
-      text-align: left;
-      white-space: pre-wrap;
-    }
-
-    h2 {
-      color: #00bfff;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
       }
     }
   </style>
@@ -157,9 +180,9 @@
   </div>
 
   <script>
+    const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
-    const toggleBtn = document.getElementById("toggle-btn");
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
@@ -167,61 +190,29 @@
     });
 
     const content = {
-      manager: `<h2>🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2>📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `
-        <h2>✍️ Script Writer</h2>
-        <textarea id="prompt" placeholder="Enter a video topic..."></textarea>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <div id="output-box"></div>
-      `,
-      voiceover: `<h2>🎤 Voiceover</h2><p>Coming soon.</p>`,
-      upload: `<h2>📤 Upload Strategy</h2><p>Coming soon.</p>`,
-      output: `<h2>📺 Final Output</h2><p>Coming soon.</p>`,
-      history: `<h2>🗂️ History</h2><p>Coming soon.</p>`,
-      settings: `<h2>⚙️ Settings</h2><p>Coming soon.</p>`
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your final video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" title="Boss AI Final Video" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
-        main.innerHTML = content[module];
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center; margin-top: 60px;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
-
-    async function generateScript() {
-      const prompt = document.getElementById("prompt").value;
-      const apiKey = document.getElementById("api-key").value;
-      const outputBox = document.getElementById("output-box");
-      outputBox.innerText = "Generating...";
-
-      try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You are a helpful script-writing assistant for short-form videos." },
-              { role: "user", content: prompt }
-            ],
-            max_tokens: 300,
-            temperature: 0.7
-          })
-        });
-
-        const data = await response.json();
-        const script = data.choices[0].message.content;
-        outputBox.innerText = script;
-      } catch (err) {
-        outputBox.innerText = "Error generating script. Check API key or try again.";
-      }
-    }
   </script>
 
 </body>
