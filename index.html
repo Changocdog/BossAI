@@ -6,16 +6,16 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -31,26 +31,32 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
     .sidebar button {
       background: #121212;
-      color: #ffffff;
+      color: #fff;
       border: none;
       padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
     }
+
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
+
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
+
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -61,12 +67,13 @@
       flex-direction: column;
       padding: 20px;
       text-align: center;
-      transition: margin-left 0.3s ease;
     }
+
     .main.full {
       margin-left: 0;
       width: 100%;
     }
+
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -77,121 +84,103 @@
       border: none;
       padding: 10px 16px;
       border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-    textarea {
+
+    #api-key, textarea, input {
       width: 100%;
       max-width: 500px;
       padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: 1px solid #00bfff;
+      margin: 10px auto;
       background-color: #1a1a1a;
+      border: 1px solid #00bfff;
       color: white;
+      border-radius: 6px;
     }
+
     button.generate-btn {
       background-color: #007bff;
       color: white;
-      border: none;
+      padding: 10px 20px;
       margin-top: 10px;
-      padding: 10px 16px;
+      border: none;
       border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
       cursor: pointer;
-      font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
-    }
-    @media (max-width: 768px) {
-      .main { margin-left: 0; width: 100%; }
-      .sidebar { position: fixed; z-index: 999; }
     }
   </style>
 </head>
 <body>
+  <button id="toggle-btn">☰ Menu</button>
+  <div class="sidebar" id="sidebar">
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="script">✍️ Script Writer</button>
+  </div>
+  <div class="main" id="main">
+    <h1>Boss AI Dashboard</h1>
+    <p>Enter your OpenAI API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 OpenAI API Key">
+  </div>
 
-<button id="toggle-btn">☰ Menu</button>
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggle-btn");
 
-<div class="sidebar" id="sidebar">
-  <button data-module="manager" class="active">🤖 Manager AI</button>
-  <button data-module="legal">📜 Legal Review</button>
-  <button data-module="script">✍️ Script Writer</button>
-  <button data-module="voiceover">🎤 Voiceover</button>
-  <button data-module="upload">📤 Upload Strategy</button>
-  <button data-module="output">📺 Final Output</button>
-  <button data-module="history">🗂️ History</button>
-  <button data-module="settings">⚙️ Settings</button>
-</div>
+    toggleBtn.onclick = () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    };
 
-<div class="main" id="main">
-  <h1>Boss AI Dashboard</h1>
-  <p>Enter your OpenAI API key to begin:</p>
-  <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
-</div>
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <input type="text" id="prompt" placeholder="What should the video be about?">
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <textarea id="script-output" placeholder="Generated script will appear here..." rows="10"></textarea>
+      `
+    };
 
-<script>
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-  const main = document.getElementById("main");
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("hidden");
-    main.classList.toggle("full");
-  });
-
-  const content = {
-    manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-    legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-    script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-    voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-    upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-    output: `<h2 style="color:#00bfff;">📺 Final Output</h2>
-      <p>Here's your final video preview:</p>
-      <div style="margin: 20px auto; max-width: 560px;">
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg"
-        title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-      </div>
-      <p style="color: #aaa;">This is a simulated video. Real rendering will be added next.</p>`,
-    history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script 1: Business video</li><li>Voiceover 2: Explainer</li><li>Upload Plan 3: YouTube Shorts</li></ul>`,
-    settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder='Set your preferences here...'></textarea><br><button class='generate-btn'>Save Settings</button>`
-  };
-
-  document.querySelectorAll(".sidebar button").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-      button.classList.add("active");
-
-      const module = button.getAttribute("data-module");
-      main.innerHTML = `<div style="max-width:800px;text-align:center;margin:auto;">${content[module] || ''}</div>`;
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.onclick = () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        const module = button.getAttribute("data-module");
+        main.innerHTML = content[module] || '';
+      };
     });
-  });
-</script>
 
+    async function generateScript() {
+      const prompt = document.getElementById("prompt").value;
+      const apiKey = document.getElementById("api-key").value;
+      const output = document.getElementById("script-output");
+
+      if (!prompt || !apiKey) return alert("Please enter both a prompt and your API key.");
+
+      output.value = "Generating script with GPT-3.5...";
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + apiKey
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.7
+          })
+        });
+
+        const data = await res.json();
+        output.value = data.choices[0].message.content.trim();
+      } catch (err) {
+        output.value = "❌ Error generating script. Please check your API key and try again.";
+      }
+    }
+  </script>
 </body>
 </html>
