@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -206,44 +206,28 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p><textarea placeholder='Type your task here...'></textarea><br><button class="generate-btn">Run Manager AI</button>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><textarea placeholder='Paste content to review'></textarea><br><button class="generate-btn">Check Legality</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Describe your video topic...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This will show the rendered video preview or downloadable file.</p>`,
       history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Here are the latest trending topics:</p>
-        <ul class="trend-list" id="trend-list">
-          <li>#MakeMoneyOnline</li>
-          <li>#AIContent</li>
-          <li>#PassiveIncome</li>
-        </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
-      `,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class='trend-list'><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#Crypto2025</li></ul><button class='generate-btn' onclick='updateTrends()'>🔄 Update Trends</button>`,
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
-      const list = document.getElementById("trend-list");
-      list.innerHTML = `
-        <li>#FinanceTips</li>
-        <li>#ContentAutomation</li>
-        <li>#ViralShorts</li>
-        <li>#Crypto2025</li>
-        <li>#BossAI</li>
-      `;
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#FinanceTips</li>
+          <li>#ContentAutomation</li>
+          <li>#ViralShorts</li>
+          <li>#Crypto2025</li>
+          <li>#BossAI</li>
+        `;
+      }
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -252,12 +236,62 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        main.innerHTML = `<div style="max-width: 800px; margin: auto;">${content[module]}</div>`;
       });
+    });
+
+    // Real GPT Integration for Script Writer
+    const apiKeyInput = document.getElementById("api-key");
+
+    document.addEventListener("click", async function (e) {
+      if (e.target.classList.contains("generate-btn")) {
+        const parent = e.target.closest("div");
+        const textarea = parent.querySelector("textarea");
+        const outputBox = document.createElement("div");
+        outputBox.style.marginTop = "12px";
+        outputBox.style.background = "#111";
+        outputBox.style.padding = "12px";
+        outputBox.style.borderRadius = "6px";
+        outputBox.style.color = "#0ff";
+
+        const apiKey = apiKeyInput.value.trim();
+        const prompt = textarea.value.trim();
+
+        if (!apiKey || !prompt) {
+          alert("Please enter your API key and a prompt.");
+          return;
+        }
+
+        e.target.disabled = true;
+        e.target.innerText = "Generating...";
+
+        try {
+          const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: [{ role: "user", content: prompt }],
+              temperature: 0.7
+            })
+          });
+
+          const data = await res.json();
+          const output = data.choices?.[0]?.message?.content || "No response.";
+
+          outputBox.innerText = output;
+          parent.appendChild(outputBox);
+        } catch (err) {
+          outputBox.innerText = "❌ Error: " + err.message;
+          parent.appendChild(outputBox);
+        }
+
+        e.target.disabled = false;
+        e.target.innerText = "Generate Script";
+      }
     });
   </script>
 
