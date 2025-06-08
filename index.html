@@ -7,15 +7,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -31,10 +33,14 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
     .sidebar button {
       background: #121212;
-      color: #ffffff;
+      color: #fff;
       border: none;
       padding: 12px;
       font-size: 14px;
@@ -43,14 +49,17 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
+
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
+
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
+
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -63,10 +72,12 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
+
     .main.full {
       margin-left: 0;
       width: 100%;
     }
+
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -82,30 +93,20 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
+
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
-      letter-spacing: 1px;
     }
+
     p {
-      color: #cccccc;
+      color: #ccc;
       font-size: 14px;
-      letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-    textarea {
+
+    textarea, input {
       width: 100%;
       max-width: 500px;
       padding: 12px;
@@ -116,6 +117,7 @@
       background-color: #1a1a1a;
       color: white;
     }
+
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -128,12 +130,14 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
+
     ul.trend-list {
       list-style: none;
       padding-left: 0;
       max-width: 500px;
       margin: auto;
     }
+
     ul.trend-list li {
       background: #111;
       margin-bottom: 10px;
@@ -141,9 +145,17 @@
       border-radius: 6px;
       text-align: left;
     }
+
     @media (max-width: 768px) {
-      .main { margin-left: 0; width: 100%; }
-      .sidebar { position: fixed; z-index: 999; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -181,38 +193,19 @@
 
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `
-        <h2 style="color:#00bfff;">📜 Legal Review</h2>
-        <p>Paste content below to check for potential issues:</p>
-        <textarea id="legal-input" placeholder="Paste content here..."></textarea><br>
-        <button class="generate-btn" onclick="runLegalCheck()">Run Legal Check</button>
-        <div id="legal-result" style="margin-top: 15px;"></div>
-      `,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Video generation will appear here.</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script #1: How to invest in 2025</li><li>Upload Plan: TikTok 9AM PST</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Update</button>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set preferences..."></textarea><br><button class="generate-btn">Save</button>`
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your final video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs:</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Plan 3</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list" id="trend-list"><li>#AIContent</li><li>#MakeMoneyOnline</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder='Adjust settings here...'></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
       const list = document.getElementById("trend-list");
-      list.innerHTML = `<li>#FinanceTips</li><li>#Automation2025</li><li>#YouTubeGrowth</li>`;
-    }
-
-    function runLegalCheck() {
-      const input = document.getElementById("legal-input").value;
-      const resultDiv = document.getElementById("legal-result");
-      if (!input.trim()) {
-        resultDiv.innerHTML = `<p style="color:orange;">⚠️ Please enter some content first.</p>`;
-        return;
-      }
-      resultDiv.innerHTML = `<p>🔍 Scanning content for legal risk...</p>`;
-      setTimeout(() => {
-        resultDiv.innerHTML = `<p style="color:lime;">✅ No immediate legal issues detected. This result is for simulation only.</p>`;
-      }, 1500);
+      list.innerHTML = `<li>#Finance2025</li><li>#GPTAutomation</li><li>#SmartTools</li>`;
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -220,7 +213,7 @@
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `<div style="max-width: 800px;">${content[module]}</div>`;
       });
     });
   </script>
