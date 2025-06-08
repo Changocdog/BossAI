@@ -1,95 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="sidebar">
-    <button class="module-button" data-module="home">🏠 Home</button>
-    <button class="module-button" data-module="manager">🧠 Manager AI</button>
-    <button class="module-button" data-module="script">✍️ Script Writer</button>
-    <button class="module-button" data-module="voiceover">🔊 Voiceover</button>
-    <button class="module-button" data-module="upload">📤 Upload Strategy</button>
-    <button class="module-button" data-module="legal">⚖️ Legal Review</button>
-    <button class="module-button" data-module="history">🕘 History</button>
-    <button class="module-button" data-module="dashboard">📊 Dashboard</button>
-    <button class="module-button" data-module="settings">⚙️ Settings</button>
-  </div>
+let currentModule = "home";
+const apiKeyKey = "elevenlabs_api_key";
 
-  <div class="main-content">
-    <!-- Home Panel -->
-    <div class="module-panel active" id="home-panel">
-      <h1>Welcome to Boss AI</h1>
-      <p>Enter a task in any module and let Boss AI handle it for you.</p>
-    </div>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".module-button").forEach((button) => {
+    button.addEventListener("click", function () {
+      const module = this.getAttribute("data-module");
+      switchModule(module);
+    });
+  });
 
-    <!-- Manager AI -->
-    <div class="module-panel" id="manager-panel">
-      <h2>Manager AI</h2>
-      <p>This module will coordinate sub-AIs and manage content strategy. (Coming soon)</p>
-    </div>
+  document.getElementById("run-script-btn")?.addEventListener("click", generateScript);
+  document.getElementById("run-voiceover-btn")?.addEventListener("click", generateVoiceover);
+  document.getElementById("run-upload-btn")?.addEventListener("click", generateUploadStrategy);
+  document.getElementById("run-legal-btn")?.addEventListener("click", runLegalReview);
+  document.getElementById("save-api-key-btn")?.addEventListener("click", saveElevenLabsKey);
+  document.getElementById("test-logging-btn")?.addEventListener("click", runTestLogger);
 
-    <!-- Script Writer AI -->
-    <div class="module-panel" id="script-panel">
-      <h2>Script Writer AI</h2>
-      <textarea id="script-input" placeholder="Enter video topic or hook..."></textarea>
-      <button id="run-script-btn">Generate Script</button>
-    </div>
+  const savedKey = localStorage.getItem(apiKeyKey);
+  if (savedKey) {
+    document.getElementById("elevenlabs-api-key").value = savedKey;
+  }
 
-    <!-- Voiceover AI -->
-    <div class="module-panel" id="voiceover-panel">
-      <h2>Voiceover AI</h2>
-      <textarea id="voiceover-input" placeholder="Paste your script here..."></textarea>
-      <button id="run-voiceover-btn">Generate Voiceover</button>
-    </div>
+  switchModule("home");
+});
 
-    <!-- Upload Strategy AI -->
-    <div class="module-panel" id="upload-panel">
-      <h2>Upload Strategy AI</h2>
-      <input id="upload-input" placeholder="Enter niche or video title..." />
-      <button id="run-upload-btn">Get Strategy</button>
-    </div>
+function switchModule(module) {
+  currentModule = module;
+  document.querySelectorAll(".module-panel").forEach((panel) => {
+    panel.classList.remove("active");
+  });
+  document.getElementById(`${module}-panel`).classList.add("active");
+}
 
-    <!-- Legal Review AI -->
-    <div class="module-panel" id="legal-panel">
-      <h2>Legal Review AI</h2>
-      <textarea id="legal-input" placeholder="Paste your script or description..."></textarea>
-      <button id="run-legal-btn">Run Legal Review</button>
-    </div>
+function displayOutput(moduleName, input, output) {
+  const outputBox = document.getElementById("final-output-box");
+  outputBox.innerHTML = `<strong>${moduleName}</strong><br><em>Input:</em> ${input}<br><em>Output:</em> ${output}`;
+  logToGoogleSheets(moduleName, input, output);
+}
 
-    <!-- History Panel -->
-    <div class="module-panel" id="history-panel">
-      <h2>Video History & Output Log</h2>
-      <p>Previously generated scripts and results will appear here. (Coming soon)</p>
-    </div>
+async function generateScript() {
+  const input = document.getElementById("script-input").value;
+  const outputBox = document.getElementById("final-output-box");
+  outputBox.innerHTML = "⏳ Generating script...";
 
-    <!-- Performance Dashboard -->
-    <div class="module-panel" id="dashboard-panel">
-      <h2>Performance Dashboard</h2>
-      <p>Tracking module activity, usage, and performance over time. (Coming soon)</p>
-    </div>
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer free",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "You are a professional short-form video script writer. Output script only." },
+          { role: "user", content: input }
+        ]
+      })
+    });
 
-    <!-- Settings Panel -->
-    <div class="module-panel" id="settings-panel">
-      <h2>Settings</h2>
-      <label for="elevenlabs-api-key">ElevenLabs API Key:</label>
-      <input type="text" id="elevenlabs-api-key" placeholder="Enter your ElevenLabs API key" />
-      <button id="save-api-key-btn">Save Key</button>
+    const data = await response.json();
+    const script = data.choices?.[0]?.message?.content || "No script generated.";
+    displayOutput("Script Writer AI", input, script);
+  } catch (error) {
+    outputBox.innerHTML = "❌ Error generating script.";
+    console.error(error);
+  }
+}
 
-      <hr />
-      <h3>Test Logging</h3>
-      <p>This will send a test entry to your BossAI Google Sheet.</p>
-      <button id="test-logging-btn">Run Logging Test</button>
-      <div id="test-log-result" style="margin-top: 10px;"></div>
-    </div>
+async function generateVoiceover() {
+  const text = document.getElementById("voiceover-input").value;
+  const outputBox = document.getElementById("final-output-box");
+  const apiKey = localStorage.getItem(apiKeyKey);
 
-    <!-- Final Output Box -->
-    <div id="final-output-box" class="output-box"></div>
-  </div>
+  if (!apiKey) {
+    outputBox.innerHTML = "❌ Please enter your ElevenLabs API key in Settings.";
+    return;
+  }
 
-  <script src="script.js"></script>
-</body>
-</html>
+  outputBox.innerHTML = "🔊 Generating voiceover...";
+
+  try {
+    const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB/stream", {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: "eleven_monolingual_v1",
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    });
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    outputBox.innerHTML = `
+      ✅ Voiceover ready:<br>
+      <audio controls src="${audioUrl}"></audio>
+    `;
+
+    logToGoogleSheets("Voiceover AI", text, "[Voiceover MP3 generated]");
+  } catch (error) {
+    outputBox.innerHTML = "❌ Error generating voiceover.";
+    console.error(error);
+  }
+}
+
+function generateUploadStrategy() {
+  const input = document.getElementById("upload-input").value;
+  const output = `Recommended schedule for: "${input}" → Post on Mon/Wed/Fri at 9am PT for highest engagement.`;
+  displayOutput("Upload Strategy AI", input, output);
+}
+
+function runLegalReview() {
+  const input = document.getElementById("legal-input").value;
+  const output = input.toLowerCase().includes("copyright")
+    ? "⚠️ Potential copyright issue detected. Please verify all assets are royalty-free."
+    : "✅ No legal issues detected.";
+  displayOutput("Legal Review AI", input, output);
+}
+
+function saveElevenLabsKey() {
+  const key = document.getElementById("elevenlabs-api-key").value;
+  localStorage.setItem(apiKeyKey, key);
+  alert("✅ ElevenLabs API key saved.");
+}
+
+function logToGoogleSheets(module, input, output) {
+  fetch("https://n8n.openai-assistant.workers.dev/webhook/bossai-logger", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ module, input, output })
+  }).then(res => console.log("✅ Logged to Sheet")).catch(err => console.error("❌ Logging error", err));
+}
+
+// ✅ Test Logging Button Handler
+function runTestLogger() {
+  const testResultBox = document.getElementById("test-log-result");
+  testResultBox.innerText = "⏳ Sending test...";
+
+  fetch("https://n8n.openai-assistant.workers.dev/webhook/bossai-logger", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      module: "Logger Test",
+      input: "Test message from Boss AI",
+      output: "✅ Google Sheet logging works!"
+    })
+  })
+  .then(res => {
+    if (res.ok) {
+      testResultBox.innerText = "✅ Logged to Google Sheet successfully!";
+    } else {
+      testResultBox.innerText = "❌ Logging failed. Check your webhook.";
+    }
+  })
+  .catch(err => {
+    testResultBox.innerText = "❌ Error sending test log.";
+    console.error(err);
+  });
+}
