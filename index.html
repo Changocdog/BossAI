@@ -1,19 +1,18 @@
-<!-- Full functional Boss AI base app with fixed layout, styling, and module switching -->
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -146,6 +145,21 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
+    ul.trend-list {
+      list-style: none;
+      padding-left: 0;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    ul.trend-list li {
+      background: #111;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
+
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
@@ -170,6 +184,9 @@
     <button data-module="voiceover">🎤 Voiceover</button>
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
+    <button data-module="history">🗂️ History</button>
+    <button data-module="trends">📈 Trends AI</button>
+    <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
@@ -189,13 +206,26 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all module tasks. GPT activation coming next.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scans for copyright or legal risks. GPT integration coming.</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write or generate your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover</h2><textarea placeholder='Enter script for voiceover...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Enter video or platform info...'></textarea><br><button class="generate-btn">Generate Strategy</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Video preview or file output shown here after AI flow completes.</p>`
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p><button class="generate-btn">Run Manager AI</button>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><button class="generate-btn">Run Legal Review</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here's your final video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Here are the latest trending topics:</p><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
+
+    function updateTrends() {
+      document.getElementById("trend-list").innerHTML = `
+        <li>#FinanceTips</li>
+        <li>#ContentAutomation</li>
+        <li>#ViralShorts</li>
+        <li>#Crypto2025</li>
+        <li>#BossAI</li>
+      `;
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
@@ -203,7 +233,11 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px; margin:auto; text-align:center;">${content[module] || ''}</div>`;
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
   </script>
