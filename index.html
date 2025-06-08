@@ -2,44 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      background-color: #111;
-      color: #f0f0f0;
+      background-color: #0b0b0c;
+      color: #e0e0ff;
+    }
+
+    #menu-toggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      padding: 10px;
+      background: #222;
+      color: white;
+      border: none;
+      font-size: 20px;
+      border-radius: 5px;
     }
 
     .sidebar {
-      width: 220px;
-      background-color: #000;
+      width: 230px;
+      background: #000;
       height: 100vh;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      border-right: 2px solid #333;
+      border-right: 2px solid #222;
+      transition: left 0.3s ease;
     }
 
     .sidebar button {
       margin: 6px 0;
       padding: 12px;
-      border: none;
       background: #1e1e1e;
-      color: white;
+      color: #fff;
+      border: none;
       border-radius: 6px;
-      text-align: left;
       cursor: pointer;
+      text-align: left;
     }
 
     .sidebar button.active {
       background-color: #007bff;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 0 8px #007bff;
     }
 
     .main-content {
-      flex-grow: 1;
+      flex: 1;
       padding: 20px;
       overflow-y: auto;
     }
@@ -55,43 +73,60 @@
     textarea, input {
       width: 100%;
       padding: 10px;
-      border-radius: 5px;
-      border: none;
       margin: 10px 0;
-      background: #222;
+      background-color: #222;
+      border: none;
       color: white;
+      border-radius: 5px;
       font-size: 16px;
     }
 
     button.main-action {
+      padding: 10px 16px;
       background-color: #007bff;
       color: white;
-      padding: 10px 16px;
       border: none;
       border-radius: 5px;
-      margin-bottom: 10px;
+      margin-top: 5px;
     }
 
     .output-box {
-      background-color: #1a1a1a;
+      background: #1a1a1a;
       padding: 15px;
+      border-radius: 5px;
       margin-top: 20px;
-      border-radius: 6px;
       white-space: pre-wrap;
     }
 
-    a button {
-      margin-top: 10px;
+    h1, h2 {
+      color: #44aaff;
+      text-shadow: 0 0 8px #44aaff;
     }
 
-    h2 {
-      border-bottom: 1px solid #333;
-      padding-bottom: 5px;
+    @media (max-width: 768px) {
+      #menu-toggle {
+        display: block;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -250px;
+        height: 100%;
+        z-index: 998;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .main-content {
+        padding-top: 60px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
+  <button id="menu-toggle">☰ Menu</button>
+
+  <div class="sidebar" id="sidebar">
     <button class="module-button active" data-module="home">🏠 Home</button>
     <button class="module-button" data-module="manager">🧠 Manager</button>
     <button class="module-button" data-module="script">✍️ Script Writer</button>
@@ -113,53 +148,53 @@
 
     <div class="module-panel" id="manager-panel">
       <h2>Manager AI</h2>
-      <p>This module coordinates all Boss AI tools. (Coming soon)</p>
+      <p>Coordinates all other AI systems. (Coming soon)</p>
     </div>
 
     <div class="module-panel" id="script-panel">
       <h2>Script Writer AI</h2>
-      <textarea id="script-input" placeholder="Enter video topic..."></textarea>
+      <textarea id="script-input" placeholder="Enter a video topic..."></textarea>
       <button class="main-action" id="run-script-btn">Generate Script</button>
     </div>
 
     <div class="module-panel" id="voiceover-panel">
       <h2>Voiceover AI</h2>
-      <textarea id="voiceover-input" placeholder="Paste your script..."></textarea>
+      <textarea id="voiceover-input" placeholder="Paste your script here..."></textarea>
       <button class="main-action" id="run-voiceover-btn">Generate Voiceover</button>
     </div>
 
     <div class="module-panel" id="upload-panel">
       <h2>Upload Strategy AI</h2>
-      <input id="upload-input" placeholder="Enter niche or topic..." />
+      <input id="upload-input" placeholder="Enter content niche or platform..." />
       <button class="main-action" id="run-upload-btn">Get Strategy</button>
     </div>
 
     <div class="module-panel" id="legal-panel">
       <h2>Legal Review AI</h2>
-      <textarea id="legal-input" placeholder="Paste content to check legality..."></textarea>
+      <textarea id="legal-input" placeholder="Paste content to check for compliance..."></textarea>
       <button class="main-action" id="run-legal-btn">Run Legal Review</button>
     </div>
 
     <div class="module-panel" id="trends-panel">
       <h2>Trend AI</h2>
-      <p>Trend analysis and idea generation coming soon.</p>
+      <p>Trending topic discovery coming soon.</p>
     </div>
 
     <div class="module-panel" id="history-panel">
       <h2>Video History</h2>
-      <p>Past outputs will appear here. (Coming soon)</p>
+      <p>Previously generated results will appear here.</p>
     </div>
 
     <div class="module-panel" id="dashboard-panel">
       <h2>Performance Dashboard</h2>
-      <p>Analytics and system insights will appear here. (Coming soon)</p>
+      <p>Usage analytics will be displayed here.</p>
     </div>
 
     <div class="module-panel" id="sheets-panel">
       <h2>📄 Google Sheets Log</h2>
-      <p>Open your BossAI Logs Sheet:</p>
+      <p>Open your BossAI Logs Sheet below:</p>
       <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit" target="_blank">
-        <button class="main-action">Open Google Sheet</button>
+        <button class="main-action">Open Sheet</button>
       </a>
     </div>
 
@@ -170,7 +205,7 @@
       <button class="main-action" id="save-api-key-btn">Save Key</button>
 
       <h3>Test Logging</h3>
-      <p>This sends a test entry to your Google Sheet:</p>
+      <p>Click below to test Google Sheets logging.</p>
       <button class="main-action" id="test-logging-btn">Run Logging Test</button>
       <div id="test-log-result" style="margin-top: 10px;"></div>
     </div>
@@ -179,18 +214,27 @@
   </div>
 
   <script>
+    const menuBtn = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
     const buttons = document.querySelectorAll(".module-button");
     const panels = document.querySelectorAll(".module-panel");
 
-    buttons.forEach(button => {
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+
+    buttons.forEach((button) => {
       button.addEventListener("click", () => {
         const target = button.dataset.module;
+
         buttons.forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
 
         panels.forEach(panel => {
           panel.classList.toggle("active", panel.id === `${target}-panel`);
         });
+
+        sidebar.classList.remove("open");
       });
     });
   </script>
