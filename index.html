@@ -29,7 +29,6 @@
       top: 0;
       border-right: 1px solid #1a1a1a;
       z-index: 100;
-      transition: transform 0.3s ease;
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
@@ -190,6 +189,37 @@
       }
     }
 
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openai_key", val);
+        renderScriptKeyUI();
+      }
+    }
+
+    function editScriptKey() {
+      document.getElementById("script-key-entry").innerHTML = `
+        <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
+        <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+      `;
+    }
+
+    function renderScriptKeyUI() {
+      const savedKey = localStorage.getItem("openai_key");
+      const keyEntry = document.getElementById("script-key-entry");
+      if (!savedKey) {
+        keyEntry.innerHTML = `
+          <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
+          <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+        `;
+      } else {
+        keyEntry.innerHTML = `
+          <p style="color: #0f0;">✅ OpenAI key saved</p>
+          <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
+        `;
+      }
+    }
+
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
@@ -198,101 +228,9 @@
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
 
-        if (module === 'voiceover') {
-          const savedKey = localStorage.getItem("elevenlabs_key");
-          const keyEntryDiv = document.getElementById("key-entry");
-          if (!savedKey) {
-            keyEntryDiv.innerHTML = `
-              <input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key" />
-              <button onclick="saveVoiceKey()" class="generate-btn" style="margin-top:10px;">Save Key</button>
-            `;
-          } else {
-            keyEntryDiv.innerHTML = `<p style="color: #0f0;">✅ ElevenLabs key saved</p>`;
-          }
-        }
-
-        if (module === 'script') {
-          const savedKey = localStorage.getItem("openai_key");
-          const keyEntry = document.getElementById("script-key-entry");
-          if (!savedKey) {
-            keyEntry.innerHTML = `
-              <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
-              <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
-            `;
-          } else {
-            keyEntry.innerHTML = `
-              <p style="color: #0f0;">✅ OpenAI key saved</p>
-              <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
-            `;
-          }
-        }
+        if (module === 'script') renderScriptKeyUI();
       });
     });
-
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        document.getElementById("key-entry").innerHTML = `<p style="color: #0f0;">✅ Key saved successfully</p>`;
-      }
-    }
-
-    function saveScriptKey() {
-      const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("openai_key", val);
-        document.getElementById("script-key-entry").innerHTML = `
-          <p style="color: #0f0;">✅ OpenAI key saved</p>
-          <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
-        `;
-      }
-    }
-
-    function editScriptKey() {
-      const current = localStorage.getItem("openai_key") || "";
-      document.getElementById("script-key-entry").innerHTML = `
-        <input id="script-key" type="password" value="${current}" placeholder="🔑 OpenAI API Key" />
-        <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
-      `;
-    }
-
-    async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
-      const status = document.getElementById("voice-status");
-
-      if (!key || !text) {
-        status.innerHTML = `<span style="color:red;">❌ Enter both key and text</span>`;
-        return;
-      }
-
-      status.innerHTML = "🔄 Generating voice...";
-      try {
-        const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-          method: "POST",
-          headers: {
-            "xi-api-key": key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            text: text,
-            voice_settings: {
-              stability: 0.3,
-              similarity_boost: 0.7
-            }
-          })
-        });
-
-        if (!response.ok) throw new Error("API request failed");
-
-        const blob = await response.blob();
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.play();
-        status.innerHTML = "✅ Voiceover playing";
-      } catch (err) {
-        status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
-      }
-    }
 
     async function generateScript() {
       const key = localStorage.getItem("openai_key");
