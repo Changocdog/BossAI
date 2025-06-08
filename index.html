@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
@@ -17,7 +16,6 @@
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -33,11 +31,9 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-
     .sidebar.hidden {
       transform: translateX(-100%);
     }
-
     .sidebar button {
       background: #121212;
       color: #ffffff;
@@ -49,17 +45,14 @@
       cursor: pointer;
       transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -72,12 +65,10 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
-
     .main.full {
       margin-left: 0;
       width: 100%;
     }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -93,21 +84,18 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-
     h1 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #00bfff;
       letter-spacing: 1px;
     }
-
     p {
       color: #cccccc;
       font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
     }
-
     #api-key {
       padding: 14px 18px;
       font-size: 16px;
@@ -119,10 +107,9 @@
       color: #ffffff;
       box-shadow: 0 0 10px #00bfff88;
     }
-
-    textarea, input[type="text"] {
+    textarea {
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -131,7 +118,6 @@
       background-color: #1a1a1a;
       color: white;
     }
-
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -144,14 +130,12 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-
     ul.trend-list {
       list-style: none;
       padding-left: 0;
       max-width: 500px;
       margin: auto;
     }
-
     ul.trend-list li {
       background: #111;
       margin-bottom: 10px;
@@ -159,24 +143,11 @@
       border-radius: 6px;
       text-align: left;
     }
-
-    .output-box {
-      margin-top: 20px;
-      padding: 15px;
-      background: #111111;
-      border: 1px solid #00bfff88;
-      border-radius: 6px;
-      max-width: 600px;
-      color: #aaf;
-      text-align: left;
-    }
-
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
       }
-
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -217,76 +188,74 @@
     });
 
     const content = {
-      manager: `
-        <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
-        <p>Type a task below and let the Manager AI route it to the right module.</p>
-        <input id="manager-input" type="text" placeholder="e.g., Write a script about AI tools" />
-        <button class="generate-btn" onclick="runManager()">Execute Task</button>
-        <div class="output-box" id="manager-output"></div>
-      `,
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2>
+        <textarea id="manager-input" placeholder="Describe your task or goal..."></textarea><br>
+        <button class="generate-btn" onclick="generateManagerResponse()">Run Manager AI</button>
+        <div id="manager-output" style="margin-top:15px;"></div>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Here are the latest trending topics:</p>
-        <ul class="trend-list" id="trend-list">
-          <li>#MakeMoneyOnline</li>
-          <li>#AIContent</li>
-          <li>#PassiveIncome</li>
-        </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>This will display rendered video and results.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Previously generated content logs will appear here.</p>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Fetching top trends...</p><ul class="trend-list"><li>#AIContent</li><li>#FinanceTips</li><li>#Crypto2025</li></ul>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Adjust preferences..."></textarea><br><button class="generate-btn">Save</button>`
     };
 
-    function updateTrends() {
-      const list = document.getElementById("trend-list");
-      list.innerHTML = `
-        <li>#FinanceTips</li>
-        <li>#ContentAutomation</li>
-        <li>#ViralShorts</li>
-        <li>#Crypto2025</li>
-        <li>#BossAI</li>
-      `;
-    }
-
-    function runManager() {
-      const input = document.getElementById("manager-input").value.toLowerCase();
-      const output = document.getElementById("manager-output");
-      if (input.includes("script") || input.includes("video")) {
-        output.innerHTML = "🧠 Manager AI detected a script request. Dispatching to Script Writer AI...<br><br>📜 Script generated:<br>\"Are you looking for a way to build passive income with AI? Here's how to start...\"";
-      } else {
-        output.innerHTML = "⚠️ Task not recognized. Please try again with a different command.";
-      }
+    function switchPanel(module) {
+      main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        switchPanel(button.getAttribute("data-module"));
       });
     });
-  </script>
 
+    async function generateManagerResponse() {
+      const key = document.getElementById("api-key").value.trim();
+      const input = document.getElementById("manager-input").value.trim();
+      const outputDiv = document.getElementById("manager-output");
+
+      if (!key || !input) {
+        outputDiv.innerHTML = `<p style="color:red;">Please enter both your API key and input.</p>`;
+        return;
+      }
+
+      outputDiv.innerHTML = "⏳ Generating...";
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are the Boss AI Manager. Help coordinate tasks across teams." },
+              { role: "user", content: input }
+            ]
+          })
+        });
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "No response.";
+        outputDiv.innerHTML = `<p>${reply}</p>`;
+        logToSheets("ManagerAI", input, reply);
+      } catch (err) {
+        outputDiv.innerHTML = `<p style="color:red;">Error generating response.</p>`;
+      }
+    }
+
+    async function logToSheets(module, input, output) {
+      await fetch("https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module, input, output })
+      });
+    }
+  </script>
 </body>
 </html>
