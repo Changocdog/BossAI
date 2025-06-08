@@ -14,7 +14,6 @@
     <button class="module-button" data-module="voiceover">🔊 Voiceover</button>
     <button class="module-button" data-module="upload">📤 Upload Strategy</button>
     <button class="module-button" data-module="legal">⚖️ Legal Review</button>
-    <button class="module-button" data-module="trends">📈 Trend AI</button>
     <button class="module-button" data-module="history">🕘 History</button>
     <button class="module-button" data-module="dashboard">📊 Dashboard</button>
     <button class="module-button" data-module="sheets">📄 Sheets</button>
@@ -22,75 +21,68 @@
   </div>
 
   <div class="main-content">
-    <!-- Home -->
+    <!-- Home Panel -->
     <div class="module-panel active" id="home-panel">
       <h1>Welcome to Boss AI</h1>
-      <p>Let Boss AI automate your content strategy, creation, and success.</p>
+      <p>Enter a task in any module and let Boss AI handle it for you.</p>
     </div>
 
-    <!-- Manager -->
+    <!-- Manager AI -->
     <div class="module-panel" id="manager-panel">
       <h2>Manager AI</h2>
-      <p>This module coordinates all sub-AIs and optimizes your system. (Coming soon)</p>
+      <p>This module coordinates all Boss AI tools. (Coming soon)</p>
     </div>
 
-    <!-- Script -->
+    <!-- Script Writer AI -->
     <div class="module-panel" id="script-panel">
       <h2>Script Writer AI</h2>
-      <textarea id="script-input" placeholder="Enter a video topic..."></textarea>
+      <textarea id="script-input" placeholder="Enter video topic or hook..."></textarea>
       <button id="run-script-btn">Generate Script</button>
     </div>
 
-    <!-- Voiceover -->
+    <!-- Voiceover AI -->
     <div class="module-panel" id="voiceover-panel">
       <h2>Voiceover AI</h2>
       <textarea id="voiceover-input" placeholder="Paste your script here..."></textarea>
       <button id="run-voiceover-btn">Generate Voiceover</button>
     </div>
 
-    <!-- Upload -->
+    <!-- Upload Strategy AI -->
     <div class="module-panel" id="upload-panel">
       <h2>Upload Strategy AI</h2>
-      <input id="upload-input" placeholder="Enter niche or platform..." />
+      <input id="upload-input" placeholder="Enter niche or video title..." />
       <button id="run-upload-btn">Get Strategy</button>
     </div>
 
-    <!-- Legal -->
+    <!-- Legal Review AI -->
     <div class="module-panel" id="legal-panel">
       <h2>Legal Review AI</h2>
-      <textarea id="legal-input" placeholder="Paste your content..."></textarea>
+      <textarea id="legal-input" placeholder="Paste your script or description..."></textarea>
       <button id="run-legal-btn">Run Legal Review</button>
     </div>
 
-    <!-- Trend AI -->
-    <div class="module-panel" id="trends-panel">
-      <h2>Trend AI</h2>
-      <p>This module identifies trending topics across platforms like TikTok, YouTube, and Reddit. (Coming soon)</p>
-      <button disabled>Fetch Trends</button>
-    </div>
-
-    <!-- History -->
+    <!-- History Panel -->
     <div class="module-panel" id="history-panel">
-      <h2>Video History</h2>
-      <p>Previously generated content will appear here. (Coming soon)</p>
+      <h2>Video History & Output Log</h2>
+      <p>Previously generated scripts and voiceovers will appear here. (Coming soon)</p>
     </div>
 
-    <!-- Dashboard -->
+    <!-- Dashboard Panel -->
     <div class="module-panel" id="dashboard-panel">
       <h2>Performance Dashboard</h2>
-      <p>Track how each module is performing. (Coming soon)</p>
+      <p>Track how each AI module is performing. (Coming soon)</p>
     </div>
 
-    <!-- Sheets -->
+    <!-- Sheets Panel -->
     <div class="module-panel" id="sheets-panel">
       <h2>📄 Google Sheet Logs</h2>
-      <p>Open your BossAI Google Sheet:</p>
-      <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit" target="_blank">
+      <p>Click below to open your BossAI-Logs Google Sheet.</p>
+      <a href="https://docs.google.com/spreadsheets/d/1trwqBdVoqY1ukYh2xxxxxxxxxxxxxxx/edit" target="_blank">
         <button>Open Logs Sheet</button>
       </a>
     </div>
 
-    <!-- Settings -->
+    <!-- Settings Panel -->
     <div class="module-panel" id="settings-panel">
       <h2>Settings</h2>
       <label for="elevenlabs-api-key">ElevenLabs API Key:</label>
@@ -99,12 +91,12 @@
 
       <hr />
       <h3>Test Logging</h3>
-      <p>This sends a test row to your BossAI-Logs Google Sheet.</p>
+      <p>This sends a test entry to your BossAI Google Sheet.</p>
       <button id="test-logging-btn">Run Logging Test</button>
       <div id="test-log-result" style="margin-top: 10px;"></div>
     </div>
 
-    <!-- Output -->
+    <!-- Final Output Box -->
     <div id="final-output-box" class="output-box"></div>
   </div>
 
