@@ -7,15 +7,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -28,30 +30,36 @@
       left: 0;
       top: 0;
       border-right: 1px solid #1a1a1a;
-      z-index: 100;
       transition: transform 0.3s ease;
+      z-index: 100;
     }
+
     .sidebar.hidden {
       transform: translateX(-100%);
     }
+
     .sidebar button {
       background: #121212;
-      color: #fff;
+      color: #ffffff;
       border: none;
       padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
     }
+
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
+
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
+
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -64,10 +72,12 @@
       text-align: center;
       transition: margin-left 0.3s ease;
     }
+
     .main.full {
       margin-left: 0;
       width: 100%;
     }
+
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -81,27 +91,10 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 16px;
+      box-shadow: 0 0 12px #00bfff;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-    }
-    p {
-      color: #ccc;
-      font-size: 14px;
-    }
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #fff;
-    }
-    textarea {
+
+    textarea, input[type="text"], input[type="password"] {
       width: 100%;
       max-width: 500px;
       padding: 12px;
@@ -112,6 +105,7 @@
       background-color: #1a1a1a;
       color: white;
     }
+
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -122,23 +116,19 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 15px;
+      box-shadow: 0 0 10px #00bfff88;
     }
-    ul.trend-list {
-      list-style: none;
-      padding-left: 0;
-      max-width: 500px;
-      margin: auto;
-    }
-    ul.trend-list li {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: left;
-    }
+
     @media (max-width: 768px) {
-      .main { margin-left: 0; width: 100%; }
-      .sidebar { position: fixed; z-index: 999; }
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 999;
+      }
     }
   </style>
 </head>
@@ -154,14 +144,12 @@
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
-    <button data-module="trends">📈 Trends AI</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your ElevenLabs API key to use Voiceover:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your ElevenLabs API Key" />
+    <p>Welcome to the AI content engine.</p>
   </div>
 
   <script>
@@ -174,56 +162,41 @@
       main.classList.toggle("full");
     });
 
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflow logic.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scan your script or upload plan for legal compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Describe the video or topic...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+    const modules = {
+      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all modules and monitors app workflow.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>All content appears compliant with current guidelines ✅</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="scriptInput" placeholder="Write your script..."></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `
         <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voice-text" placeholder="Paste your script here..."></textarea><br>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
-        <audio id="voice-preview" controls style="margin-top:15px; display:none;"></audio>
+        <input id="voice-api" type="password" placeholder="🔑 Enter ElevenLabs API Key" />
+        <textarea id="voiceText" placeholder="Paste script here..."></textarea><br>
+        <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
+        <p id="voice-status" style="color: #00ffcc;"></p>
       `,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your content goals...'></textarea><br><button class="generate-btn">Optimize Upload</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Video Preview Placeholder</p>
-        <iframe width="100%" height="300" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>✅ Script: "Top 5 AI Hacks"</li><li>✅ Voiceover: "Passive Income Guide"</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <ul class="trend-list" id="trend-list"><li>#ViralTikTok</li><li>#Finance2025</li></ul>
-        <button class="generate-btn" onclick="updateTrends()">🔁 Refresh Trends</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Change theme, voice, or other preferences..."></textarea><br><button class="generate-btn">Save</button>`
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Suggesting best time + platform for upload...</p>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Your rendered content will appear here.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>View past video generations and strategy logs.</p>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Save your preferences below:</p><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save</button>`
     };
-
-    function updateTrends() {
-      const list = document.getElementById("trend-list");
-      list.innerHTML = `
-        <li>#CryptoGains</li>
-        <li>#ShortFormGold</li>
-        <li>#BossAI</li>
-        <li>#ElevenLabs</li>
-      `;
-    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px;margin:auto;">${content[module] || ''}</div>`;
+        main.innerHTML = `<div style="max-width: 800px;">${modules[module] || ''}</div>`;
       });
     });
 
-    async function generateVoice() {
-      const apiKey = document.getElementById("api-key").value.trim();
-      const text = document.getElementById("voice-text").value.trim();
-      if (!apiKey || !text) return alert("Please enter API key and text.");
+    async function generateVoiceover() {
+      const apiKey = document.getElementById('voice-api').value.trim();
+      const text = document.getElementById('voiceText').value.trim();
+      const status = document.getElementById('voice-status');
+      if (!apiKey || !text) return status.textContent = "Please provide both API key and script text.";
 
-      const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/TxGEqnHWrfWFTfGW9XjX", {
+      status.textContent = "Generating...";
+
+      const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/exAVZ5W3Y9JnMf5qXw8d", {
         method: "POST",
         headers: {
           "xi-api-key": apiKey,
@@ -231,21 +204,24 @@
         },
         body: JSON.stringify({
           text: text,
-          model_id: "eleven_monolingual_v1",
           voice_settings: {
             stability: 0.4,
-            similarity_boost: 1.0
+            similarity_boost: 0.8
           }
         })
       });
 
-      const blob = await response.blob();
-      const audio = document.getElementById("voice-preview");
-      audio.src = URL.createObjectURL(blob);
-      audio.style.display = "block";
+      if (!response.ok) {
+        status.textContent = "❌ Error: Voiceover failed.";
+        return;
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
       audio.play();
+      status.textContent = "✅ Voiceover played.";
     }
   </script>
-
 </body>
 </html>
