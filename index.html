@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
@@ -117,6 +116,12 @@
       cursor: pointer;
       font-size: 15px;
     }
+
+    ul {
+      text-align: left;
+      margin: auto;
+      max-width: 400px;
+    }
   </style>
 </head>
 <body>
@@ -146,31 +151,35 @@
     });
 
     const modules = {
-      manager: `<h2>🤖 Manager AI</h2><p>This AI coordinates the other modules and controls workflow.</p>`,
+      manager: `<h2>🤖 Manager AI</h2><p>This AI coordinates the other modules and manages workflow.</p>`,
+
       script: `
         <h2>✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Describe your video topic..."></textarea>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <div id="script-output" style="margin-top:20px;"></div>
       `,
+
       voiceover: `
         <h2>🎤 Voiceover AI</h2>
         <textarea id="voice-text" placeholder="Paste your script here..."></textarea>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <audio id="voice-audio" controls style="margin-top:15px;"></audio>
       `,
+
       upload: `
         <h2>📤 Upload Strategy AI</h2>
-        <p>📊 Best times to post based on audience engagement (mock example):</p>
-        <ul style="text-align:left; margin:auto; max-width:400px;">
+        <p>📊 Optimal times to post:</p>
+        <ul>
           <li><strong>YouTube:</strong> Tues & Thurs @ 6PM</li>
           <li><strong>TikTok:</strong> Mon–Fri @ 3PM, Weekends @ 11AM</li>
           <li><strong>Instagram:</strong> Wed & Sun @ 7PM</li>
         </ul>
       `,
+
       output: `
         <h2>📺 Final Output</h2>
-        <p>This will display your generated content preview.</p>
+        <p>Your generated content will appear here:</p>
         <div id="final-preview" style="margin-top:20px;"></div>
       `
     };
@@ -187,14 +196,14 @@
     async function generateScript() {
       const input = document.getElementById("script-input").value;
       const outputDiv = document.getElementById("script-output");
-      if (!input) return outputDiv.innerHTML = "❗Please enter a topic.";
+      if (!input) return outputDiv.innerHTML = "❗ Please enter a topic.";
 
       outputDiv.innerHTML = "⏳ Generating script...";
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+          "Authorization": "Bearer YOUR_OPENAI_KEY"
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -223,7 +232,7 @@
         },
         body: JSON.stringify({
           text: text,
-          voice_settings: { stability: 0.4, similarity_boost: 0.8 }
+          voice_settings: { stability: 0.4, similarity_boost: 0.85 }
         })
       });
 
