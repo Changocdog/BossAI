@@ -6,18 +6,15 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -25,59 +22,37 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      height: 100vh;
       position: fixed;
+      height: 100%;
       left: 0;
       top: 0;
       border-right: 1px solid #1a1a1a;
-      transition: transform 0.3s ease;
-      z-index: 100;
+      z-index: 10;
     }
-
-    .sidebar.hidden {
-      transform: translateX(-100%);
-    }
-
     .sidebar button {
       background: #121212;
-      color: #ffffff;
+      color: #fff;
       border: none;
       padding: 12px;
       font-size: 14px;
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
     }
-
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
     }
-
     .sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-
     .main {
-      flex-grow: 1;
       margin-left: 240px;
-      width: calc(100% - 240px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       padding: 20px;
-      text-align: center;
-      transition: margin-left 0.3s ease;
+      width: calc(100% - 240px);
+      overflow-y: auto;
     }
-
-    .main.full {
-      margin-left: 0;
-      width: 100%;
-    }
-
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -91,47 +66,17 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
       font-size: 16px;
-      box-shadow: 0 0 12px #00bfff;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-
-    #api-key {
-      padding: 14px 18px;
-      font-size: 16px;
-      width: 100%;
-      max-width: 500px;
-      background-color: #1a1a1a;
-      border: 1px solid #00bfff;
-      border-radius: 8px;
-      color: #ffffff;
-      box-shadow: 0 0 10px #00bfff88;
-    }
-
     textarea, input[type="text"], input[type="password"] {
       width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
+      max-width: 600px;
+      margin: 10px auto;
+      padding: 10px;
+      background: #1a1a1a;
       border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
+      color: #fff;
+      border-radius: 6px;
     }
-
     button.generate-btn {
       background-color: #007bff;
       color: white;
@@ -141,35 +86,19 @@
       border-radius: 6px;
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
-      font-size: 15px;
-      box-shadow: 0 0 10px #00bfff88;
     }
-
     ul.trend-list {
       list-style: none;
       padding-left: 0;
       max-width: 500px;
       margin: auto;
     }
-
     ul.trend-list li {
       background: #111;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 6px;
       text-align: left;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        margin-left: 0;
-        width: 100%;
-      }
-
-      .sidebar {
-        position: fixed;
-        z-index: 999;
-      }
     }
   </style>
 </head>
@@ -190,104 +119,94 @@
   </div>
 
   <div class="main" id="main">
-    <h1>Boss AI Dashboard</h1>
-    <p>Enter your OpenAI API key to begin:</p>
-    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
+    <h2>Boss AI Dashboard</h2>
+    <p>Welcome to your AI control panel</p>
   </div>
 
   <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+    const modules = {
+      manager: `<h2>🤖 Manager AI</h2><p>This AI coordinates all sub-AIs and oversees the entire process. Type a command below to get started.</p><textarea placeholder="E.g., 'Generate a video on passive income'"></textarea><br><button class="generate-btn">Run Manager AI</button>`,
+      legal: `<h2>📜 Legal Review</h2><p>This module scans content for copyright and legal risk.</p><textarea placeholder="Paste content to review..."></textarea><br><button class="generate-btn">Run Legal Review</button>`,
+      script: `<h2>✍️ Script Writer</h2><p>Generate high-engagement short video scripts.</p><textarea placeholder="Describe your topic (e.g. investing, motivation)..."></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `
-        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voiceover-script" placeholder="Paste your script here..." style="margin-bottom: 10px;"></textarea><br>
-        <input id="tts-api-key" placeholder="🔑 VoiceRSS API Key"><br>
-        <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
-        <div id="voiceover-output" style="margin-top: 20px;"></div>
+        <h2>🎤 Voiceover AI</h2>
+        <p>Use ElevenLabs for realistic voiceover.</p>
+        <input type="text" id="eleven-api" placeholder="Enter ElevenLabs API Key"/>
+        <textarea id="voice-script" placeholder="Paste your script here..."></textarea>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
+        <div id="voice-output" style="margin-top:20px;"></div>
       `,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here's your final video preview:</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
-        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Here are the latest trending topics:</p>
-        <ul class="trend-list" id="trend-list">
-          <li>#MakeMoneyOnline</li>
-          <li>#AIContent</li>
-          <li>#PassiveIncome</li>
-        </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      upload: `<h2>📤 Upload Strategy</h2><p>Choose best platform and schedule.</p><textarea placeholder="Describe your content..."></textarea><br><button class="generate-btn">Get Upload Plan</button>`,
+      output: `<h2>📺 Final Output</h2><p>Your AI-generated video will appear here.</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe></div>`,
+      history: `<h2>🗂️ History</h2><ul><li>Video: Passive Income Tips</li><li>Script: How to Budget</li><li>Upload Plan: TikTok + 7pm</li></ul>`,
+      trends: `<h2>📈 Trends AI</h2><p>Latest trends:</p><ul class="trend-list"><li>#AIContent</li><li>#FinanceTips</li><li>#Crypto2025</li></ul><button class="generate-btn" onclick="updateTrends()">🔁 Refresh</button>`,
+      settings: `<h2>⚙️ Settings</h2><textarea placeholder="Preferences and API keys..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
-      const list = document.getElementById("trend-list");
-      list.innerHTML = `
-        <li>#FinanceTips</li>
-        <li>#ContentAutomation</li>
-        <li>#ViralShorts</li>
-        <li>#Crypto2025</li>
-        <li>#BossAI</li>
-      `;
+      const list = document.querySelector('.trend-list');
+      if (list) {
+        list.innerHTML = `
+          <li>#MakeMoneyOnline</li>
+          <li>#AutomatedAI</li>
+          <li>#DigitalNomad</li>
+          <li>#ContentEmpire</li>
+        `;
+      }
     }
 
-    function generateVoiceover() {
-      const script = document.getElementById("voiceover-script").value;
-      const ttsKey = document.getElementById("tts-api-key").value;
-      const outputDiv = document.getElementById("voiceover-output");
+    function generateVoice() {
+      const apiKey = document.getElementById("eleven-api").value;
+      const text = document.getElementById("voice-script").value;
+      const outputDiv = document.getElementById("voice-output");
 
-      if (!script || !ttsKey) {
-        outputDiv.innerHTML = "❗ Please provide both a script and API key.";
+      if (!apiKey || !text) {
+        alert("Please provide both API key and script.");
         return;
       }
 
-      const encodedScript = encodeURIComponent(script);
-      const ttsUrl = `https://api.voicerss.org/?key=${ttsKey}&hl=en-us&src=${encodedScript}`;
+      outputDiv.innerHTML = "⏳ Generating voice...";
 
-      outputDiv.innerHTML = `
-        <p>🔊 Voiceover generated below:</p>
-        <audio controls>
-          <source src="${ttsUrl}" type="audio/mpeg">
-          Your browser does not support audio playback.
-        </audio>
-      `;
+      fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          text: text,
+          voice_settings: {
+            stability: 0.3,
+            similarity_boost: 0.8
+          }
+        })
+      })
+      .then(res => res.blob())
+      .then(blob => {
+        const audioURL = URL.createObjectURL(blob);
+        outputDiv.innerHTML = \`
+          ✅ Voice generated!<br><br>
+          <audio controls src="\${audioURL}"></audio>
+        \`;
+      })
+      .catch(err => {
+        console.error("Voice Error:", err);
+        outputDiv.innerHTML = "❌ Error generating voice.";
+      });
     }
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+    document.querySelectorAll(".sidebar button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mod = btn.getAttribute("data-module");
+        document.getElementById("main").innerHTML = modules[mod] || "<p>Module not found.</p>";
       });
     });
-  </script>
 
+    document.getElementById("toggle-btn").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("hidden");
+    });
+  </script>
 </body>
 </html>
