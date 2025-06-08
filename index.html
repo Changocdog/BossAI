@@ -10,8 +10,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -31,10 +31,12 @@
       transition: transform 0.3s ease;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
     .sidebar button {
       background: #121212;
-      color: #ffffff;
+      color: #fff;
       border: none;
       padding: 12px;
       font-size: 14px;
@@ -82,22 +84,11 @@
       font-size: 16px;
       box-shadow: 0 0 12px #00bfff;
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #00bfff;
-      letter-spacing: 1px;
-    }
-    p {
-      color: #cccccc;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-    }
-    input, textarea {
+    textarea, input {
       width: 100%;
       max-width: 500px;
       padding: 12px;
+      margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
@@ -116,7 +107,19 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
-    .status { margin-top: 12px; font-size: 14px; color: #0f0; }
+    ul.trend-list {
+      list-style: none;
+      padding-left: 0;
+      max-width: 500px;
+      margin: auto;
+    }
+    ul.trend-list li {
+      background: #111;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
     @media (max-width: 768px) {
       .main { margin-left: 0; width: 100%; }
       .sidebar { position: fixed; z-index: 999; }
@@ -126,6 +129,7 @@
 <body>
 
   <button id="toggle-btn">☰ Menu</button>
+
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="legal">📜 Legal Review</button>
@@ -140,8 +144,7 @@
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Enter your ElevenLabs API key to begin:</p>
-    <input id="voice-api-key" type="password" placeholder="🔑 ElevenLabs API Key" />
+    <p>Welcome! Select a module from the menu.</p>
   </div>
 
   <script>
@@ -155,44 +158,76 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea id="script-text" placeholder='Write your script here...'></textarea><br><button class="generate-btn" onclick="generateScript()">Generate Script</button><p class="status" id="script-status"></p>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all tasks and sub-AIs.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking for copyright risks and upload issues...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
         <textarea id="voice-text" placeholder='Paste your script here...'></textarea><br>
-        <input type="password" id="voice-key" placeholder="🔑 ElevenLabs API Key (stored)" /><br>
+        <div id="key-entry"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
-        <p class="status" id="voice-status"></p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Describe your video..."></textarea><br><button class="generate-btn">Optimize Strategy</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here’s your final video result (simulated)</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Sample Script 1</li><li>Sample Voiceover 2</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul><li>#AIContent</li><li>#BossAI</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea id="settings-area" placeholder="Your preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
+        <p id="voice-status" style="margin-top:10px;"></p>
+      `,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Enter your video goals:</p><textarea placeholder='What’s your upload strategy?'></textarea><br><button class="generate-btn">Optimize Strategy</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script 1</li><li>Voiceover 2</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#PassiveIncome</li><li>#AIContent</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh Trends</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
+
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralReels</li>
+          <li>#BossAI</li>
+        `;
+      }
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
+
         if (module === 'voiceover') {
           const savedKey = localStorage.getItem("elevenlabs_key");
-          if (savedKey) document.getElementById("voice-key").value = savedKey;
+          const keyEntryDiv = document.getElementById("key-entry");
+          if (!savedKey) {
+            keyEntryDiv.innerHTML = `
+              <input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key" />
+              <button onclick="saveKey()" class="generate-btn" style="margin-top:10px;">Save Key</button>
+            `;
+          } else {
+            keyEntryDiv.innerHTML = `<p style="color: #0f0;">✅ ElevenLabs key saved</p>`;
+          }
         }
       });
     });
 
+    function saveKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        document.getElementById("key-entry").innerHTML = `<p style="color: #0f0;">✅ Key saved successfully</p>`;
+      }
+    }
+
     async function generateVoice() {
-      const key = document.getElementById("voice-key").value.trim();
+      const key = localStorage.getItem("elevenlabs_key");
       const text = document.getElementById("voice-text").value.trim();
       const status = document.getElementById("voice-status");
 
-      if (!key || !text) return status.textContent = "❌ Enter both key and text";
+      if (!key || !text) {
+        status.innerHTML = `<span style="color:red;">❌ Enter both key and text</span>`;
+        return;
+      }
 
-      localStorage.setItem("elevenlabs_key", key);
-      status.textContent = "🔄 Generating voice...";
-
+      status.innerHTML = "🔄 Generating voice...";
       try {
         const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
           method: "POST",
@@ -200,21 +235,26 @@
             "xi-api-key": key,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+          body: JSON.stringify({
+            text: text,
+            voice_settings: {
+              stability: 0.3,
+              similarity_boost: 0.7
+            }
+          })
         });
+
+        if (!response.ok) throw new Error("API request failed");
+
         const blob = await response.blob();
         const audio = new Audio(URL.createObjectURL(blob));
         audio.play();
-        status.textContent = "✅ Voiceover generated and playing!";
+        status.innerHTML = "✅ Voiceover playing";
       } catch (err) {
-        status.textContent = "❌ Error generating voiceover.";
+        status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
       }
     }
-
-    function generateScript() {
-      const status = document.getElementById("script-status");
-      status.textContent = "✅ Script generated (placeholder).";
-    }
   </script>
+
 </body>
 </html>
