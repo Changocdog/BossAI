@@ -232,6 +232,7 @@
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
+
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
       });
@@ -250,7 +251,7 @@
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are a helpful assistant that writes engaging short-form video scripts in a finance, motivational, or viral content style." },
+            { role: "system", content: "You are a helpful assistant that writes short viral video scripts." },
             { role: "user", content: text }
           ]
         })
@@ -261,6 +262,13 @@
       alert(result);
     }
 
+    function generateVoice(text) {
+      if (!text) return alert("Please enter a script to convert to voice.");
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
     document.addEventListener("click", function (e) {
       if (e.target && e.target.classList.contains("generate-btn")) {
         const label = e.target.innerText.toLowerCase();
@@ -268,6 +276,7 @@
         const input = textarea?.value.trim();
 
         if (label.includes("script")) generateScript(input);
+        else if (label.includes("voiceover")) generateVoice(input);
       }
     });
   </script>
