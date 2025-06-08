@@ -206,20 +206,33 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates sub-AIs, manages workflows, and monitors system performance.</p>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Running compliance and copyright checks...</p>`,
-      script: `
-        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder='Enter a video topic...'></textarea><br>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <pre id="script-output" style="text-align:left; margin-top:20px; white-space:pre-wrap;"></pre>
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p><textarea placeholder='Type your task here...'></textarea><br><button class="generate-btn">Run Manager AI</button>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p><textarea placeholder='Paste content to review'></textarea><br><button class="generate-btn">Check Legality</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste script to convert to audio...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your video and goals:</p><textarea placeholder='e.g. A finance short on passive income...'></textarea><br><button class="generate-btn">Optimize Upload</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Video preview below (simulated):</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" title="Boss AI Video Preview" frameborder="0" allowfullscreen></iframe></div><button class="generate-btn" onclick="alert('Simulating rerender...')">🔁 Render Again</button>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Finance Script - May</li><li>Voiceover #3</li><li>Upload Plan - TikTok 3PM</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder='Dark mode = on, API = rotated, Voice = male'></textarea><br><button class="generate-btn">Save</button>`
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      trends: `
+        <h2 style="color:#00bfff;">📈 Trends AI</h2>
+        <p>Here are the latest trending topics:</p>
+        <ul class="trend-list" id="trend-list">
+          <li>#MakeMoneyOnline</li>
+          <li>#AIContent</li>
+          <li>#PassiveIncome</li>
+        </ul>
+        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
+      `,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
@@ -242,42 +255,10 @@
         main.innerHTML = `
           <div style="max-width: 800px; text-align: center;">
             ${content[module] || ''}
-          </div>`;
+          </div>
+        `;
       });
     });
-
-    async function generateScript() {
-      const topic = document.getElementById("script-input").value;
-      const apiKey = document.getElementById("api-key").value;
-      const output = document.getElementById("script-output");
-
-      if (!topic || !apiKey) {
-        alert("Please enter both a topic and your API key.");
-        return;
-      }
-
-      output.textContent = "⏳ Generating script...";
-
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{
-            role: "user",
-            content: `Write a 60-second viral YouTube short script about: "${topic}". Make it punchy, exciting, and hook viewers within the first sentence.`
-          }],
-          temperature: 0.8
-        })
-      });
-
-      const data = await response.json();
-      const scriptText = data?.choices?.[0]?.message?.content;
-      output.textContent = scriptText || "❌ Failed to generate script.";
-    }
   </script>
 
 </body>
