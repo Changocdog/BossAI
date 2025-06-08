@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -66,11 +66,11 @@
       width: calc(100% - 240px);
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       flex-direction: column;
-      padding: 40px 20px;
+      padding: 20px;
+      text-align: center;
       transition: margin-left 0.3s ease;
-      overflow-y: auto;
     }
 
     .main.full {
@@ -96,7 +96,7 @@
 
     textarea, input {
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -119,24 +119,14 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    ul {
-      padding-left: 20px;
-    }
-
-    h2 {
-      color: #00bfff;
-    }
-
-    iframe {
-      max-width: 600px;
-      width: 100%;
-    }
+    h2 { color: #00bfff; }
 
     @media (max-width: 768px) {
       .main {
         margin-left: 0;
         width: 100%;
       }
+
       .sidebar {
         position: fixed;
         z-index: 999;
@@ -156,15 +146,13 @@
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
-    <button data-module="trends">📈 Trends AI</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
-    <div style="max-width: 700px;">
-      <h2>🤖 Manager AI</h2>
-      <p>This module will coordinate all Boss AI workflows. (GPT integration coming next)</p>
-    </div>
+    <h1>Boss AI Dashboard</h1>
+    <p>Enter your OpenAI API key to begin:</p>
+    <input id="api-key" type="password" placeholder="🔑 Enter your OpenAI API Key" />
   </div>
 
   <script>
@@ -177,25 +165,20 @@
     });
 
     const content = {
-      manager: `<h2>🤖 Manager AI</h2><p>This module will coordinate all Boss AI workflows. (GPT integration coming next)</p>`,
-      legal: `<h2>📜 Legal Review</h2><p>This module checks for compliance, copyright, and policy risks.</p>`,
-      script: `<h2>✍️ Script Writer</h2><textarea id="script-input" placeholder="Write your short-form script here..."></textarea><button class="generate-btn">Generate Script</button>`,
+      manager: `<h2>🤖 Manager AI</h2><p>This AI will soon coordinate all modules and automate workflows.</p>`,
+      legal: `<h2>📜 Legal Review</h2><p>This module will check your scripts and uploads for copyright and policy issues.</p>`,
+      script: `<h2>✍️ Script Writer</h2><textarea placeholder="Write your short-form video script here..."></textarea><button class="generate-btn">Generate Script</button>`,
       voiceover: `
         <h2>🎤 Voiceover AI</h2>
         <textarea id="voice-script" placeholder="Paste your script here..."></textarea>
-        <input id="eleven-api" type="text" placeholder="🔑 Enter ElevenLabs API Key" />
+        <input id="eleven-api" type="text" placeholder="🔑 ElevenLabs API Key" />
         <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
         <div id="voice-status" style="margin-top:10px;"></div>
       `,
-      upload: `<h2>📤 Upload Strategy</h2><textarea placeholder="Describe the content goals and platform..."></textarea><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2>📺 Final Output</h2>
-        <p>Here’s your final video preview:</p>
-        <iframe height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-      `,
-      history: `<h2>🗂️ History</h2><ul><li>Script - Budget Hacks</li><li>Voiceover - Uploaded</li><li>Upload Plan - Fri 6 PM</li></ul>`,
-      trends: `<h2>📈 Trends AI</h2><ul><li>#MakeMoneyOnline</li><li>#PassiveIncome</li><li>#AIShorts</li></ul>`,
-      settings: `<h2>⚙️ Settings</h2><textarea placeholder="Preferences or feature requests..."></textarea><button class="generate-btn">Save Settings</button>`
+      upload: `<h2>📤 Upload Strategy</h2><p>Get platform recommendations and schedule your content uploads.</p>`,
+      output: `<h2>📺 Final Output</h2><p>Your rendered final video or content will appear here. (Coming soon)</p>`,
+      history: `<h2>🗂️ History</h2><ul><li>Generated Script - 6/7</li><li>Voiceover Output - Saved</li><li>Upload Plan - Draft</li></ul>`,
+      settings: `<h2>⚙️ Settings</h2><textarea placeholder="Preferences or custom prompt templates..."></textarea><button class="generate-btn">Save Settings</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
@@ -203,27 +186,29 @@
         document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const module = btn.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 700px; margin: auto;">${content[module]}</div>`;
-        if (module === "voiceover" && localStorage.getItem("eleven_api_key")) {
+        main.innerHTML = `<div style="max-width: 800px; text-align: center; margin: auto;">${content[module]}</div>`;
+
+        if (module === "voiceover") {
           setTimeout(() => {
-            document.getElementById("eleven-api").value = localStorage.getItem("eleven_api_key");
+            const input = document.getElementById("eleven-api");
+            const savedKey = localStorage.getItem("eleven_api_key");
+            if (input && savedKey) input.value = savedKey;
           }, 100);
         }
       });
     });
 
     async function generateVoiceover() {
-      const scriptText = document.getElementById("voice-script").value;
-      const apiKey = document.getElementById("eleven-api").value;
+      const scriptText = document.getElementById("voice-script")?.value?.trim();
+      const apiKey = document.getElementById("eleven-api")?.value?.trim();
       const status = document.getElementById("voice-status");
 
-      if (!apiKey || !scriptText) {
-        status.innerText = "❗ Please enter both script and API key.";
+      if (!scriptText || !apiKey) {
+        status.innerText = "❗ Please enter both a script and your ElevenLabs API key.";
         return;
       }
 
       localStorage.setItem("eleven_api_key", apiKey);
-
       status.innerText = "⏳ Generating voice...";
 
       try {
@@ -239,24 +224,25 @@
           })
         });
 
-        if (!response.ok) throw new Error("API request failed");
+        if (!response.ok) throw new Error("API Error: Invalid key or quota exceeded.");
 
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
+        const blob = await response.blob();
+        const audioURL = URL.createObjectURL(blob);
+        const audio = new Audio(audioURL);
         audio.play();
 
         status.innerText = "✅ Voiceover generated and playing.";
       } catch (err) {
-        status.innerText = "❌ Error: " + err.message;
+        status.innerText = "❌ " + err.message;
       }
     }
 
-    // Auto-load API key
+    // Auto-load API key if saved
     window.onload = () => {
-      if (localStorage.getItem("eleven_api_key")) {
-        const input = document.getElementById("eleven-api");
-        if (input) input.value = localStorage.getItem("eleven_api_key");
+      const savedKey = localStorage.getItem("eleven_api_key");
+      const input = document.getElementById("eleven-api");
+      if (input && savedKey) {
+        input.value = savedKey;
       }
     };
   </script>
