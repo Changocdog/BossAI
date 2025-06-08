@@ -29,7 +29,6 @@
       top: 0;
       border-right: 1px solid #1a1a1a;
       z-index: 100;
-      transition: transform 0.3s ease;
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
@@ -105,22 +104,44 @@
       font-size: 15px;
       box-shadow: 0 0 10px #00bfff88;
     }
+    ul.trend-list {
+      list-style: none;
+      padding-left: 0;
+      max-width: 500px;
+      margin: auto;
+    }
+    ul.trend-list li {
+      background: #111;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
+    @media (max-width: 768px) {
+      .main { margin-left: 0; width: 100%; }
+      .sidebar { position: fixed; z-index: 999; }
+    }
   </style>
 </head>
 <body>
+
   <button id="toggle-btn">☰ Menu</button>
+
   <div class="sidebar" id="sidebar">
-    <button data-module="script" class="active">✍️ Script Writer</button>
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="legal">📜 Legal Review</button>
+    <button data-module="script">✍️ Script Writer</button>
+    <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="upload">📤 Upload Strategy</button>
+    <button data-module="output">📺 Final Output</button>
+    <button data-module="history">🗂️ History</button>
+    <button data-module="trends">📈 Trends AI</button>
+    <button data-module="settings">⚙️ Settings</button>
   </div>
+
   <div class="main" id="main">
-    <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-    <textarea id="script-input" placeholder="Write a short video idea..."></textarea>
-    <div id="key-entry">
-      <input id="script-key" type="password" placeholder="🔑 Free GPT API Key (OpenRouter)" />
-      <button onclick="saveKey()" class="generate-btn">Save Key</button>
-    </div>
-    <button onclick="generateScript()" class="generate-btn">Generate Script</button>
-    <p id="script-output" style="margin-top:10px;"></p>
+    <h1>Boss AI Dashboard</h1>
+    <p>Welcome! Select a module from the menu.</p>
   </div>
 
   <script>
@@ -133,48 +154,121 @@
       main.classList.toggle("full");
     });
 
-    function saveKey() {
-      const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("gpt_free_key", val);
-        document.getElementById("key-entry").innerHTML = '<p style="color:#0f0;">✅ Key saved</p>';
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all tasks and sub-AIs.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking for copyright risks and upload issues...</p>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
+        <textarea id="script-input" placeholder="Enter your video idea..."></textarea><br>
+        <div id="script-key-entry"></div>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <p id="script-output" style="margin-top:10px;"></p>
+      `,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <textarea id="voice-text" placeholder='Paste your script here...'></textarea><br>
+        <div id="key-entry"></div>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
+        <p id="voice-status" style="margin-top:10px;"></p>
+      `,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='What’s your upload strategy?'></textarea><br><button class="generate-btn">Optimize Strategy</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script 1</li><li>Voiceover 2</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#PassiveIncome</li><li>#AIContent</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh Trends</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
+    };
+
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralReels</li>
+          <li>#BossAI</li>
+        `;
       }
     }
 
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openai_key", val);
+        renderScriptKeyUI();
+      }
+    }
+
+    function editScriptKey() {
+      document.getElementById("script-key-entry").innerHTML = `
+        <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
+        <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+      `;
+    }
+
+    function renderScriptKeyUI() {
+      const savedKey = localStorage.getItem("openai_key");
+      const keyEntry = document.getElementById("script-key-entry");
+      if (!savedKey) {
+        keyEntry.innerHTML = `
+          <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
+          <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+        `;
+      } else {
+        keyEntry.innerHTML = `
+          <p style="color: #0f0;">✅ OpenAI key saved</p>
+          <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
+        `;
+      }
+    }
+
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const module = button.getAttribute("data-module");
+        main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
+
+        if (module === 'script') renderScriptKeyUI();
+      });
+    });
+
     async function generateScript() {
-      const key = localStorage.getItem("gpt_free_key");
-      const input = document.getElementById("script-input").value.trim();
+      const key = localStorage.getItem("openai_key");
+      const idea = document.getElementById("script-input").value.trim();
       const output = document.getElementById("script-output");
 
-      if (!key || !input) {
-        output.innerHTML = "<span style='color:red;'>❌ Missing input or key</span>";
+      if (!key || !idea) {
+        output.innerHTML = `<span style="color:red;">❌ Missing input or key</span>`;
         return;
       }
 
-      output.innerHTML = "⏳ Generating script...";
+      output.innerHTML = "🧠 Thinking...";
       try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${key}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
+            model: "gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are a viral short-form script writer for TikTok and YouTube Shorts." },
-              { role: "user", content: `Write a short 30s script: ${input}` }
+              { role: "system", content: "You are a script writer that creates viral short-form video scripts for TikTok and Instagram Reels." },
+              { role: "user", content: `Write a 30-second video script about: ${idea}` }
             ],
-            temperature: 0.8,
-            max_tokens: 300
+            max_tokens: 200,
+            temperature: 0.8
           })
         });
 
-        const data = await response.json();
-        if (!data.choices || !data.choices[0]) throw new Error("No response from GPT");
+        const data = await res.json();
+        if (!res.ok || !data.choices || !data.choices[0]) {
+          throw new Error(data.error?.message || "OpenAI response error");
+        }
+
         output.innerHTML = data.choices[0].message.content.trim();
       } catch (err) {
-        output.innerHTML = `<span style='color:red;'>❌ ${err.message}</span>`;
+        output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
       }
     }
   </script>
