@@ -160,7 +160,13 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all tasks and sub-AIs.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking for copyright risks and upload issues...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
+        <input id="script-topic" placeholder="Enter a video idea or niche..." />
+        <div id="openai-key-entry" style="margin-top:10px;"></div>
+        <button onclick="generateScript()" class="generate-btn">Generate Script</button>
+        <pre id="script-result" style="text-align:left; margin-top:20px;"></pre>
+      `,
       voiceover: `
         <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
         <textarea id="voice-text" placeholder='Paste your script here...'></textarea><br>
@@ -175,35 +181,28 @@
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
-    function updateTrends() {
-      const list = document.querySelector(".trend-list");
-      if (list) {
-        list.innerHTML = `
-          <li>#Crypto2025</li>
-          <li>#ViralReels</li>
-          <li>#BossAI</li>
-        `;
-      }
-    }
-
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
-
         if (module === 'voiceover') {
           const savedKey = localStorage.getItem("elevenlabs_key");
           const keyEntryDiv = document.getElementById("key-entry");
           if (!savedKey) {
-            keyEntryDiv.innerHTML = `
-              <input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key" />
-              <button onclick="saveKey()" class="generate-btn" style="margin-top:10px;">Save Key</button>
-            `;
+            keyEntryDiv.innerHTML = `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key" /><button onclick="saveKey()" class="generate-btn" style="margin-top:10px;">Save Key</button>`;
           } else {
             keyEntryDiv.innerHTML = `<p style="color: #0f0;">✅ ElevenLabs key saved</p>`;
+          }
+        }
+        if (module === 'script') {
+          const saved = localStorage.getItem("openai_key");
+          const keyArea = document.getElementById("openai-key-entry");
+          if (!saved) {
+            keyArea.innerHTML = `<input id="openai-key" type="password" placeholder="🔑 OpenAI API Key" /><button onclick="saveOpenAIKey()" class="generate-btn" style="margin-top:10px;">Save Key</button>`;
+          } else {
+            keyArea.innerHTML = `<p style="color: #0f0;">✅ OpenAI key saved</p>`;
           }
         }
       });
@@ -214,6 +213,14 @@
       if (val.length > 10) {
         localStorage.setItem("elevenlabs_key", val);
         document.getElementById("key-entry").innerHTML = `<p style="color: #0f0;">✅ Key saved successfully</p>`;
+      }
+    }
+
+    function saveOpenAIKey() {
+      const val = document.getElementById("openai-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openai_key", val);
+        document.getElementById("openai-key-entry").innerHTML = `<p style="color: #0f0;">✅ OpenAI key saved</p>`;
       }
     }
 
@@ -252,6 +259,50 @@
         status.innerHTML = "✅ Voiceover playing";
       } catch (err) {
         status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+      }
+    }
+
+    async function generateScript() {
+      const key = localStorage.getItem("openai_key");
+      const topic = document.getElementById("script-topic").value.trim();
+      const result = document.getElementById("script-result");
+      if (!key || !topic) {
+        result.textContent = "❌ Please enter both topic and API key.";
+        return;
+      }
+
+      result.textContent = "⏳ Generating script...";
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are a short-form video script writer." },
+              { role: "user", content: `Write a 45-second short-form video script about: ${topic}` }
+            ]
+          })
+        });
+
+        const data = await res.json();
+        result.textContent = data.choices?.[0]?.message?.content || "⚠️ Error parsing response";
+      } catch (err) {
+        result.textContent = "❌ " + err.message;
+      }
+    }
+
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralReels</li>
+          <li>#BossAI</li>
+        `;
       }
     }
   </script>
