@@ -205,6 +205,8 @@
       main.classList.toggle("full");
     });
 
+    let latestOutput = "";
+
     const content = {
       manager: `
         <h2 style="color:#00bfff;">🤖 Manager AI</h2>
@@ -216,7 +218,18 @@
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
       upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Your video preview will appear here.</p>`,
+      output: () => `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Latest AI Result:</p>
+        <div style="background:#111; padding:15px; border-radius:8px; margin-bottom:20px;">
+          ${latestOutput || "No output generated yet. Use Manager AI first."}
+        </div>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <button class="generate-btn" onclick="alert('Video re-rendering in progress...')">🔁 Render Again</button>
+      `,
       history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li></ul>`,
       trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Trending Topics:</p><ul><li>#AI</li><li>#Shorts</li><li>#Finance</li></ul>`,
       settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure your preferences.</p>`
@@ -247,7 +260,9 @@
       })
         .then(res => res.json())
         .then(data => {
-          resultBox.innerText = data.choices?.[0]?.message?.content || "No response.";
+          const output = data.choices?.[0]?.message?.content || "No response.";
+          latestOutput = output;
+          resultBox.innerText = output;
         })
         .catch(err => {
           resultBox.innerText = "⚠️ Error: " + err.message;
@@ -260,11 +275,8 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">
-            ${content[module] || ''}
-          </div>
-        `;
+        const html = typeof content[module] === "function" ? content[module]() : content[module];
+        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${html}</div>`;
       });
     });
   </script>
