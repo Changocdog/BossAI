@@ -214,10 +214,17 @@
         if (module === 'script') {
           const savedKey = localStorage.getItem("openai_key");
           const keyEntry = document.getElementById("script-key-entry");
-          keyEntry.innerHTML = `
-            <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" value="${savedKey || ''}" />
-            <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
-          `;
+          if (!savedKey) {
+            keyEntry.innerHTML = `
+              <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
+              <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+            `;
+          } else {
+            keyEntry.innerHTML = `
+              <p style="color: #0f0;">✅ OpenAI key saved</p>
+              <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
+            `;
+          }
         }
       });
     });
@@ -234,8 +241,19 @@
       const val = document.getElementById("script-key").value.trim();
       if (val.length > 10) {
         localStorage.setItem("openai_key", val);
-        document.getElementById("script-key-entry").innerHTML = `<p style="color: #0f0;">✅ Key saved successfully</p>`;
+        document.getElementById("script-key-entry").innerHTML = `
+          <p style="color: #0f0;">✅ OpenAI key saved</p>
+          <button onclick="editScriptKey()" class="generate-btn" style="margin-top:10px;">Edit Key</button>
+        `;
       }
+    }
+
+    function editScriptKey() {
+      const current = localStorage.getItem("openai_key") || "";
+      document.getElementById("script-key-entry").innerHTML = `
+        <input id="script-key" type="password" value="${current}" placeholder="🔑 OpenAI API Key" />
+        <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+      `;
     }
 
     async function generateVoice() {
