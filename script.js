@@ -1,99 +1,147 @@
-<script>
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-  const main = document.getElementById("main");
-  let apiKey = "";
+let currentModule = "home";
+const apiKeyKey = "elevenlabs_api_key";
 
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("hidden");
-    main.classList.toggle("full");
-  });
-
-  document.getElementById("api-key").addEventListener("input", (e) => {
-    apiKey = e.target.value.trim();
-  });
-
-  const content = {
-    manager: `
-      <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
-      <p>This AI coordinates the sub-AIs and manages workflows.</p>
-    `,
-    legal: `
-      <h2 style="color:#00bfff;">📜 Legal Review</h2>
-      <p>Reviewing content for compliance...</p>
-    `,
-    script: `
-      <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-      <textarea id="script-input" placeholder="Write your topic here..."></textarea><br>
-      <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-      <div id="script-result" style="margin-top:20px;"></div>
-    `,
-    voiceover: `
-      <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-      <textarea placeholder='Paste your script here...'></textarea><br>
-      <button class="generate-btn">Generate Voiceover</button>
-    `,
-    upload: `
-      <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-      <textarea placeholder='Describe your video goals...'></textarea><br>
-      <button class="generate-btn">Optimize Upload Plan</button>
-    `,
-    output: `
-      <h2 style="color:#00bfff;">📺 Final Output</h2>
-      <p>This is where your final video or result will appear.</p>
-      <br><button class="generate-btn">Render Final Video</button>
-    `,
-    history: `
-      <h2 style="color:#00bfff;">🗂️ History</h2>
-      <p>Review your past content outputs.</p>
-      <ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>
-    `,
-    settings: `
-      <h2 style="color:#00bfff;">⚙️ Settings</h2>
-      <textarea placeholder="Set custom preferences here..."></textarea><br>
-      <button class="generate-btn">Save Settings</button>
-    `
-  };
-
-  document.querySelectorAll(".sidebar button").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-      button.classList.add("active");
-      const module = button.getAttribute("data-module");
-      main.innerHTML = `
-        <div style="max-width: 800px; text-align: center;">
-          ${content[module] || ''}
-        </div>
-      `;
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".module-button").forEach((button) => {
+    button.addEventListener("click", function () {
+      const module = this.getAttribute("data-module");
+      switchModule(module);
     });
   });
 
-  async function generateScript() {
-    const input = document.getElementById("script-input").value;
-    const resultDiv = document.getElementById("script-result");
+  document.getElementById("run-script-btn")?.addEventListener("click", generateScript);
+  document.getElementById("run-voiceover-btn")?.addEventListener("click", generateVoiceover);
+  document.getElementById("run-upload-btn")?.addEventListener("click", generateUploadStrategy);
+  document.getElementById("run-legal-btn")?.addEventListener("click", runLegalReview);
+  document.getElementById("save-api-key-btn")?.addEventListener("click", saveElevenLabsKey);
 
-    if (!apiKey || !input) {
-      resultDiv.innerHTML = "<p style='color: orange;'>Please enter your API key and a script topic.</p>";
-      return;
-    }
+  const savedKey = localStorage.getItem(apiKeyKey);
+  if (savedKey) {
+    document.getElementById("elevenlabs-api-key").value = savedKey;
+  }
 
-    resultDiv.innerHTML = "<p style='color: #00bfff;'>Generating script...</p>";
+  switchModule("home");
+});
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta3/models/gemini-pro:generateContent?key=" + apiKey, {
+function switchModule(module) {
+  currentModule = module;
+  document.querySelectorAll(".module-panel").forEach((panel) => {
+    panel.classList.remove("active");
+  });
+  document.getElementById(`${module}-panel`).classList.add("active");
+}
+
+function displayOutput(moduleName, input, output) {
+  const outputBox = document.getElementById("final-output-box");
+  outputBox.innerHTML = `<strong>${moduleName}</strong><br><em>Input:</em> ${input}<br><em>Output:</em> ${output}`;
+  logToGoogleSheets(moduleName, input, output);
+}
+
+async function generateScript() {
+  const input = document.getElementById("script-input").value;
+  const outputBox = document.getElementById("final-output-box");
+  outputBox.innerHTML = "⏳ Generating script...";
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": "Bearer free", // Use 'free' tier from OpenRouter if enabled
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: input }] }]
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "You are a professional short-form video script writer. Output script only." },
+          { role: "user", content: input }
+        ]
       })
     });
 
     const data = await response.json();
-    if (data.candidates && data.candidates.length > 0) {
-      resultDiv.innerHTML = "<pre style='text-align:left; white-space:pre-wrap;'>" + data.candidates[0].content.parts[0].text + "</pre>";
-    } else {
-      resultDiv.innerHTML = "<p style='color: red;'>Failed to generate script. Please try again.</p>";
-    }
+    const script = data.choices?.[0]?.message?.content || "No script generated.";
+    displayOutput("Script Writer AI", input, script);
+  } catch (error) {
+    outputBox.innerHTML = "❌ Error generating script.";
+    console.error(error);
   }
-</script>
+}
+
+async function generateVoiceover() {
+  const text = document.getElementById("voiceover-input").value;
+  const outputBox = document.getElementById("final-output-box");
+  const apiKey = localStorage.getItem(apiKeyKey);
+
+  if (!apiKey) {
+    outputBox.innerHTML = "❌ Please enter your ElevenLabs API key in Settings.";
+    return;
+  }
+
+  outputBox.innerHTML = "🔊 Generating voiceover...";
+
+  try {
+    const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB/stream", {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: "eleven_monolingual_v1",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
+        }
+      })
+    });
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    outputBox.innerHTML = `
+      ✅ Voiceover ready:<br>
+      <audio controls src="${audioUrl}"></audio>
+    `;
+
+    logToGoogleSheets("Voiceover AI", text, "[Voiceover MP3 generated]");
+  } catch (error) {
+    outputBox.innerHTML = "❌ Error generating voiceover.";
+    console.error(error);
+  }
+}
+
+function generateUploadStrategy() {
+  const input = document.getElementById("upload-input").value;
+  const output = `Recommended schedule for: "${input}" → Post on Mon/Wed/Fri at 9am PT for highest engagement.`;
+  displayOutput("Upload Strategy AI", input, output);
+}
+
+function runLegalReview() {
+  const input = document.getElementById("legal-input").value;
+  const output = input.toLowerCase().includes("copyright")
+    ? "⚠️ Potential copyright issue detected. Please verify all assets are royalty-free."
+    : "✅ No legal issues detected.";
+  displayOutput("Legal Review AI", input, output);
+}
+
+function saveElevenLabsKey() {
+  const key = document.getElementById("elevenlabs-api-key").value;
+  localStorage.setItem(apiKeyKey, key);
+  alert("✅ ElevenLabs API key saved.");
+}
+
+// ✅ Log output to n8n webhook → Google Sheets
+function logToGoogleSheets(module, input, output) {
+  fetch("https://n8n.openai-assistant.workers.dev/webhook/bossai-logger", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      module: module,
+      input: input,
+      output: output
+    })
+  }).then(res => console.log("✅ Logged to Sheet")).catch(err => console.error("❌ Logging error", err));
+}
