@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -20,7 +20,7 @@
 
     .sidebar {
       width: 240px;
-      background: #111;
+      background: #0d0d0d;
       padding: 60px 10px 20px;
       display: flex;
       flex-direction: column;
@@ -29,7 +29,7 @@
       position: fixed;
       left: 0;
       top: 0;
-      border-right: 1px solid #222;
+      border-right: 1px solid #1a1a1a;
       transition: transform 0.3s ease;
       z-index: 100;
     }
@@ -39,8 +39,8 @@
     }
 
     .sidebar button {
-      background: #222;
-      color: #fff;
+      background: #121212;
+      color: #ffffff;
       border: none;
       padding: 12px;
       font-size: 14px;
@@ -102,7 +102,7 @@
     }
 
     p {
-      color: #ccc;
+      color: #cccccc;
       font-size: 14px;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
@@ -199,6 +199,7 @@
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
+    const apiKeyInput = document.getElementById("api-key");
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
@@ -206,35 +207,85 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates all sub-AIs. Awaiting input to initiate tasks...</p><textarea placeholder="Describe what you want to generate..."></textarea><br><button class="generate-btn">Start Full Generation</button>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance. Paste below:</p><textarea placeholder='Paste content for review...'></textarea><br><button class="generate-btn">Run Legal Check</button>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Describe your video topic...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
+        <textarea id="script-prompt" placeholder='Describe your video idea...'></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <div id="script-output" style="margin-top:20px;"></div>
+      `,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform:</p><textarea placeholder='Video topic, audience, and goals...'></textarea><br><button class="generate-btn">Optimize Plan</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
       output: `
         <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here’s your video preview:</p>
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>
-        <p style="color:#aaa;">Sample result — real output coming soon.</p>
-        <button class="generate-btn">Render Again</button>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
       `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content:</p><ul><li>📄 Script 1</li><li>🎤 Voiceover 2</li><li>📤 Upload 3</li></ul>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
       trends: `
         <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Current trends:</p>
+        <p>Here are the latest trending topics:</p>
         <ul class="trend-list" id="trend-list">
+          <li>#MakeMoneyOnline</li>
           <li>#AIContent</li>
           <li>#PassiveIncome</li>
-          <li>#Crypto2025</li>
         </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>
+        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
       `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set custom preferences..."></textarea><br><button class="generate-btn">Save</button>`
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
       const list = document.getElementById("trend-list");
-      list.innerHTML = `<li>#SmartInvesting</li><li>#ViralReels</li><li>#BossAI</li>`;
+      list.innerHTML = `
+        <li>#FinanceTips</li>
+        <li>#ContentAutomation</li>
+        <li>#ViralShorts</li>
+        <li>#Crypto2025</li>
+        <li>#BossAI</li>
+      `;
+    }
+
+    function generateScript() {
+      const apiKey = apiKeyInput.value.trim();
+      const prompt = document.getElementById("script-prompt").value;
+      const outputDiv = document.getElementById("script-output");
+
+      if (!apiKey) return alert("Please enter your OpenAI API key.");
+      if (!prompt) return alert("Please enter a video idea to generate a script.");
+
+      outputDiv.innerHTML = "⏳ Generating script...";
+
+      fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a professional short-form video script writer." },
+            { role: "user", content: prompt }
+          ],
+          temperature: 0.7
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const script = data.choices?.[0]?.message?.content || "❌ No script returned.";
+        outputDiv.innerHTML = `<pre style="text-align:left; white-space:pre-wrap;">${script}</pre>`;
+      })
+      .catch(err => {
+        console.error(err);
+        outputDiv.innerHTML = "❌ Failed to generate script.";
+      });
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -243,10 +294,13 @@
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
     });
   </script>
-
 </body>
 </html>
