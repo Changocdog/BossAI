@@ -11,8 +11,8 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #000;
-      color: #fff;
+      background: #000000;
+      color: #ffffff;
       display: flex;
       height: 100vh;
       overflow: hidden;
@@ -206,39 +206,25 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>Coordinates all modules. Provide a task prompt below:</p><textarea placeholder="e.g., Generate a finance script for TikTok..."></textarea><br><button class="generate-btn">Execute Workflow</button>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Analyzing for compliance and copyright issues...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script idea here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your video prompt...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video and audience...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <p>Here’s your final video preview (placeholder):</p>
-        <div style="margin: 20px auto; max-width: 560px;">
-          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
-            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <button class="generate-btn">Render Again</button>
-      `,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Finance Script 1</li><li>Voiceover Sample</li><li>Upload Plan A</li></ul>`,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <p>Latest trends:</p>
-        <ul class="trend-list" id="trend-list">
-          <li>#AIBusiness</li>
-          <li>#SideHustles</li>
-          <li>#CryptoGrowth</li>
-        </ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
-      `,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder='Customize settings here...'></textarea><br><button class="generate-btn">Save</button>`
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here’s your final video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Here are the latest trending topics:</p><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
-      document.getElementById("trend-list").innerHTML = `
-        <li>#MarketingAI</li>
-        <li>#AutomatedContent</li>
-        <li>#BossAIPlatform</li>
+      const list = document.getElementById("trend-list");
+      list.innerHTML = `
+        <li>#FinanceTips</li>
+        <li>#ContentAutomation</li>
+        <li>#ViralShorts</li>
+        <li>#Crypto2025</li>
+        <li>#BossAI</li>
       `;
     }
 
@@ -246,13 +232,45 @@
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-
         const module = button.getAttribute("data-module");
-        main.innerHTML = `
-          <div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>
-        `;
+        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
       });
     });
+
+    async function generateScript(text) {
+      const apiKey = document.getElementById("api-key").value;
+      if (!apiKey) return alert("Please enter your OpenAI API key first.");
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are a helpful assistant that writes engaging short-form video scripts in a finance, motivational, or viral content style." },
+            { role: "user", content: text }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const result = data.choices?.[0]?.message?.content || "No script returned.";
+      alert(result);
+    }
+
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("generate-btn")) {
+        const label = e.target.innerText.toLowerCase();
+        const textarea = e.target.previousElementSibling;
+        const input = textarea?.value.trim();
+
+        if (label.includes("script")) generateScript(input);
+      }
+    });
   </script>
+
 </body>
 </html>
