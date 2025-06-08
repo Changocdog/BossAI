@@ -11,7 +11,7 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to bottom right, #000428, #004e92);
+      background: #000000;
       color: #ffffff;
       display: flex;
       height: 100vh;
@@ -206,15 +206,15 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates sub-AIs, manages workflows, and monitors system performance. Coming soon: full automation.</p>`,
+      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates sub-AIs, manages workflows, and monitors system performance.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Running compliance and copyright checks...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Enter a topic for your script...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste script to convert to audio...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your video, and we’ll recommend the best time/platform to post.</p><textarea placeholder='e.g. A finance short on passive income...'></textarea><br><button class="generate-btn">Optimize Upload</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Video preview will appear here once rendered. Currently simulating output.</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" title="Boss AI Video Preview" frameborder="0" allowfullscreen></iframe></div><button class="generate-btn" onclick="alert('Simulating rerender...')">🔁 Render Again</button>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Previously generated content:</p><ul><li>Finance Script - May 2025</li><li>Voiceover #3</li><li>Upload Plan - TikTok 3PM</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Latest content trends:</p><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize preferences or reset API keys.</p><textarea placeholder='Dark mode = on, Key = auto-rotate, etc.'></textarea><br><button class="generate-btn">Save</button>`
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Describe your video and goals:</p><textarea placeholder='e.g. A finance short on passive income...'></textarea><br><button class="generate-btn">Optimize Upload</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Video preview below (simulated):</p><div style="margin: 20px auto; max-width: 560px;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" title="Boss AI Video Preview" frameborder="0" allowfullscreen></iframe></div><button class="generate-btn" onclick="alert('Simulating rerender...')">🔁 Render Again</button>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Finance Script - May</li><li>Voiceover #3</li><li>Upload Plan - TikTok 3PM</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder='Dark mode = on, API = rotated, Voice = male'></textarea><br><button class="generate-btn">Save</button>`
     };
 
     function updateTrends() {
