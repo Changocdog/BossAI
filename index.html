@@ -120,9 +120,9 @@
       box-shadow: 0 0 10px #00bfff88;
     }
 
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -157,6 +157,17 @@
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 6px;
+      text-align: left;
+    }
+
+    .output-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #111111;
+      border: 1px solid #00bfff88;
+      border-radius: 6px;
+      max-width: 600px;
+      color: #aaf;
       text-align: left;
     }
 
@@ -206,15 +217,39 @@
     });
 
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 General Manager AI</h2><p>This AI coordinates the sub-AIs and manages workflows.</p>`,
+      manager: `
+        <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
+        <p>Type a task below and let the Manager AI route it to the right module.</p>
+        <input id="manager-input" type="text" placeholder="e.g., Write a script about AI tools" />
+        <button class="generate-btn" onclick="runManager()">Execute Task</button>
+        <div class="output-box" id="manager-output"></div>
+      `,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your video prompt...'></textarea><br><button class="generate-btn">Generate Script</button>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
       voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2><textarea placeholder='Paste your script here...'></textarea><br><button class="generate-btn">Generate Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Here’s your final video preview:</p><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Choose best time & platform for video:</p><textarea placeholder='Describe your video goals...'></textarea><br><button class="generate-btn">Optimize Upload Plan</button>`,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <p>Here's your final video preview:</p>
+        <div style="margin: 20px auto; max-width: 560px;">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" 
+            title="Boss AI Final Video Preview" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p style="color: #aaa;">This is a simulated video result. Real rendering coming next.</p>
+        <button class="generate-btn" onclick="alert('Rendering new video (placeholder)...')">🔁 Render Again</button>
+      `,
       history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Review your past content outputs.</p><ul><li>Script 1</li><li>Voiceover 2</li><li>Upload Strategy 3</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Here are the latest trending topics:</p><ul class="trend-list" id="trend-list"><li>#MakeMoneyOnline</li><li>#AIContent</li><li>#PassiveIncome</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
+      trends: `
+        <h2 style="color:#00bfff;">📈 Trends AI</h2>
+        <p>Here are the latest trending topics:</p>
+        <ul class="trend-list" id="trend-list">
+          <li>#MakeMoneyOnline</li>
+          <li>#AIContent</li>
+          <li>#PassiveIncome</li>
+        </ul>
+        <button class="generate-btn" onclick="updateTrends()">🔄 Update Trends</button>
+      `,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure app preferences and integrations.</p><textarea placeholder="Set custom preferences here..."></textarea><br><button class="generate-btn">Save Settings</button>`
     };
 
     function updateTrends() {
@@ -228,56 +263,28 @@
       `;
     }
 
+    function runManager() {
+      const input = document.getElementById("manager-input").value.toLowerCase();
+      const output = document.getElementById("manager-output");
+      if (input.includes("script") || input.includes("video")) {
+        output.innerHTML = "🧠 Manager AI detected a script request. Dispatching to Script Writer AI...<br><br>📜 Script generated:<br>\"Are you looking for a way to build passive income with AI? Here's how to start...\"";
+      } else {
+        output.innerHTML = "⚠️ Task not recognized. Please try again with a different command.";
+      }
+    }
+
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
 
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width: 800px; text-align: center;">${content[module] || ''}</div>`;
+        main.innerHTML = `
+          <div style="max-width: 800px; text-align: center;">
+            ${content[module] || ''}
+          </div>
+        `;
       });
-    });
-
-    async function generateScript(text) {
-      const apiKey = document.getElementById("api-key").value;
-      if (!apiKey) return alert("Please enter your OpenAI API key first.");
-
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You are a helpful assistant that writes short viral video scripts." },
-            { role: "user", content: text }
-          ]
-        })
-      });
-
-      const data = await response.json();
-      const result = data.choices?.[0]?.message?.content || "No script returned.";
-      alert(result);
-    }
-
-    function generateVoice(text) {
-      if (!text) return alert("Please enter a script to convert to voice.");
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      speechSynthesis.speak(utterance);
-    }
-
-    document.addEventListener("click", function (e) {
-      if (e.target && e.target.classList.contains("generate-btn")) {
-        const label = e.target.innerText.toLowerCase();
-        const textarea = e.target.previousElementSibling;
-        const input = textarea?.value.trim();
-
-        if (label.includes("script")) generateScript(input);
-        else if (label.includes("voiceover")) generateVoice(input);
-      }
     });
   </script>
 
