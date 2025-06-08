@@ -27,13 +27,22 @@
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: #121212; color: #fff;
+      background: #121212;
       border: none; padding: 12px;
       font-size: 14px; text-align: left;
       border-radius: 6px; cursor: pointer;
+      color: #00bfff;
+      text-shadow: 0 0 4px #00bfff;
     }
-    .sidebar button:hover { background: #003366; color: #4fc3f7; }
-    .sidebar button.active { background-color: #007bff; color: white; }
+    .sidebar button:hover {
+      background: #003366;
+      color: #4fc3f7;
+    }
+    .sidebar button.active {
+      background-color: #007bff;
+      color: white;
+      text-shadow: none;
+    }
     .main {
       flex-grow: 1; margin-left: 240px;
       width: calc(100% - 240px);
@@ -137,7 +146,7 @@
       trends: `<h2>📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
       sheets: `
         <h2>📄 Google Sheets Logs</h2>
-        <p>Click below to open your BossAI Google Sheet:</p>
+        <p>Click below to open your BossAI Logs spreadsheet:</p>
         <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit" target="_blank">
           <button class="generate-btn">Open Google Sheet</button>
         </a>
