@@ -214,14 +214,10 @@
         if (module === 'script') {
           const savedKey = localStorage.getItem("openai_key");
           const keyEntry = document.getElementById("script-key-entry");
-          if (!savedKey) {
-            keyEntry.innerHTML = `
-              <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" />
-              <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
-            `;
-          } else {
-            keyEntry.innerHTML = `<p style="color: #0f0;">✅ OpenAI key saved</p>`;
-          }
+          keyEntry.innerHTML = `
+            <input id="script-key" type="password" placeholder="🔑 OpenAI API Key" value="${savedKey || ''}" />
+            <button onclick="saveScriptKey()" class="generate-btn">Save Key</button>
+          `;
         }
       });
     });
