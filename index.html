@@ -5,75 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      background-color: #111;
-      font-family: Arial, sans-serif;
-      color: white;
-    }
-    .sidebar {
-      width: 220px;
-      background-color: #000;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-shadow: 2px 0 5px #000;
-    }
-    .sidebar button {
-      margin: 8px 0;
-      padding: 12px;
-      background: #222;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      text-align: left;
-    }
-    .sidebar button.active {
-      background-color: #007bff;
-    }
-    .main-content {
-      flex-grow: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .module-panel {
-      display: none;
-    }
-    .module-panel.active {
-      display: block;
-    }
-    textarea, input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 4px;
-      border: none;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .output-box {
-      background-color: #1a1a1a;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-    }
-  </style>
 </head>
 <body>
   <div class="sidebar">
-    <button class="module-button active" data-module="home">🏠 Home</button>
+    <button class="module-button" data-module="home">🏠 Home</button>
     <button class="module-button" data-module="manager">🧠 Manager AI</button>
     <button class="module-button" data-module="script">✍️ Script Writer</button>
     <button class="module-button" data-module="voiceover">🔊 Voiceover</button>
@@ -90,67 +25,68 @@
     <!-- Home -->
     <div class="module-panel active" id="home-panel">
       <h1>Welcome to Boss AI</h1>
-      <p>Use the modules on the left to automate your content pipeline.</p>
+      <p>Let Boss AI automate your content strategy, creation, and success.</p>
     </div>
 
     <!-- Manager -->
     <div class="module-panel" id="manager-panel">
       <h2>Manager AI</h2>
-      <p>This module coordinates all sub-AIs and performance decisions. (Coming soon)</p>
+      <p>This module coordinates all sub-AIs and optimizes your system. (Coming soon)</p>
     </div>
 
-    <!-- Script Writer -->
+    <!-- Script -->
     <div class="module-panel" id="script-panel">
       <h2>Script Writer AI</h2>
-      <textarea id="script-input" placeholder="Enter video topic..."></textarea>
+      <textarea id="script-input" placeholder="Enter a video topic..."></textarea>
       <button id="run-script-btn">Generate Script</button>
     </div>
 
     <!-- Voiceover -->
     <div class="module-panel" id="voiceover-panel">
       <h2>Voiceover AI</h2>
-      <textarea id="voiceover-input" placeholder="Paste script here..."></textarea>
+      <textarea id="voiceover-input" placeholder="Paste your script here..."></textarea>
       <button id="run-voiceover-btn">Generate Voiceover</button>
     </div>
 
-    <!-- Upload Strategy -->
+    <!-- Upload -->
     <div class="module-panel" id="upload-panel">
       <h2>Upload Strategy AI</h2>
-      <input id="upload-input" placeholder="Enter topic or platform..." />
+      <input id="upload-input" placeholder="Enter niche or platform..." />
       <button id="run-upload-btn">Get Strategy</button>
     </div>
 
-    <!-- Legal Review -->
+    <!-- Legal -->
     <div class="module-panel" id="legal-panel">
       <h2>Legal Review AI</h2>
-      <textarea id="legal-input" placeholder="Paste content for compliance check..."></textarea>
+      <textarea id="legal-input" placeholder="Paste your content..."></textarea>
       <button id="run-legal-btn">Run Legal Review</button>
     </div>
 
     <!-- Trend AI -->
     <div class="module-panel" id="trends-panel">
       <h2>Trend AI</h2>
-      <p>This module discovers trending video topics. (Coming soon)</p>
+      <p>This module identifies trending topics across platforms like TikTok, YouTube, and Reddit. (Coming soon)</p>
+      <button disabled>Fetch Trends</button>
     </div>
 
     <!-- History -->
     <div class="module-panel" id="history-panel">
       <h2>Video History</h2>
-      <p>Generated content will appear here. (Coming soon)</p>
+      <p>Previously generated content will appear here. (Coming soon)</p>
     </div>
 
     <!-- Dashboard -->
     <div class="module-panel" id="dashboard-panel">
       <h2>Performance Dashboard</h2>
-      <p>Usage stats, engagement analysis, and trends. (Coming soon)</p>
+      <p>Track how each module is performing. (Coming soon)</p>
     </div>
 
-    <!-- Sheets Panel -->
+    <!-- Sheets -->
     <div class="module-panel" id="sheets-panel">
       <h2>📄 Google Sheet Logs</h2>
-      <p>Click below to open your BossAI-Logs Google Sheet:</p>
+      <p>Open your BossAI Google Sheet:</p>
       <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit" target="_blank">
-        <button>Open Sheet</button>
+        <button>Open Logs Sheet</button>
       </a>
     </div>
 
@@ -158,32 +94,20 @@
     <div class="module-panel" id="settings-panel">
       <h2>Settings</h2>
       <label for="elevenlabs-api-key">ElevenLabs API Key:</label>
-      <input type="text" id="elevenlabs-api-key" placeholder="Enter your API key..." />
+      <input type="text" id="elevenlabs-api-key" placeholder="Enter your ElevenLabs API key" />
       <button id="save-api-key-btn">Save Key</button>
+
+      <hr />
+      <h3>Test Logging</h3>
+      <p>This sends a test row to your BossAI-Logs Google Sheet.</p>
+      <button id="test-logging-btn">Run Logging Test</button>
+      <div id="test-log-result" style="margin-top: 10px;"></div>
     </div>
 
-    <!-- Output Box -->
+    <!-- Output -->
     <div id="final-output-box" class="output-box"></div>
   </div>
 
-  <script>
-    const buttons = document.querySelectorAll(".module-button");
-    const panels = document.querySelectorAll(".module-panel");
-
-    buttons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const module = btn.getAttribute("data-module");
-
-        // Activate button
-        buttons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-
-        // Show panel
-        panels.forEach(p => {
-          p.classList.toggle("active", p.id === `${module}-panel`);
-        });
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
