@@ -208,10 +208,9 @@
     const content = {
       manager: `
         <h2 style="color:#00bfff;">🤖 General Manager AI</h2>
-        <p>This AI coordinates the sub-AIs and manages content workflows.</p>
-        <textarea placeholder="Describe your current project goal..."></textarea><br>
-        <button class="generate-btn" onclick="generateManagerStrategy()">Generate Strategy</button>
-        <div id="manager-output" style="margin-top: 15px; color: #4fc3f7;"></div>
+        <p>This AI coordinates all modules.</p>
+        <button class="generate-btn" onclick="runAllModules()">▶️ Run Full Workflow</button>
+        <div id="manager-status" style="margin-top:20px; font-size:14px; color:#ccc;"></div>
       `,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Reviewing content for compliance...</p>`,
       script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder='Write your script here...'></textarea><br><button class="generate-btn">Generate Script</button>`,
@@ -252,18 +251,21 @@
       `;
     }
 
-    function generateManagerStrategy() {
-      const output = document.getElementById("manager-output");
-      output.innerHTML = `
-        <strong>📋 Strategy Generated:</strong><br>
-        1. Identify trending niche for this week.<br>
-        2. Generate 3 finance scripts using Script Writer AI.<br>
-        3. Run voiceover generation for each.<br>
-        4. Create upload schedule using Upload AI.<br>
-        5. Review all results in History.<br>
-        6. Legal AI to verify each post before publishing.<br>
-        <em>Tip: Use the Trends module to enhance your visibility.</em>
-      `;
+    function runAllModules() {
+      const statusDiv = document.getElementById('manager-status');
+      statusDiv.innerHTML = 'Running Script Writer...';
+      setTimeout(() => {
+        statusDiv.innerHTML += '<br>Script Writer ✅<br>Running Legal Review...';
+        setTimeout(() => {
+          statusDiv.innerHTML += '<br>Legal Review ✅<br>Running Upload Strategy...';
+          setTimeout(() => {
+            statusDiv.innerHTML += '<br>Upload Strategy ✅<br>Rendering Final Output...';
+            setTimeout(() => {
+              statusDiv.innerHTML += '<br><strong>✅ All Modules Completed.</strong>';
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 1000);
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
