@@ -16,7 +16,14 @@
       height: 100vh;
       overflow: hidden;
     }
-    .sidebar {
+    header {
+      background-color: #0d0d0d;
+      color: #00bfff;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    nav.sidebar {
       width: 240px;
       background: #0d0d0d;
       padding: 60px 10px 20px;
@@ -30,8 +37,8 @@
       border-right: 1px solid #1a1a1a;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); }
-    .sidebar button {
+    nav.sidebar.hidden { transform: translateX(-100%); }
+    nav.sidebar button {
       background: #121212;
       color: #00bfff;
       border: none;
@@ -41,12 +48,12 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .sidebar button:hover { background: #003366; color: #4fc3f7; }
-    .sidebar button.active {
+    nav.sidebar button:hover { background: #003366; color: #4fc3f7; }
+    nav.sidebar button.active {
       background-color: #007bff;
       color: white;
     }
-    .main {
+    main {
       flex-grow: 1;
       margin-left: 240px;
       width: calc(100% - 240px);
@@ -55,7 +62,7 @@
       padding: 20px;
       overflow-y: auto;
     }
-    .main.full {
+    main.full {
       margin-left: 0;
       width: 100%;
     }
@@ -94,7 +101,10 @@
       font-size: 15px;
       font-family: 'Orbitron', sans-serif;
     }
-    .chat-log { margin-top: 20px; max-width: 600px; }
+    .chat-log {
+      margin-top: 20px;
+      max-width: 600px;
+    }
     .chat-log p {
       background: #111;
       padding: 10px;
@@ -113,13 +123,16 @@
       border: 1px solid #00bfff;
       color: white;
     }
+    section { margin-top: 30px; }
+    ul { list-style: none; padding-left: 0; }
+    li { padding: 5px 0; }
   </style>
 </head>
 <body>
 
-  <button id="toggle-btn">☰ Menu</button>
+  <button id="toggle-btn" aria-label="Toggle Menu">☰ Menu</button>
 
-  <div class="sidebar" id="sidebar">
+  <nav class="sidebar" id="sidebar" aria-label="Main Navigation">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
@@ -129,183 +142,21 @@
     <button data-module="history">🗂️ History</button>
     <button data-module="trends">📈 Trends</button>
     <button data-module="settings">⚙️ Settings</button>
-  </div>
+  </nav>
 
-  <div class="main" id="main">
-    <h1>Boss AI Dashboard</h1>
-    <div id="chat-log" class="chat-log"></div>
-    <div class="chat-input">
-      <input id="manager-input" placeholder="Ask Manager AI anything...">
+  <main id="main">
+    <header>
+      <h1>Boss AI Dashboard</h1>
+    </header>
+
+    <section id="chat-log" class="chat-log" aria-live="polite"></section>
+
+    <section class="chat-input">
+      <input id="manager-input" placeholder="Ask Manager AI anything..." aria-label="Manager AI prompt" />
       <button class="generate-btn" onclick="handleManagerInput()">Send</button>
-    </div>
-    <div id="module-content" style="margin-top:40px;"></div>
-  </div>
+    </section>
 
-  <script>
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementById("toggle-btn");
-    const main = document.getElementById("main");
-    const chatLog = document.getElementById("chat-log");
-    const moduleContent = document.getElementById("module-content");
+    <section id="module-content"></section>
+  </main>
 
-    toggleBtn.onclick = () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    };
-
-    const modules = {
-      manager: `<h2 style="color:#00bfff;">Manager AI</h2><p>I can manage all modules, fix broken features, and guide improvements.</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-        <textarea id="script-input" placeholder="Enter video idea..."></textarea>
-        <div id="script-key-box"></div>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output"></p>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voice-text" placeholder="Paste your script..."></textarea>
-        <div id="voice-key-box"></div>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-status"></p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Upload goals..."></textarea><button class="generate-btn">Optimize</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Scanning content for compliance...</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History Log</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul><li>#Crypto2025</li><li>#AIContent</li><li>#OpenRouter</li></ul>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Your preferences..."></textarea><button class="generate-btn">Save</button>`
-    };
-
-    function switchModule(key) {
-      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-      document.querySelector(`.sidebar button[data-module="${key}"]`)?.classList.add("active");
-      moduleContent.innerHTML = modules[key] || "<p>Module not found.</p>";
-
-      if (key === "script") {
-        const keySaved = localStorage.getItem("openrouter_key");
-        document.getElementById("script-key-box").innerHTML = keySaved
-          ? `<p style="color:lime;">✅ Key saved</p>`
-          : `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
-      }
-
-      if (key === "voiceover") {
-        const keySaved = localStorage.getItem("elevenlabs_key");
-        document.getElementById("voice-key-box").innerHTML = keySaved
-          ? `<p style="color:lime;">✅ Key saved</p>`
-          : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
-      }
-    }
-
-    function handleManagerInput() {
-      const input = document.getElementById("manager-input").value.trim();
-      if (!input) return;
-      chatLog.innerHTML += `<p><strong>You:</strong> ${input}</p>`;
-      respondWithGPT(input);
-      document.getElementById("manager-input").value = '';
-    }
-
-    async function respondWithGPT(text) {
-      const key = localStorage.getItem("openrouter_key");
-      if (!key) return speak("❌ OpenRouter key is missing. Please set it in the Script module.");
-      speak("🤖 Thinking...");
-
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${key}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You are Manager AI. Help fix and run Boss AI." },
-              { role: "user", content: text }
-            ]
-          })
-        });
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-        speak(reply);
-        if (text.includes("script")) switchModule("script");
-        if (text.includes("voice")) switchModule("voiceover");
-      } catch (err) {
-        speak("❌ Error: " + err.message);
-      }
-    }
-
-    function speak(text) {
-      chatLog.innerHTML += `<p><strong>Manager AI:</strong> ${text}</p>`;
-    }
-
-    function saveScriptKey() {
-      const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("openrouter_key", val);
-        switchModule("script");
-      }
-    }
-
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        switchModule("voiceover");
-      }
-    }
-
-    async function generateScript() {
-      const key = localStorage.getItem("openrouter_key");
-      const prompt = document.getElementById("script-input").value.trim();
-      const output = document.getElementById("script-output");
-      if (!key || !prompt) return output.innerHTML = "❌ Missing input or key";
-
-      output.innerHTML = "Generating...";
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${key}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You're a short-form video script writer." },
-              { role: "user", content: `Write a 30-second video script about: ${prompt}` }
-            ]
-          })
-        });
-        const data = await res.json();
-        output.innerHTML = data.choices[0].message.content;
-      } catch (err) {
-        output.innerHTML = "❌ " + err.message;
-      }
-    }
-
-    async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
-      const status = document.getElementById("voice-status");
-      if (!key || !text) return status.innerHTML = "❌ Missing input or key";
-
-      status.innerHTML = "Generating...";
-      try {
-        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-          method: "POST",
-          headers: {
-            "xi-api-key": key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ text: text })
-        });
-        const blob = await res.blob();
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.play();
-        status.innerHTML = "✅ Voiceover playing";
-      } catch (err) {
-        status.innerHTML = "❌ " + err.message;
-      }
-    }
-
-    switchModule("manager");
-  </script>
-</body>
-</html>
+  <!-- JavaScript logic follows in next message -->
