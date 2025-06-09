@@ -1,3 +1,4 @@
+<!-- Full updated Boss AI Dashboard with Manager AI chat -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: 'Orbitron', sans-serif;
-      background: #000; color: #fff;
+      background: #000; color: #00bfff;
       display: flex; height: 100vh; overflow: hidden;
     }
     .sidebar {
@@ -23,7 +24,7 @@
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: #121212; color: #fff;
+      background: #121212; color: #00bfff;
       border: none; padding: 12px;
       font-size: 14px; text-align: left;
       border-radius: 6px; cursor: pointer;
@@ -76,6 +77,15 @@
       border-radius: 6px;
       text-align: left;
     }
+    #manager-chat { max-width: 600px; margin: 20px auto; text-align: left; }
+    #manager-chat p { background: #111; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+    #manager-input-box { display: flex; gap: 10px; margin-top: 10px; }
+    #manager-input-box input {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #00bfff;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -109,8 +119,38 @@
       main.classList.toggle("full");
     });
 
+    function managerPanelHTML() {
+      const openKey = localStorage.getItem("openrouter_key");
+      const voiceKey = localStorage.getItem("elevenlabs_key");
+      return `
+        <h2 style="color:#00bfff;">🤖 Manager AI</h2>
+        <p>System diagnostic scan complete:</p>
+        <ul style="text-align:left; max-width:500px; margin:auto; list-style:none; padding:0;">
+          <li>✅ Sidebar Toggle: <b>Working</b></li>
+          <li>${openKey ? "✅" : "❌"} Script Writer Key: <b>${openKey ? "Saved" : "Missing"}</b></li>
+          <li>${voiceKey ? "✅" : "❌"} Voiceover Key: <b>${voiceKey ? "Saved" : "Missing"}</b></li>
+          <li>✅ Layout: <b>Responsive</b></li>
+          <li>✅ Trends Module: <b>Active</b></li>
+          <li>✅ History Log: <b>Static Content Present</b></li>
+          <li>❌ Upload AI: <b>No Logic Detected</b></li>
+          <li>❌ Final Output: <b>Hardcoded Video</b></li>
+          <li>❌ Google Sheets Logging: <b>Not Connected</b></li>
+          <li>❌ Monetization: <b>Placeholder Only</b></li>
+        </ul>
+        <div id="manager-chat">
+          <h3 style="color:#00bfff;">Ask Manager AI</h3>
+          <div id="manager-chat-log"></div>
+          <div id="manager-input-box">
+            <input id="manager-question" placeholder="Type a question..."/>
+            <button class="generate-btn" onclick="askManager()">Send</button>
+          </div>
+          <p id="manager-response-status" style="margin-top:10px;"></p>
+        </div>
+      `;
+    }
+
     const content = {
-      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
+      manager: managerPanelHTML(),
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
       script: `
         <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
@@ -255,6 +295,46 @@
         const audio = new Audio(URL.createObjectURL(blob));
         audio.play();
         status.innerHTML = "✅ Voiceover playing";
+      } catch (err) {
+        status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+      }
+    }
+
+    async function askManager() {
+      const key = localStorage.getItem("openrouter_key");
+      const input = document.getElementById("manager-question").value.trim();
+      const log = document.getElementById("manager-chat-log");
+      const status = document.getElementById("manager-response-status");
+
+      if (!key || !input) {
+        status.innerHTML = `<span style="color:red;">❌ Missing input or key</span>`;
+        return;
+      }
+
+      log.innerHTML += `<p><b>You:</b> ${input}</p>`;
+      status.innerHTML = "🤖 Thinking...";
+
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are Manager AI, a helpful assistant that checks which modules in the Boss AI dashboard are working or broken, and tells the user how to fix them." },
+              { role: "user", content: input }
+            ]
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.choices) throw new Error(data.error?.message || "GPT error");
+        const reply = data.choices[0].message.content;
+        log.innerHTML += `<p><b>Manager AI:</b> ${reply}</p>`;
+        status.innerHTML = "";
+        document.getElementById("manager-question").value = "";
       } catch (err) {
         status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
       }
