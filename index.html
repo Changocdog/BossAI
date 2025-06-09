@@ -30,7 +30,6 @@
       border-right: 1px solid #1a1a1a;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
       background: #121212;
       color: #00bfff;
@@ -41,29 +40,23 @@
       border-radius: 6px;
       cursor: pointer;
       transition: 0.3s;
-    }
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-      text-shadow: 0 0 8px #00bfff;
+      text-shadow: 0 0 6px #00bfff;
     }
     .sidebar button.active {
       background-color: #007bff;
       color: white;
-      text-shadow: 0 0 10px #00bfff;
+      text-shadow: 0 0 12px #00bfff;
     }
     .main {
       flex-grow: 1;
       margin-left: 240px;
       width: calc(100% - 240px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       padding: 20px;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
     }
-    .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -78,70 +71,93 @@
       border: none;
       cursor: pointer;
     }
+    .module {
+      display: none;
+      background: #111;
+      padding: 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00bfff;
+    }
+    .module.active { display: block; }
     textarea, input {
       width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
+      padding: 10px;
       border-radius: 6px;
       border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
+      background: #1a1a1a;
+      color: #00bfff;
+      margin-top: 10px;
     }
     button.generate-btn {
+      margin-top: 10px;
+      padding: 10px 16px;
       background-color: #007bff;
       color: white;
       border: none;
-      margin-top: 10px;
-      padding: 10px 16px;
       border-radius: 6px;
-      font-size: 15px;
       font-family: 'Orbitron', sans-serif;
       text-shadow: 0 0 8px #00bfff;
-    }
-    ul.trend-list {
-      list-style: none;
-      padding-left: 0;
-      max-width: 500px;
-      margin: auto;
-    }
-    ul.trend-list li {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: left;
     }
     h2 {
       color: #00bfff;
       text-shadow: 0 0 10px #00bfff;
     }
+    .chat-box {
+      max-height: 300px;
+      overflow-y: auto;
+      background: #111;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <button id="toggle-btn">☰ Menu</button>
+<button id="toggle-btn">☰ Menu</button>
 
-  <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="legal">📜 Legal Review</button>
-    <button data-module="script">✍️ Script Writer</button>
-    <button data-module="voiceover">🎤 Voiceover</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="output">📺 Final Output</button>
-    <button data-module="history">🗂️ History</button>
-    <button data-module="trends">📈 Trends AI</button>
-    <button data-module="sheets">📊 Sheets Log</button>
-    <button data-module="settings">⚙️ Settings</button>
+<div class="sidebar" id="sidebar">
+  <button data-module="manager" class="active">🤖 Manager AI</button>
+  <button data-module="legal">📜 Legal Review</button>
+  <button data-module="script">✍️ Script Writer</button>
+  <button data-module="voiceover">🎤 Voiceover</button>
+  <button data-module="upload">📤 Upload Strategy</button>
+  <button data-module="output">📺 Final Output</button>
+  <button data-module="history">🗂️ History</button>
+  <button data-module="trends">📈 Trends AI</button>
+  <button data-module="sheets">📊 Sheets Log</button>
+  <button data-module="settings">⚙️ Settings</button>
+</div>
+
+<div class="main" id="main">
+  <div id="manager" class="module active">
+    <h2>Manager AI</h2>
+    <div class="chat-box" id="manager-chat"></div>
+    <input type="text" id="manager-input" placeholder="Ask Manager AI...">
+    <button class="generate-btn" onclick="handleManagerCommand()">Send</button>
   </div>
 
-  <div class="main" id="main">
-    <h1>Boss AI Dashboard</h1>
-    <p>Welcome! Select a module from the menu.</p>
+  <div id="script" class="module">
+    <h2>Script Writer AI</h2>
+    <input type="text" id="script-key" placeholder="Enter API Key">
+    <textarea id="script-input" rows="5" placeholder="Enter video topic..."></textarea>
+    <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+    <div id="script-output"></div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="voiceover" class="module">
+    <h2>Voiceover AI</h2>
+    <input type="text" id="voiceover-key" placeholder="Enter ElevenLabs API Key">
+    <textarea id="voiceover-input" rows="4" placeholder="Paste script here..."></textarea>
+    <button class="generate-btn" onclick="generateVoiceover()">Generate Voiceover</button>
+    <div id="voiceover-output"></div>
+  </div>
+
+  <!-- Other modules can be added similarly -->
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
