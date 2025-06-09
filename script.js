@@ -1,108 +1,151 @@
-const modules = {
-  manager: "Welcome to Manager AI. Enter a prompt below to begin coordination.",
-  legal: "Legal Review AI is active. Please submit text to review.",
-  script: "Script Writer AI ready. Enter your video idea and submit.",
-  voiceover: "Voiceover AI active. Enter script to generate voice.",
-  upload: "Upload Strategy AI ready. Enter script or title for strategy tips.",
-  output: "Final Output panel will show completed videos here.",
-  history: "History panel loading...",
-  trends: "Trends AI active. Current trending topics will appear here.",
-  settings: "Settings panel loaded.",
-};
+document.addEventListener("DOMContentLoaded", function () {
+  const sidebarButtons = document.querySelectorAll(".sidebar button");
+  const mainPanel = document.getElementById("main");
 
-const main = document.getElementById("main");
-const sidebarButtons = document.querySelectorAll(".sidebar button");
-const toggleBtn = document.getElementById("toggle-btn");
+  function highlightActive(button) {
+    sidebarButtons.forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+  }
 
-let currentModule = "manager";
+  function setOutput(content) {
+    mainPanel.innerHTML = content;
+  }
 
-function showModule(module) {
-  currentModule = module;
-  sidebarButtons.forEach((btn) => btn.classList.remove("active"));
-  document.querySelector(`[data-module="${module}"]`).classList.add("active");
+  function getOpenAIKey() {
+    return localStorage.getItem("openai_api_key") || "";
+  }
 
-  main.innerHTML = `
-    <h2>${module.charAt(0).toUpperCase() + module.slice(1)} Module</h2>
-    <p>${modules[module]}</p>
-    <textarea id="input-box" rows="6" placeholder="Enter your input here..."></textarea>
-    <button class="generate-btn" onclick="runAI('${module}')">Generate</button>
-    <div id="result-box" style="margin-top:20px;"></div>
-  `;
-}
+  function getElevenLabsKey() {
+    return localStorage.getItem("elevenlabs_key") || "";
+  }
 
-function runAI(module) {
-  const input = document.getElementById("input-box").value;
-  const resultBox = document.getElementById("result-box");
-  resultBox.innerHTML = "<em>Generating...</em>";
+  async function generateScript(prompt) {
+    const key = getOpenAIKey();
+    if (!key) return "❌ OpenAI API key missing.";
 
-  if (module === "script") {
-    const apiKey = localStorage.getItem("openai_key");
-    if (!apiKey) return alert("No OpenAI API key found. Please add it in Settings.");
-    fetch("https://api.openai.com/v1/chat/completions", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + apiKey,
+        "Authorization": `Bearer ${key}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Write a viral short-form video script about: ${input}` }],
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const output = data.choices?.[0]?.message?.content || "No output.";
-        resultBox.innerText = output;
+        messages: [{ role: "user", content: `Create a short-form video script for: ${prompt}` }],
+        max_tokens: 300
       })
-      .catch((err) => {
-        resultBox.innerText = "Error: " + err.message;
-      });
+    });
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || "❌ No script generated.";
+  }
 
-  } else if (module === "voiceover") {
-    const voiceKey = localStorage.getItem("eleven_key");
-    if (!voiceKey) return alert("No ElevenLabs API key found. Add it in Settings.");
-    fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+  async function generateVoiceover(text) {
+    const key = getElevenLabsKey();
+    if (!key) return "❌ ElevenLabs API key missing.";
+
+    const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/exAVoiceID/stream", {
       method: "POST",
       headers: {
-        "xi-api-key": voiceKey,
-        "Content-Type": "application/json",
-        accept: "audio/mpeg",
+        "xi-api-key": key,
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ text: input, model_id: "eleven_monolingual_v1", voice_settings: { stability: 0.3, similarity_boost: 0.7 } }),
-    })
-      .then((res) => res.blob())
-      .then((blob) => {
-        const audioUrl = URL.createObjectURL(blob);
-        resultBox.innerHTML = `<audio controls src="${audioUrl}"></audio>`;
+      body: JSON.stringify({
+        text: text,
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
+        }
       })
-      .catch((err) => {
-        resultBox.innerText = "Voiceover error: " + err.message;
-      });
+    });
 
-  } else if (module === "upload") {
-    const tips = `
-      🔹 Post to TikTok, Reels, and Shorts.\n
-      🔹 Use 3-5 hashtags related to: "${input.split(" ").slice(0, 3).join(", ")}"\n
-      🔹 Upload between 3-6 PM local time.\n
-      🔹 Thumbnail should include a face and large text.\n
-      🔹 Hook in first 2 seconds is key!
-    `;
-    resultBox.innerText = tips;
-
-  } else if (module === "manager") {
-    resultBox.innerText = `👔 Manager AI suggests you run Script AI, then Voiceover, then Upload Strategy.`;
-  } else {
-    resultBox.innerText = "This module is under development.";
+    const audioBlob = await res.blob();
+    const audioURL = URL.createObjectURL(audioBlob);
+    return `<audio controls src="${audioURL}"></audio>`;
   }
-}
 
-toggleBtn.addEventListener("click", () => {
-  document.getElementById("sidebar").classList.toggle("hidden");
-  main.classList.toggle("full");
+  function uploadStrategyResponse(input) {
+    if (!input) return "Please enter a topic.";
+    return `
+      <h2>📤 Upload Strategy</h2>
+      <p><strong>Topic:</strong> ${input}</p>
+      <ul>
+        <li>Post to TikTok Shorts and YouTube Reels at 10am PST</li>
+        <li>Use hashtags: #moneytips #sidehustle</li>
+        <li>Title: "How to Make Money from This Simple Trick"</li>
+      </ul>
+    `;
+  }
+
+  function showInputPanel(module, callback) {
+    setOutput(`
+      <h2>${module}</h2>
+      <textarea id="user-input" placeholder="Enter your prompt..."></textarea>
+      <button class="generate-btn">Run</button>
+      <div id="output-area" style="margin-top:20px;"></div>
+    `);
+
+    document.querySelector(".generate-btn").onclick = async () => {
+      const input = document.getElementById("user-input").value;
+      const outputArea = document.getElementById("output-area");
+      outputArea.innerHTML = "⏳ Working...";
+
+      const result = await callback(input);
+      outputArea.innerHTML = result;
+    };
+  }
+
+  sidebarButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const module = button.getAttribute("data-module");
+      highlightActive(button);
+
+      if (module === "manager") {
+        showInputPanel("🤖 Manager AI", async (input) => {
+          return `Manager received your input: <strong>${input}</strong><br>All modules are ready.`;
+        });
+      } else if (module === "script") {
+        showInputPanel("✍️ Script Writer AI", async (input) => {
+          return await generateScript(input);
+        });
+      } else if (module === "voiceover") {
+        showInputPanel("🎤 Voiceover AI", async (input) => {
+          return await generateVoiceover(input);
+        });
+      } else if (module === "upload") {
+        showInputPanel("📤 Upload Strategy", async (input) => {
+          return uploadStrategyResponse(input);
+        });
+      } else if (module === "output") {
+        setOutput(`<h2>📺 Final Output</h2><p>All AI outputs will be collected here in the future version.</p>`);
+      } else if (module === "history") {
+        setOutput(`<h2>🗂️ Video History</h2><p>Saved video drafts will appear here in a future update.</p>`);
+      } else if (module === "trends") {
+        setOutput(`<h2>📈 Trends AI</h2><ul class="trend-list"><li>AI Side Hustles</li><li>Passive Income</li><li>Crypto Comeback</li></ul>`);
+      } else if (module === "settings") {
+        setOutput(`
+          <h2>⚙️ Settings</h2>
+          <label>OpenAI Key:</label><input id="openaiKeyInput" placeholder="sk-..." value="${getOpenAIKey()}"/><br>
+          <label>ElevenLabs Key:</label><input id="elevenKeyInput" placeholder="eleven..." value="${getElevenLabsKey()}"/><br>
+          <button class="generate-btn" onclick="saveKeys()">Save Keys</button>
+        `);
+      } else if (module === "sheets") {
+        setOutput(`<h2>📊 Sheets Log</h2><p>This module is not yet active.</p>`);
+      } else {
+        setOutput(`<h2>Boss AI</h2><p>Select a module to begin.</p>`);
+      }
+    });
+  });
+
+  document.getElementById("toggle-btn").onclick = () => {
+    document.getElementById("sidebar").classList.toggle("hidden");
+    document.getElementById("main").classList.toggle("full");
+  };
 });
 
-sidebarButtons.forEach((btn) =>
-  btn.addEventListener("click", () => showModule(btn.dataset.module))
-);
-
-showModule(currentModule);
+function saveKeys() {
+  const openai = document.getElementById("openaiKeyInput").value;
+  const eleven = document.getElementById("elevenKeyInput").value;
+  localStorage.setItem("openai_api_key", openai);
+  localStorage.setItem("elevenlabs_key", eleven);
+  alert("✅ Keys saved!");
+}
