@@ -1,121 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
+  <title>Boss AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet"/>
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Orbitron', sans-serif;
+      font-family: Orbitron, sans-serif;
       background: #000;
       color: #00bfff;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
     }
-    .sidebar {
-      width: 240px;
-      background: #0d0d0d;
-      padding: 60px 10px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      border-right: 1px solid #1a1a1a;
-      z-index: 100;
-    }
-    .sidebar.hidden { transform: translateX(-100%); }
-    .sidebar button {
-      background: #121212;
+    .glow {
       color: #00bfff;
-      border: none;
-      padding: 12px;
-      font-size: 14px;
-      text-align: left;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
     }
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-      text-shadow: 0 0 8px #00bfff;
+    #toggle-btn {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 999;
+      background: #111;
+      border: 1px solid #00bfff;
+      color: #00bfff;
+      padding: 6px 10px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      text-shadow: 0 0 4px #00bfff;
+    }
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background: #111;
+      border-right: 2px solid #00bfff;
+      padding-top: 50px;
+    }
+    .sidebar button {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #00bfff;
+      padding: 15px;
+      text-align: left;
+      font-size: 16px;
+      cursor: pointer;
+      text-shadow: 0 0 6px #00bfff;
     }
     .sidebar button.active {
-      background-color: #007bff;
-      color: white;
-      text-shadow: 0 0 10px #00bfff;
+      background: #00bfff;
+      color: #000;
     }
-    .main {
-      flex-grow: 1;
-      margin-left: 240px;
-      width: calc(100% - 240px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 20px;
-      text-align: center;
+    #main {
+      margin-left: 220px;
+      padding: 30px;
     }
-    .main.full { margin-left: 0; width: 100%; }
-    #toggle-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background-color: #007bff;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-family: 'Orbitron', sans-serif;
+    #main.full {
+      margin-left: 0;
+    }
+    #sidebar.hidden {
+      display: none;
+    }
+    textarea, input[type="password"] {
+      width: 90%;
+      height: 100px;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #00bfff;
+      padding: 10px;
+      font-family: Orbitron, sans-serif;
+      font-size: 14px;
+    }
+    .generate-btn {
+      padding: 10px 18px;
+      margin-top: 10px;
+      background: #00bfff;
+      color: #000;
+      font-weight: bold;
       border: none;
       cursor: pointer;
-    }
-    textarea, input {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
       border-radius: 6px;
-      border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
     }
-    button.generate-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 8px #00bfff;
+    .trend-list li {
+      padding: 6px 0;
+      text-shadow: 0 0 4px #00bfff;
     }
-    ul.trend-list {
-      list-style: none;
-      padding-left: 0;
-      max-width: 500px;
-      margin: auto;
-    }
-    ul.trend-list li {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: left;
-    }
-    h2 {
+    a {
       color: #00bfff;
-      text-shadow: 0 0 10px #00bfff;
     }
   </style>
 </head>
@@ -123,25 +98,26 @@
 
   <button id="toggle-btn">☰ Menu</button>
 
-  <div class="sidebar" id="sidebar">
+  <div id="sidebar" class="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
+    <button data-module="legal">📜 Legal Review</button>
     <button data-module="trends">📈 Trends AI</button>
     <button data-module="sheets">📊 Sheets Log</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
-  <div class="main" id="main">
-    <h1>Boss AI Dashboard</h1>
-    <p>Welcome! Select a module from the menu.</p>
+  <div id="main">
+    <div style="max-width:800px;text-align:center">
+      <h2 class="glow">🤖 Manager AI</h2>
+      <p>This AI coordinates tasks and sub-AIs.</p>
+    </div>
   </div>
 
   <script src="script.js"></script>
-
 </body>
 </html>
