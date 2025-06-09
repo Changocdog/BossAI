@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -15,6 +15,9 @@
       display: flex;
       height: 100vh;
       overflow: hidden;
+    }
+    .glow-text {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 15px #00bfff;
     }
     .sidebar {
       width: 240px;
@@ -40,10 +43,6 @@
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-    }
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
     }
     .sidebar button.active {
       background-color: #007bff;
@@ -100,22 +99,6 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
-    ul.trend-list {
-      list-style: none;
-      padding-left: 0;
-      max-width: 500px;
-      margin: auto;
-    }
-    ul.trend-list li {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      text-align: left;
-    }
-    .glow-text {
-      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 15px #00bfff;
-    }
   </style>
 </head>
 <body>
@@ -123,14 +106,8 @@
 
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="output">📺 Final Output</button>
-    <button data-module="history">🗂️ History</button>
-    <button data-module="trends">📈 Trends AI</button>
-    <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
@@ -139,87 +116,128 @@
   </div>
 
   <script>
-    const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggle-btn");
 
-    toggleBtn.addEventListener("click", () => {
+    toggleBtn.onclick = () => {
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
-    });
+    };
 
     const content = {
       manager: `
         <h2 class="glow-text">🤖 Manager AI</h2>
-        <p>Ask me to directly control the app or modify its layout.</p>
-        <textarea id="manager-command" placeholder="e.g., Hide sidebar, Change background to red..."></textarea><br>
+        <p>Give a command below (e.g. “Hide sidebar”, “Change title to Welcome”)</p>
+        <textarea id="manager-command" placeholder="Your command..."></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Execute</button>
-        <div id="manager-response" style="margin-top:10px;"></div>
+        <div id="manager-response"></div>
       `,
-      legal: `<h2 class="glow-text">📜 Legal Review</h2><p>Checking for copyright and compliance risks...</p>`,
-      script: `<h2 class="glow-text">✍️ Script Writer</h2><textarea placeholder="Video idea..."></textarea><br><button class="generate-btn">Generate</button>`,
-      voiceover: `<h2 class="glow-text">🎤 Voiceover AI</h2><textarea placeholder="Paste script..."></textarea><br><button class="generate-btn">Speak</button>`,
-      upload: `<h2 class="glow-text">📤 Upload Strategy</h2><textarea placeholder="Upload plan..."></textarea><br><button class="generate-btn">Plan</button>`,
-      output: `<h2 class="glow-text">📺 Final Output</h2><p>View final video or result here.</p>`,
-      history: `<h2 class="glow-text">🗂️ History</h2><ul><li>Script: Passive Income</li><li>Voiceover: Motivation Tips</li></ul>`,
-      trends: `<h2 class="glow-text">📈 Trends AI</h2><ul class="trend-list"><li>#BossAI</li><li>#2025Tech</li><li>#ViralShorts</li></ul>`,
-      settings: `<h2 class="glow-text">⚙️ Settings</h2><textarea placeholder="Settings..."></textarea><br><button class="generate-btn">Save</button>`
+      script: `
+        <h2 class="glow-text">✍️ Script Writer</h2>
+        <input id="script-key" placeholder="OpenAI API Key" /><br>
+        <textarea id="script-input" placeholder="Video idea..."></textarea><br>
+        <button class="generate-btn" onclick="generateScript()">Generate</button>
+        <div id="script-output"></div>
+      `,
+      voiceover: `
+        <h2 class="glow-text">🎤 Voiceover AI</h2>
+        <input id="voice-key" placeholder="ElevenLabs API Key" /><br>
+        <textarea id="voice-input" placeholder="Paste script..."></textarea><br>
+        <button class="generate-btn" onclick="generateVoice()">Speak</button>
+        <div id="voice-output"></div>
+      `
     };
 
     document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
+      button.onclick = () => {
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         const module = button.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
-      });
+      };
     });
 
     function runManagerCommand() {
-      const input = document.getElementById("manager-command").value.trim();
-      const responseBox = document.getElementById("manager-response");
-      if (!input) {
-        responseBox.innerHTML = "❌ Please enter a command.";
-        return;
+      const input = document.getElementById("manager-command").value.trim().toLowerCase();
+      const out = document.getElementById("manager-response");
+
+      if (input.includes("hide sidebar")) {
+        sidebar.classList.add("hidden");
+        main.classList.add("full");
+        out.innerText = "✅ Sidebar hidden.";
+      } else if (input.includes("show sidebar")) {
+        sidebar.classList.remove("hidden");
+        main.classList.remove("full");
+        out.innerText = "✅ Sidebar shown.";
+      } else if (input.includes("change title to")) {
+        const newTitle = input.split("change title to")[1]?.trim();
+        if (newTitle) {
+          document.querySelector("h1").innerText = newTitle;
+          out.innerText = `✅ Title changed to "${newTitle}".`;
+        } else {
+          out.innerText = "⚠️ No title specified.";
+        }
+      } else {
+        out.innerText = "⚠️ Unknown command.";
       }
+    }
+
+    async function generateScript() {
+      const key = document.getElementById("script-key").value.trim();
+      const prompt = document.getElementById("script-input").value.trim();
+      const out = document.getElementById("script-output");
+
+      if (!key || !prompt) return out.innerText = "❌ API key and prompt required.";
+      out.innerText = "Generating...";
 
       try {
-        const result = parseAndExecuteCommand(input.toLowerCase());
-        responseBox.innerHTML = `✅ ${result}`;
-      } catch (err) {
-        responseBox.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+        const res = await fetch("https://api.openai.com/v1/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: "text-davinci-003",
+            prompt: `Write a viral YouTube short script about: ${prompt}`,
+            max_tokens: 150
+          })
+        });
+        const data = await res.json();
+        out.innerText = data.choices?.[0]?.text || "No output.";
+      } catch (e) {
+        out.innerText = "❌ Error generating script.";
       }
     }
 
-    function parseAndExecuteCommand(command) {
-      if (command.includes("hide sidebar")) {
-        document.getElementById("sidebar").classList.add("hidden");
-        document.getElementById("main").classList.add("full");
-        return "Sidebar hidden.";
+    async function generateVoice() {
+      const key = document.getElementById("voice-key").value.trim();
+      const text = document.getElementById("voice-input").value.trim();
+      const out = document.getElementById("voice-output");
+
+      if (!key || !text) return out.innerText = "❌ API key and script required.";
+      out.innerText = "Generating...";
+
+      try {
+        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xi-api-key": key
+          },
+          body: JSON.stringify({
+            text: text,
+            voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+          })
+        });
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        out.innerHTML = `<audio controls src="${url}"></audio>`;
+      } catch (e) {
+        out.innerText = "❌ Voice generation failed.";
       }
-      if (command.includes("show sidebar")) {
-        document.getElementById("sidebar").classList.remove("hidden");
-        document.getElementById("main").classList.remove("full");
-        return "Sidebar shown.";
-      }
-      if (command.includes("background red")) {
-        document.body.style.background = "#330000";
-        return "Background changed to red.";
-      }
-      if (command.includes("background blue")) {
-        document.body.style.background = "#000033";
-        return "Background changed to blue.";
-      }
-      if (command.includes("change title to")) {
-        const newTitle = command.split("change title to")[1].trim();
-        const titleEl = document.querySelector("h1");
-        if (titleEl && newTitle.length > 0) {
-          titleEl.innerText = newTitle;
-          return `Title updated to "${newTitle}"`;
-        }
-        throw new Error("Missing title text.");
-      }
-      throw new Error("Unrecognized command.");
     }
-  </script>  
-  
+  </script>
+</body>
+</html>
