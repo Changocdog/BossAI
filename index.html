@@ -16,7 +16,6 @@
       height: 100vh;
       overflow: hidden;
     }
-    .glow { text-shadow: 0 0 6px #00bfff; }
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -101,95 +100,119 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
+    .chat-box {
+      width: 100%;
+      max-width: 600px;
+      height: 250px;
+      overflow-y: auto;
+      background-color: #111;
+      border: 1px solid #00bfff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
+    .chat-box p {
+      margin: 0 0 10px;
+    }
   </style>
 </head>
 <body>
 
-  <button id="toggle-btn">☰ Menu</button>
+<button id="toggle-btn">☰ Menu</button>
 
-  <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="script">✍️ Script Writer</button>
-    <button data-module="voiceover">🎤 Voiceover</button>
-  </div>
+<div class="sidebar" id="sidebar">
+  <button data-module="manager" class="active">🤖 Manager AI</button>
+  <button data-module="legal">📜 Legal Review</button>
+  <button data-module="script">✍️ Script Writer</button>
+  <button data-module="voiceover">🎤 Voiceover</button>
+  <button data-module="upload">📤 Upload Strategy</button>
+  <button data-module="output">📺 Final Output</button>
+  <button data-module="history">🗂️ History</button>
+  <button data-module="trends">📈 Trends AI</button>
+  <button data-module="settings">⚙️ Settings</button>
+</div>
 
-  <div class="main" id="main">
-    <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome! Select a module from the menu.</p>
-  </div>
+<div class="main" id="main">
+  <h1>Boss AI Dashboard</h1>
+  <p>Welcome! Select a module from the menu.</p>
+</div>
 
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
+<script>
+const toggleBtn = document.getElementById("toggle-btn");
+const sidebar = document.getElementById("sidebar");
+const main = document.getElementById("main");
 
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("hidden");
+  main.classList.toggle("full");
+});
 
-    const content = {
-      manager: `
-        <h2 class="glow">🤖 Manager AI</h2>
-        <p class="glow">Give me a command to control the interface:</p>
-        <textarea id="manager-command" placeholder="e.g., Change background to red"></textarea><br>
-        <button class="generate-btn" onclick="runManagerCommand()">Send Command</button>
-        <p id="manager-response" style="margin-top:10px;"></p>
-      `,
-      script: `
-        <h2 class="glow">✍️ Script Writer AI</h2>
-        <textarea id="script-input" placeholder="Your video idea..."></textarea><br>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output" class="glow"></p>
-      `,
-      voiceover: `
-        <h2 class="glow">🎤 Voiceover AI</h2>
-        <textarea id="voice-input" placeholder="Paste your script here..."></textarea><br>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-response" class="glow"></p>
-      `
-    };
+const content = {
+  manager: `
+    <h2 style="color:#00bfff;">🤖 Manager AI</h2>
+    <div class="chat-box" id="chat-log"></div>
+    <textarea id="manager-command" placeholder="Ask Manager AI..."></textarea><br>
+    <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+  `,
+  legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
+  script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate creative short-form scripts here.</p>`,
+  voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover</h2><p>Convert scripts to speech.</p>`,
+  upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize posting schedule and visibility.</p>`,
+  output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>View your completed video results here.</p>`,
+  history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past outputs and logs will appear here.</p>`,
+  trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Trending topics powered by AI.</p>`,
+  settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize your dashboard preferences.</p>`
+};
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
-      });
-    });
+document.querySelectorAll(".sidebar button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+    const module = button.getAttribute("data-module");
+    main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
+  });
+});
 
-    function runManagerCommand() {
-      const command = document.getElementById("manager-command").value.trim().toLowerCase();
-      const responseBox = document.getElementById("manager-response");
-      if (!command) {
-        responseBox.innerHTML = "❌ Please enter a command.";
-        return;
-      }
+function appendToChat(message, sender = "🧠 Manager AI") {
+  const chatLog = document.getElementById("chat-log");
+  const entry = document.createElement("p");
+  entry.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatLog.appendChild(entry);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
 
-      // Simulated UI manipulation
-      if (command.includes("background") && command.includes("red")) {
-        document.body.style.background = "darkred";
-        responseBox.innerHTML = "✅ Background changed to dark red.";
-      } else if (command.includes("title") && command.includes("change")) {
-        document.querySelector("h1").innerText = "Updated Boss AI Panel";
-        responseBox.innerHTML = "✅ Title changed.";
-      } else {
-        responseBox.innerHTML = "🤖 I understood your request, but it's not in my current command list.";
-      }
+function runManagerCommand() {
+  const input = document.getElementById("manager-command").value.trim();
+  if (!input) return;
+  appendToChat(input, "🧑 You");
+
+  // Simulate Manager AI understanding and responding
+  let response = "";
+
+  if (input.toLowerCase().includes("switch to")) {
+    const match = input.toLowerCase().match(/switch to (\w+)/);
+    if (match && content[match[1]]) {
+      document.querySelector(`[data-module="${match[1]}"]`).click();
+      response = `Switching to ${match[1]} module.`;
+    } else {
+      response = "❌ Module not recognized.";
     }
-
-    function generateScript() {
-      const idea = document.getElementById("script-input").value;
-      const out = document.getElementById("script-output");
-      out.innerText = `🧠 Writing script for: "${idea}"... (simulated)`;
+  } else if (input.toLowerCase().includes("change background to")) {
+    const match = input.toLowerCase().match(/change background to (\w+)/);
+    if (match) {
+      document.body.style.background = match[1];
+      response = `Background changed to ${match[1]}.`;
+    } else {
+      response = "❌ Invalid color.";
     }
+  } else {
+    response = "Command received, but no matching action was found.";
+  }
 
-    function generateVoice() {
-      const text = document.getElementById("voice-input").value;
-      const response = document.getElementById("voice-response");
-      response.innerText = `🎤 Generating voice for: "${text}"... (simulated)`;
-    }
-  </script>
+  setTimeout(() => appendToChat(response), 600);
+}
+</script>
+
 </body>
 </html>
