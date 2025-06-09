@@ -1,147 +1,129 @@
-const modules = {
-  manager: `<h2>Manager AI</h2>
-    <textarea id="managerInput" placeholder="Enter task or goal"></textarea>
-    <button class="generate-btn" onclick="handleManager()">Run Manager AI</button>
-    <div id="managerResult"></div>`,
+document.addEventListener('DOMContentLoaded', function () {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main');
+  const toggleBtn = document.getElementById('toggle-btn');
+  const moduleButtons = document.querySelectorAll('.sidebar button');
 
-  legal: `<h2>Legal Review AI</h2>
-    <textarea id="legalInput" placeholder="Enter content to review legally"></textarea>
-    <button class="generate-btn" onclick="runLegalAI()">Check Legal Status</button>
-    <div id="legalResult"></div>`,
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+    main.classList.toggle('full');
+  });
 
-  script: `<h2>Script Writer AI</h2>
-    <textarea id="scriptInput" placeholder="Enter your script topic or idea"></textarea>
-    <button class="generate-btn" onclick="runScriptAI()">Generate Script</button>
-    <div id="scriptResult"></div>`,
+  moduleButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      moduleButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      loadModule(button.dataset.module);
+    });
+  });
 
-  voiceover: `<h2>Voiceover AI</h2>
-    <textarea id="voiceoverInput" placeholder="Enter script for voiceover"></textarea>
-    <input id="elevenKey" placeholder="Enter ElevenLabs API Key (saved locally)">
-    <button class="generate-btn" onclick="runVoiceoverAI()">Generate Voiceover</button>
-    <div id="voiceoverResult"></div>`,
+  function loadModule(module) {
+    if (module === 'manager') {
+      main.innerHTML = `
+        <h2>🤖 Manager AI</h2>
+        <div id="chat-box" style="max-width:600px;text-align:left;background:#111;padding:10px;border-radius:8px;height:300px;overflow:auto;"></div>
+        <textarea id="manager-input" placeholder="Ask Manager AI..."></textarea>
+        <button onclick="handleManagerCommand()">Send</button>
+      `;
+    } else if (module === 'script') {
+      const savedKey = localStorage.getItem('openai_key') || '';
+      main.innerHTML = `
+        <h2>✍️ Script Writer AI</h2>
+        <input id="script-api-key" placeholder="OpenAI API Key" value="${savedKey}">
+        <textarea id="script-prompt" placeholder="Enter script topic..."></textarea>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <pre id="script-output"></pre>
+      `;
+    } else if (module === 'voiceover') {
+      const savedKey = localStorage.getItem('voiceover_key') || '';
+      main.innerHTML = `
+        <h2>🎤 Voiceover AI</h2>
+        <input id="voice-api-key" placeholder="ElevenLabs API Key" value="${savedKey}">
+        <textarea id="voice-text" placeholder="Enter text to convert to speech..."></textarea>
+        <button class="generate-btn" onclick="generateVoiceover()">Generate Voice</button>
+        <audio id="voice-player" controls style="margin-top:10px;"></audio>
+      `;
+    } else {
+      main.innerHTML = `<h2>${module.replace(/^\w/, c => c.toUpperCase())} Module</h2><p>Functionality coming soon!</p>`;
+    }
+  }
 
-  upload: `<h2>Upload Strategy AI</h2>
-    <textarea id="uploadInput" placeholder="Enter content to upload"></textarea>
-    <button class="generate-btn" onclick="runUploadAI()">Generate Upload Plan</button>
-    <div id="uploadResult"></div>`,
+  window.handleManagerCommand = function () {
+    const chatBox = document.getElementById('chat-box');
+    const input = document.getElementById('manager-input').value;
+    const response = interpretManagerCommand(input);
+    chatBox.innerHTML += `<p><strong>You:</strong> ${input}</p><p><strong>Boss AI:</strong> ${response}</p>`;
+    document.getElementById('manager-input').value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
 
-  output: `<h2>Final Output</h2>
-    <p>This area will show the final compiled video or content.</p>`,
+  function interpretManagerCommand(text) {
+    const command = text.toLowerCase();
+    if (command.includes('dark') && command.includes('background')) {
+      document.body.style.backgroundColor = '#000';
+      return 'Background set to dark mode.';
+    } else if (command.includes('script')) {
+      document.querySelector('button[data-module="script"]').click();
+      return 'Opening Script Writer module...';
+    } else if (command.includes('voice')) {
+      document.querySelector('button[data-module="voiceover"]').click();
+      return 'Opening Voiceover module...';
+    }
+    return 'Sorry, I didn’t understand that command yet.';
+  }
 
-  history: `<h2>Video History</h2>
-    <p>This will track and display all previous outputs.</p>`,
+  window.generateScript = async function () {
+    const key = document.getElementById('script-api-key').value;
+    const prompt = document.getElementById('script-prompt').value;
+    localStorage.setItem('openai_key', key);
 
-  trends: `<h2>Trends AI</h2>
-    <ul class="trend-list">
-      <li>Top trend 1</li>
-      <li>Top trend 2</li>
-      <li>Top trend 3</li>
-    </ul>`,
+    const output = document.getElementById('script-output');
+    output.textContent = 'Generating...';
 
-  sheets: `<h2>Sheets Log</h2>
-    <p>This feature will be available soon. Stay tuned.</p>`,
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: `Create a short-form video script on: ${prompt}` }],
+          max_tokens: 300
+        })
+      });
+      const data = await res.json();
+      output.textContent = data.choices[0].message.content;
+    } catch (err) {
+      output.textContent = 'Error generating script.';
+    }
+  };
 
-  settings: `<h2>Settings</h2>
-    <p>Customize your Boss AI experience here.</p>`
-};
+  window.generateVoiceover = async function () {
+    const key = document.getElementById('voice-api-key').value;
+    const text = document.getElementById('voice-text').value;
+    const player = document.getElementById('voice-player');
+    localStorage.setItem('voiceover_key', key);
 
-function switchModule(module) {
-  document.getElementById("main").innerHTML = modules[module];
-  document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-  document.querySelector(`.sidebar button[data-module="${module}"]`).classList.add("active");
-}
+    try {
+      const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': key
+        },
+        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+      });
 
-document.querySelectorAll(".sidebar button").forEach(button => {
-  button.addEventListener("click", () => switchModule(button.dataset.module));
+      const blob = await res.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      player.src = audioUrl;
+    } catch (err) {
+      alert('Error generating voiceover.');
+    }
+  };
+
+  // Load default module
+  loadModule('manager');
 });
-
-document.getElementById("toggle-btn").addEventListener("click", () => {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("hidden");
-  document.getElementById("main").classList.toggle("full");
-});
-
-// AI Functional Modules
-
-async function runScriptAI() {
-  const prompt = document.getElementById("scriptInput").value;
-  const resultBox = document.getElementById("scriptResult");
-  resultBox.innerText = "Generating...";
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("openaiKey") || ""}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Write a short-form video script about: ${prompt}` }]
-      })
-    });
-    const data = await response.json();
-    const output = data.choices?.[0]?.message?.content || "Error generating script.";
-    resultBox.innerText = output;
-  } catch (e) {
-    resultBox.innerText = "Failed to connect to GPT.";
-  }
-}
-
-async function runVoiceoverAI() {
-  const text = document.getElementById("voiceoverInput").value;
-  const key = document.getElementById("elevenKey").value;
-  localStorage.setItem("elevenKey", key);
-  const result = document.getElementById("voiceoverResult");
-  result.innerText = "Generating voiceover...";
-  try {
-    const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/audio", {
-      method: "POST",
-      headers: {
-        "xi-api-key": key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        text: text,
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-      })
-    });
-    const blob = await response.blob();
-    const audioURL = URL.createObjectURL(blob);
-    result.innerHTML = `<audio controls src="${audioURL}"></audio>`;
-  } catch (e) {
-    result.innerText = "Failed to connect to ElevenLabs.";
-  }
-}
-
-async function runUploadAI() {
-  const input = document.getElementById("uploadInput").value;
-  const result = document.getElementById("uploadResult");
-  result.innerText = "Analyzing...";
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("openaiKey") || ""}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: `Plan a multi-platform upload strategy for: ${input}` }]
-      })
-    });
-    const data = await response.json();
-    result.innerText = data.choices?.[0]?.message?.content || "Upload strategy failed.";
-  } catch (e) {
-    result.innerText = "Upload AI failed to respond.";
-  }
-}
-
-function handleManager() {
-  const input = document.getElementById("managerInput").value;
-  document.getElementById("managerResult").innerText = `Task received: ${input}`;
-}
-
-function runLegalAI() {
-  const input = document.getElementById("legalInput").value;
-  document.getElementById("legalResult").innerText = `✅ Legal scan completed. No violations found for: "${input}".`;
-}
