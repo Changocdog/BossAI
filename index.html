@@ -100,119 +100,185 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
-    .chat-box {
-      width: 100%;
-      max-width: 600px;
-      height: 250px;
-      overflow-y: auto;
-      background-color: #111;
-      border: 1px solid #00bfff;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      text-align: left;
-    }
-    .chat-box p {
-      margin: 0 0 10px;
-    }
   </style>
 </head>
 <body>
+  <button id="toggle-btn">☰ Menu</button>
+  <div class="sidebar" id="sidebar">
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="legal">📜 Legal Review</button>
+    <button data-module="script">✍️ Script Writer</button>
+    <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="upload">📤 Upload Strategy</button>
+    <button data-module="output">📺 Final Output</button>
+    <button data-module="history">🗂️ History</button>
+    <button data-module="trends">📈 Trends AI</button>
+    <button data-module="settings">⚙️ Settings</button>
+  </div>
 
-<button id="toggle-btn">☰ Menu</button>
+  <div class="main" id="main">
+    <h1>Boss AI Dashboard</h1>
+    <p>Welcome! Select a module from the menu.</p>
+  </div>
 
-<div class="sidebar" id="sidebar">
-  <button data-module="manager" class="active">🤖 Manager AI</button>
-  <button data-module="legal">📜 Legal Review</button>
-  <button data-module="script">✍️ Script Writer</button>
-  <button data-module="voiceover">🎤 Voiceover</button>
-  <button data-module="upload">📤 Upload Strategy</button>
-  <button data-module="output">📺 Final Output</button>
-  <button data-module="history">🗂️ History</button>
-  <button data-module="trends">📈 Trends AI</button>
-  <button data-module="settings">⚙️ Settings</button>
-</div>
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggle-btn");
 
-<div class="main" id="main">
-  <h1>Boss AI Dashboard</h1>
-  <p>Welcome! Select a module from the menu.</p>
-</div>
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
 
-<script>
-const toggleBtn = document.getElementById("toggle-btn");
-const sidebar = document.getElementById("sidebar");
-const main = document.getElementById("main");
+    const content = {
+      manager: `
+        <h2>🤖 Manager AI</h2>
+        <p>Ask me anything or tell me to make app changes:</p>
+        <textarea id="manager-command" placeholder="e.g., Change background color to black..."></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send Command</button>
+        <div id="manager-response" style="margin-top:10px;"></div>
+      `,
+      legal: `<h2>📜 Legal Review</h2><p>Content compliance check.</p>`,
+      script: `
+        <h2>✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder="Enter video idea"></textarea>
+        <input id="script-key" type="password" placeholder="OpenRouter API Key"/>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <div id="script-output"></div>
+      `,
+      voiceover: `
+        <h2>🎤 Voiceover</h2>
+        <textarea id="voice-input" placeholder="Enter script here"></textarea>
+        <input id="voice-key" type="password" placeholder="ElevenLabs API Key"/>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
+        <div id="voice-status"></div>
+      `,
+      upload: `<h2>📤 Upload Strategy</h2><p>Upload logic goes here.</p>`,
+      output: `<h2>📺 Final Output</h2><p>Preview your content.</p>`,
+      history: `<h2>🗂️ History</h2><p>View previous outputs.</p>`,
+      trends: `<h2>📈 Trends AI</h2><p>Discover what’s trending.</p>`,
+      settings: `<h2>⚙️ Settings</h2><p>Manage preferences here.</p>`
+    };
 
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("hidden");
-  main.classList.toggle("full");
-});
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        const module = button.getAttribute("data-module");
+        main.innerHTML = `<div style="max-width:600px;">${content[module]}</div>`;
+      });
+    });
 
-const content = {
-  manager: `
-    <h2 style="color:#00bfff;">🤖 Manager AI</h2>
-    <div class="chat-box" id="chat-log"></div>
-    <textarea id="manager-command" placeholder="Ask Manager AI..."></textarea><br>
-    <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-  `,
-  legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
-  script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><p>Generate creative short-form scripts here.</p>`,
-  voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover</h2><p>Convert scripts to speech.</p>`,
-  upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><p>Optimize posting schedule and visibility.</p>`,
-  output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>View your completed video results here.</p>`,
-  history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past outputs and logs will appear here.</p>`,
-  trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Trending topics powered by AI.</p>`,
-  settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Customize your dashboard preferences.</p>`
-};
+    async function runManagerCommand() {
+      const command = document.getElementById("manager-command").value.trim();
+      const responseBox = document.getElementById("manager-response");
+      if (!command) {
+        responseBox.innerHTML = "❌ Please enter a command.";
+        return;
+      }
+      // Interpret direct UI commands
+      const lower = command.toLowerCase();
+      if (lower.includes("background") && lower.includes("color")) {
+        const color = lower.split("color to")[1]?.trim();
+        if (color) {
+          document.body.style.background = color;
+          responseBox.innerHTML = `✅ Changed background to ${color}`;
+          return;
+        }
+      }
+      if (lower.includes("hide sidebar")) {
+        sidebar.classList.add("hidden");
+        responseBox.innerHTML = `✅ Sidebar hidden.`;
+        return;
+      }
+      if (lower.includes("show sidebar")) {
+        sidebar.classList.remove("hidden");
+        responseBox.innerHTML = `✅ Sidebar shown.`;
+        return;
+      }
 
-document.querySelectorAll(".sidebar button").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-    const module = button.getAttribute("data-module");
-    main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
-  });
-});
-
-function appendToChat(message, sender = "🧠 Manager AI") {
-  const chatLog = document.getElementById("chat-log");
-  const entry = document.createElement("p");
-  entry.innerHTML = `<strong>${sender}:</strong> ${message}`;
-  chatLog.appendChild(entry);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
-
-function runManagerCommand() {
-  const input = document.getElementById("manager-command").value.trim();
-  if (!input) return;
-  appendToChat(input, "🧑 You");
-
-  // Simulate Manager AI understanding and responding
-  let response = "";
-
-  if (input.toLowerCase().includes("switch to")) {
-    const match = input.toLowerCase().match(/switch to (\w+)/);
-    if (match && content[match[1]]) {
-      document.querySelector(`[data-module="${match[1]}"]`).click();
-      response = `Switching to ${match[1]} module.`;
-    } else {
-      response = "❌ Module not recognized.";
+      // Otherwise send to OpenRouter
+      responseBox.innerHTML = "🤔 Thinking...";
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + localStorage.getItem("openrouter_key"),
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are the Manager AI. Interpret commands and help run the Boss AI app." },
+              { role: "user", content: command }
+            ]
+          })
+        });
+        const data = await res.json();
+        responseBox.innerHTML = data.choices?.[0]?.message?.content || "No response.";
+      } catch (err) {
+        responseBox.innerHTML = `❌ ${err.message}`;
+      }
     }
-  } else if (input.toLowerCase().includes("change background to")) {
-    const match = input.toLowerCase().match(/change background to (\w+)/);
-    if (match) {
-      document.body.style.background = match[1];
-      response = `Background changed to ${match[1]}.`;
-    } else {
-      response = "❌ Invalid color.";
+
+    async function generateScript() {
+      const key = document.getElementById("script-key").value.trim();
+      const idea = document.getElementById("script-input").value.trim();
+      const output = document.getElementById("script-output");
+      if (!key || !idea) {
+        output.innerHTML = "❌ Missing input or key.";
+        return;
+      }
+      output.innerHTML = "🧠 Generating...";
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You're a short-form video script writer." },
+              { role: "user", content: `Create a 30-second script on: ${idea}` }
+            ]
+          })
+        });
+        const data = await res.json();
+        output.innerHTML = data.choices?.[0]?.message?.content || "❌ No output.";
+      } catch (err) {
+        output.innerHTML = `❌ ${err.message}`;
+      }
     }
-  } else {
-    response = "Command received, but no matching action was found.";
-  }
 
-  setTimeout(() => appendToChat(response), 600);
-}
-</script>
-
+    async function generateVoice() {
+      const key = document.getElementById("voice-key").value.trim();
+      const text = document.getElementById("voice-input").value.trim();
+      const status = document.getElementById("voice-status");
+      if (!key || !text) {
+        status.innerHTML = "❌ Missing input or key.";
+        return;
+      }
+      status.innerHTML = "🎤 Processing...";
+      try {
+        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+          method: "POST",
+          headers: {
+            "xi-api-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text: text })
+        });
+        const blob = await res.blob();
+        const audio = new Audio(URL.createObjectURL(blob));
+        audio.play();
+        status.innerHTML = "✅ Voice is playing.";
+      } catch (err) {
+        status.innerHTML = `❌ ${err.message}`;
+      }
+    }
+  </script>
 </body>
 </html>
