@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -41,10 +41,7 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-    }
+    .sidebar button:hover { background: #003366; color: #4fc3f7; }
     .sidebar button.active {
       background-color: #007bff;
       color: white;
@@ -98,7 +95,12 @@
       font-family: 'Orbitron', sans-serif;
     }
     .chat-log { margin-top: 20px; max-width: 600px; }
-    .chat-log p { background: #111; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+    .chat-log p {
+      background: #111;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
     .chat-input {
       display: flex;
       gap: 10px;
@@ -138,98 +140,3 @@
     </div>
     <div id="module-content" style="margin-top:40px;"></div>
   </div>
-
-  <script>
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.getElementById("toggle-btn");
-    const main = document.getElementById("main");
-    const chatLog = document.getElementById("chat-log");
-    const moduleContent = document.getElementById("module-content");
-
-    toggleBtn.onclick = () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    };
-
-    const modules = {
-      manager: `<h2 style="color:#00bfff;">Manager AI is online.</h2><p>Ask me to control any module, fix layout issues, or give system updates.</p>`,
-      script: `<h2 style="color:#00bfff;">Script Writer AI</h2><textarea placeholder="Your video idea..."></textarea><button class="generate-btn">Generate</button>`,
-      voiceover: `<h2 style="color:#00bfff;">Voiceover AI</h2><textarea placeholder="Paste your script..."></textarea><button class="generate-btn">Generate Voice</button>`,
-      upload: `<h2 style="color:#00bfff;">Upload Strategy</h2><textarea placeholder="Upload instructions..."></textarea><button class="generate-btn">Optimize</button>`,
-      output: `<h2 style="color:#00bfff;">Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
-      legal: `<h2 style="color:#00bfff;">Legal Review</h2><p>Scanning for compliance, copyright, and legal safety...</p>`,
-      history: `<h2 style="color:#00bfff;">History Log</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
-      trends: `<h2 style="color:#00bfff;">Trends AI</h2><ul><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">Refresh</button>`,
-      settings: `<h2 style="color:#00bfff;">Settings</h2><textarea placeholder="Your preferences..."></textarea><button class="generate-btn">Save</button>`
-    };
-
-    function handleManagerInput() {
-      const input = document.getElementById("manager-input").value.trim();
-      if (!input) return;
-      chatLog.innerHTML += `<p><strong>You:</strong> ${input}</p>`;
-      respondToCommand(input.toLowerCase());
-      document.getElementById("manager-input").value = '';
-    }
-
-    function respondToCommand(text) {
-      const commands = {
-        "script": "script",
-        "voice": "voiceover",
-        "upload": "upload",
-        "output": "output",
-        "legal": "legal",
-        "history": "history",
-        "trends": "trends",
-        "settings": "settings",
-        "manager": "manager"
-      };
-
-      for (const cmd in commands) {
-        if (text.includes(cmd)) {
-          switchModule(commands[cmd]);
-          speak(`Switched to ${commands[cmd]} module.`);
-          return;
-        }
-      }
-
-      if (text.includes("hide sidebar")) {
-        sidebar.classList.add("hidden");
-        main.classList.add("full");
-        speak("Sidebar is now hidden.");
-      } else if (text.includes("show sidebar")) {
-        sidebar.classList.remove("hidden");
-        main.classList.remove("full");
-        speak("Sidebar is now visible.");
-      } else if (text.includes("dark blue")) {
-        document.body.style.background = "#001f3f";
-        speak("Background changed to dark blue.");
-      } else if (text.includes("what modules") || text.includes("status")) {
-        speak("All modules are loaded. Upload, Legal, and Monetization need logic to go live.");
-      } else {
-        speak("I'm listening, but try something like 'Switch to trends' or 'Hide the sidebar'.");
-      }
-    }
-
-    function speak(text) {
-      chatLog.innerHTML += `<p><strong>Manager AI:</strong> ${text}</p>`;
-    }
-
-    function switchModule(key) {
-      document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-      document.querySelector(`.sidebar button[data-module="${key}"]`)?.classList.add("active");
-      moduleContent.innerHTML = modules[key] || "<p>Module not found.</p>";
-    }
-
-    function updateTrends() {
-      moduleContent.querySelector("ul").innerHTML = `
-        <li>#Crypto2025</li>
-        <li>#ViralContent</li>
-        <li>#OpenRouter</li>
-      `;
-    }
-
-    // Load Manager AI by default
-    switchModule("manager");
-  </script>
-</body>
-</html>
