@@ -33,7 +33,7 @@ const content = {
     <textarea placeholder="Preferences..."></textarea><br>
     <button class="generate-btn">Save</button>
     <br><br>
-    <button class="generate-btn" onclick="logToSheet('Logger Test','Manual test','✅ Logged')">🧪 Run Logging Test</button>
+    <button class="generate-btn" onclick="logToSheet('Logger Test', 'Manual test', '✅ Logged')">🧪 Run Logging Test</button>
   `
 };
 
@@ -125,7 +125,7 @@ async function generateScript() {
     const script = data.choices[0].message.content;
     output.innerHTML = script;
 
-    logToSheet("Script", idea, script);
+    logToSheet("Script Writer", idea, script);
   } catch (err) {
     output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
@@ -171,7 +171,7 @@ async function generateVoice() {
 
 async function logToSheet(module, input, output) {
   try {
-    await fetch("https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec", {
+    await fetch("https://script.google.com/macros/s/REPLACE_WITH_FINAL_DEPLOYED_URL/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ module, input, output })
