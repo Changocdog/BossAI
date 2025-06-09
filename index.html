@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -13,87 +13,67 @@
       display: flex; height: 100vh; overflow: hidden;
     }
     .sidebar {
-      width: 240px; background: #0a0a0a;
+      width: 240px; background: #0d0d0d;
       padding: 60px 10px 20px;
       display: flex; flex-direction: column;
       gap: 10px; height: 100vh;
       position: fixed; left: 0; top: 0;
-      border-right: 1px solid #1f1f1f;
+      border-right: 1px solid #1a1a1a;
       z-index: 100;
     }
-    .sidebar.hidden { transform: translateX(-100%); transition: 0.3s; }
+    .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: transparent;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      padding: 12px;
-      font-size: 14px;
-      text-align: left;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      text-shadow: 0 0 5px #00bfff;
+      background: #121212; color: #00bfff;
+      border: none; padding: 12px;
+      font-size: 14px; text-align: left;
+      border-radius: 6px; cursor: pointer;
+      transition: all 0.3s ease;
     }
-    .sidebar button:hover {
-      background: #003366;
-      color: white;
-    }
+    .sidebar button:hover { background: #003366; color: #4fc3f7; }
     .sidebar button.active {
-      background: #00bfff;
-      color: black;
+      background-color: #007bff;
+      color: white;
+      box-shadow: 0 0 10px #00bfff;
     }
     .main {
-      flex-grow: 1;
-      margin-left: 240px;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-y: auto;
+      flex-grow: 1; margin-left: 240px;
+      width: calc(100% - 240px);
+      display: flex; justify-content: center;
+      align-items: center; flex-direction: column;
+      padding: 20px; text-align: center;
     }
-    .main.full { margin-left: 0; }
+    .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
-      position: fixed;
-      top: 15px; left: 15px;
+      position: fixed; top: 15px; left: 15px;
       z-index: 1000;
-      background-color: #00bfff;
-      color: black;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
+      background-color: #007bff;
+      color: white; padding: 10px 16px;
+      border-radius: 6px; font-size: 16px;
       font-family: 'Orbitron', sans-serif;
-      border: none;
-      cursor: pointer;
-    }
-    h1, h2, p {
-      text-shadow: 0 0 8px #00bfff;
+      border: none; cursor: pointer;
+      box-shadow: 0 0 8px #00bfff;
     }
     textarea, input {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
+      width: 100%; max-width: 500px;
+      padding: 12px; margin-top: 10px;
       font-size: 15px;
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
-      color: white;
+      color: #00bfff;
     }
     button.generate-btn {
-      background-color: #00bfff;
-      color: black;
-      border: none;
-      margin-top: 10px;
-      padding: 10px 16px;
+      background-color: #007bff;
+      color: white; border: none;
+      margin-top: 10px; padding: 10px 16px;
       border-radius: 6px;
       font-size: 15px;
       font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
+      box-shadow: 0 0 6px #00bfff;
     }
     ul.trend-list {
       list-style: none;
-      padding-left: 0;
-      max-width: 500px;
+      padding-left: 0; max-width: 500px;
       margin: auto;
     }
     ul.trend-list li {
@@ -102,6 +82,8 @@
       padding: 10px;
       border-radius: 6px;
       text-align: left;
+      color: #00bfff;
+      box-shadow: 0 0 5px #00bfff;
     }
   </style>
 </head>
@@ -110,23 +92,60 @@
   <button id="toggle-btn">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager</button>
-    <button data-module="script">✍️ Script</button>
-    <button data-module="voice">🎤 Voice</button>
-    <button data-module="upload">📤 Upload</button>
-    <button data-module="legal">📜 Legal</button>
-    <button data-module="trends">📈 Trends</button>
-    <button data-module="output">📺 Output</button>
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="legal">📜 Legal Review</button>
+    <button data-module="script">✍️ Script Writer</button>
+    <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="upload">📤 Upload Strategy</button>
+    <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
-    <button data-module="sheetlog">📊 Sheets</button>
+    <button data-module="trends">📈 Trends AI</button>
+    <button data-module="sheets">📊 Google Sheets</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
   <div class="main" id="main">
     <h1>Boss AI Dashboard</h1>
-    <p>Welcome. Choose a module from the menu.</p>
+    <p>Welcome! Select a module from the menu.</p>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("toggle-btn");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
+
+    const content = {
+      manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
+      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
+      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder="Describe your video idea..."></textarea><br><button class="generate-btn">Generate</button>`,
+      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover Generator</h2><textarea placeholder="Paste script here..."></textarea><br><button class="generate-btn">Play Voiceover</button>`,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Describe your upload goal..."></textarea><br><button class="generate-btn">Generate Strategy</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview of your content will appear here.</p>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History Log</h2><p>Previous scripts and tasks.</p>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#AIshorts</li><li>#PassiveIncome</li><li>#Crypto2025</li></ul><button class="generate-btn">🔄 Refresh</button>`,
+      sheets: `<h2 style="color:#00bfff;">📊 Google Sheets Log</h2><p>Click below to view your live Boss AI Logs:</p><a href="https://docs.google.com/spreadsheets/d/1H16upg0EVwqMcwAnZ8WueQY1k6BY_FmsoAoeNVBGEBY/edit?usp=drivesdk" target="_blank" class="generate-btn">Open Sheets</a>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust preferences here.</p><textarea placeholder="Custom options..."></textarea>`
+    };
+
+    function updateMainPanel(module) {
+      const panel = content[module] || "<p>Coming soon...</p>";
+      main.innerHTML = `<div style="max-width:800px;text-align:center">${panel}</div>`;
+    }
+
+    document.querySelectorAll(".sidebar button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        const module = button.getAttribute("data-module");
+        updateMainPanel(module);
+      });
+    });
+  </script>
+
 </body>
 </html>
