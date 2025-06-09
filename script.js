@@ -28,7 +28,13 @@ const content = {
   output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
   history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
   trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
-  settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save</button>`
+  settings: `
+    <h2 style="color:#00bfff;">⚙️ Settings</h2>
+    <textarea placeholder="Preferences..."></textarea><br>
+    <button class="generate-btn">Save</button>
+    <br><br>
+    <button class="generate-btn" onclick="logToSheet('Logger Test','Manual test','✅ Logged')">🧪 Run Logging Test</button>
+  `
 };
 
 function updateTrends() {
@@ -119,7 +125,7 @@ async function generateScript() {
     const script = data.choices[0].message.content;
     output.innerHTML = script;
 
-    logToSheet("Script", idea, script); // Log to Google Sheet
+    logToSheet("Script", idea, script);
   } catch (err) {
     output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
@@ -157,21 +163,21 @@ async function generateVoice() {
     audio.play();
     status.innerHTML = "✅ Voiceover playing";
 
-    logToSheet("Voiceover", text, "Voiceover generated.");
+    logToSheet("Voiceover", text, "Voiceover generated");
   } catch (err) {
     status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
 }
 
 async function logToSheet(module, input, output) {
-  const url = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL_HERE/exec";
   try {
-    await fetch(url, {
+    await fetch("https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec", {
       method: "POST",
-      body: JSON.stringify({ module, input, output }),
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ module, input, output })
     });
+    console.log("✅ Logged to Google Sheets");
   } catch (e) {
-    console.error("Sheet log failed:", e);
+    console.error("❌ Logging failed:", e);
   }
 }
