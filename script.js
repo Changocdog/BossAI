@@ -8,11 +8,11 @@ toggleBtn.addEventListener("click", () => {
 });
 
 const content = {
-  manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates all tasks. Ready to execute.</p>`,
-  legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content for compliance and copyright flags...</p>`,
+  manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
+  legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
   script: `
     <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-    <textarea id="script-input" placeholder="Enter your video idea..."></textarea>
+    <textarea id="script-input" placeholder="Enter your video idea..."></textarea><br>
     <div id="script-key-box"></div>
     <button class="generate-btn" onclick="generateScript()">Generate Script</button>
     <p id="script-output" style="margin-top:10px;"></p>
@@ -28,13 +28,7 @@ const content = {
   output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
   history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
   trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
-  settings: `
-    <h2 style="color:#00bfff;">⚙️ Settings</h2>
-    <textarea placeholder="Preferences..."></textarea><br>
-    <button class="generate-btn">Save</button>
-    <br><br>
-    <button class="generate-btn" onclick="logToSheet('Logger Test', 'Manual test', '✅ Logged')">🧪 Run Logging Test</button>
-  `
+  settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><button class="generate-btn" onclick="testLog()">Test Logging</button>`
 };
 
 function updateTrends() {
@@ -96,6 +90,14 @@ function clearScriptKey() {
   location.reload();
 }
 
+function saveVoiceKey() {
+  const val = document.getElementById("voice-key").value.trim();
+  if (val.length > 10) {
+    localStorage.setItem("elevenlabs_key", val);
+    location.reload();
+  }
+}
+
 async function generateScript() {
   const key = localStorage.getItem("openrouter_key");
   const idea = document.getElementById("script-input").value.trim();
@@ -122,20 +124,11 @@ async function generateScript() {
     });
     const data = await res.json();
     if (!res.ok || !data.choices) throw new Error(data.error?.message || "OpenRouter error");
-    const script = data.choices[0].message.content;
-    output.innerHTML = script;
-
-    logToSheet("Script Writer", idea, script);
+    const result = data.choices[0].message.content;
+    output.innerHTML = result;
+    await logToSheet("Script Writer", idea, result);
   } catch (err) {
     output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
-  }
-}
-
-function saveVoiceKey() {
-  const val = document.getElementById("voice-key").value.trim();
-  if (val.length > 10) {
-    localStorage.setItem("elevenlabs_key", val);
-    location.reload();
   }
 }
 
@@ -162,8 +155,7 @@ async function generateVoice() {
     const audio = new Audio(URL.createObjectURL(blob));
     audio.play();
     status.innerHTML = "✅ Voiceover playing";
-
-    logToSheet("Voiceover", text, "Voiceover generated");
+    await logToSheet("Voiceover", text, "Voiceover generated and played");
   } catch (err) {
     status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
@@ -171,13 +163,17 @@ async function generateVoice() {
 
 async function logToSheet(module, input, output) {
   try {
-    await fetch("https://script.google.com/macros/s/REPLACE_WITH_FINAL_DEPLOYED_URL/exec", {
+    const res = await fetch("https://script.google.com/macros/s/YOUR_DEPLOYED_WEBHOOK_URL_HERE/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ module, input, output })
     });
-    console.log("✅ Logged to Google Sheets");
-  } catch (e) {
-    console.error("❌ Logging failed:", e);
+    if (!res.ok) throw new Error("Logging failed");
+  } catch (err) {
+    console.warn("Sheet logging error:", err.message);
   }
+}
+
+function testLog() {
+  logToSheet("Test", "Manual test input", "This is a test entry ✅");
 }
