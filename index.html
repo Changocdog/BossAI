@@ -1,77 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0; font-family: 'Orbitron', sans-serif;
-      background: #000; color: #00bfff;
-      display: flex; height: 100vh; overflow: hidden;
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #000;
+      color: #00bfff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    h1, h2, p, textarea, input, button {
+      color: #00bfff;
+      text-shadow: 0 0 5px #00bfff;
     }
     .sidebar {
-      width: 240px; background: #0d0d0d;
+      width: 240px;
+      background: #0d0d0d;
       padding: 60px 10px 20px;
-      display: flex; flex-direction: column;
-      gap: 10px; height: 100vh;
-      position: fixed; left: 0; top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
       border-right: 1px solid #1a1a1a;
       z-index: 100;
-      transition: transform 0.3s ease;
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: #121212; color: #00bfff;
-      border: none; padding: 12px;
-      font-size: 14px; text-align: left;
-      border-radius: 6px; cursor: pointer;
-      transition: all 0.2s ease;
+      background: #121212;
+      color: #00bfff;
+      border: none;
+      padding: 12px;
+      font-size: 14px;
+      text-align: left;
+      border-radius: 6px;
+      cursor: pointer;
+      text-shadow: 0 0 5px #00bfff;
     }
-    .sidebar button:hover {
-      background: #003366; color: #4fc3f7;
-    }
-    .sidebar button.active {
-      background-color: #007bff; color: white;
-    }
+    .sidebar button:hover { background: #003366; color: #4fc3f7; }
+    .sidebar button.active { background-color: #007bff; color: white; }
     .main {
-      flex-grow: 1; margin-left: 240px;
+      flex-grow: 1;
+      margin-left: 240px;
       width: calc(100% - 240px);
-      display: flex; justify-content: center;
-      align-items: center; flex-direction: column;
-      padding: 20px; text-align: center;
-      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+      text-align: center;
     }
-    .main.full {
-      margin-left: 0; width: 100%;
-    }
+    .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
-      position: fixed; top: 15px; left: 15px;
+      position: fixed;
+      top: 15px;
+      left: 15px;
       z-index: 1000;
       background-color: #007bff;
-      color: white; padding: 10px 16px;
-      border-radius: 6px; font-size: 16px;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
       font-family: 'Orbitron', sans-serif;
-      border: none; cursor: pointer;
+      border: none;
+      cursor: pointer;
     }
     textarea, input {
-      width: 100%; max-width: 500px;
-      padding: 12px; margin-top: 10px;
-      font-size: 15px; border-radius: 6px;
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 15px;
+      border-radius: 6px;
       border: 1px solid #00bfff;
-      background-color: #1a1a1a; color: white;
+      background-color: #1a1a1a;
+      color: white;
     }
     button.generate-btn {
-      background-color: #007bff; color: white;
-      border: none; margin-top: 10px; padding: 10px 16px;
-      border-radius: 6px; font-size: 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 10px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 15px;
       font-family: 'Orbitron', sans-serif;
     }
     ul.trend-list {
       list-style: none;
-      padding-left: 0; max-width: 500px;
+      padding-left: 0;
+      max-width: 500px;
       margin: auto;
     }
     ul.trend-list li {
@@ -84,7 +111,6 @@
   </style>
 </head>
 <body>
-
   <button id="toggle-btn">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
@@ -105,64 +131,78 @@
   </div>
 
   <script>
+    const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
-    const toggleBtn = document.getElementById("toggle-btn");
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
     });
 
+    const ManagerAIInterface = {
+      logs: [],
+      requestModuleControl(module) {
+        this.logAction(`Requested control of module: ${module}`);
+        // Placeholder: Hook for control logic
+      },
+      modifyHTML(targetId, html) {
+        this.logAction(`Modified HTML in ${targetId}`);
+        const el = document.getElementById(targetId);
+        if (el) el.innerHTML = html;
+      },
+      commitChange(desc) {
+        this.logAction(`Committed change: ${desc}`);
+      },
+      logAction(msg) {
+        const timestamp = new Date().toLocaleTimeString();
+        this.logs.push(`[${timestamp}] ${msg}`);
+        const logBox = document.getElementById("manager-log");
+        if (logBox) logBox.innerHTML = this.logs.slice(-10).map(l => `<li>${l}</li>`).join('');
+      }
+    };
+    window.ManagerAIInterface = ManagerAIInterface;
+
     const content = {
       manager: `
-        <h2 style="color:#00bfff;">🤖 Manager AI</h2>
-        <textarea id="manager-input" placeholder="Ask Manager AI anything..."></textarea>
-        <button class="generate-btn" onclick="askManager()">Send</button>
-        <div id="manager-output" style="margin-top:15px;"></div>
+        <h2>🤖 Manager AI</h2>
+        <p>I manage all tasks and AIs in this system.</p>
+        <textarea id="manager-input" placeholder="Type instructions..."></textarea><br>
+        <button class="generate-btn" onclick="handleManagerCommand()">Send</button>
+        <ul id="manager-log" style="margin-top:20px;text-align:left;"></ul>
       `,
-      legal: `
-        <h2 style="color:#00bfff;">📜 Legal Review</h2>
-        <p>Checking content compliance and copyright risks...</p>
-      `,
+      legal: `<h2>📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
       script: `
-        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-        <textarea id="script-input" placeholder="Enter your video idea..."></textarea>
+        <h2>✍️ Script Writer AI</h2>
+        <textarea id="script-input" placeholder="Enter your video idea..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output" style="margin-top:10px;"></p>
       `,
       voiceover: `
-        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <h2>🎤 Voiceover AI</h2>
         <textarea id="voice-text" placeholder="Paste your script..."></textarea>
         <div id="key-entry"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
         <p id="voice-status" style="margin-top:10px;"></p>
       `,
-      upload: `
-        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
-        <textarea placeholder='Upload goals...'></textarea><br>
-        <button class="generate-btn">Optimize</button>
-      `,
-      output: `
-        <h2 style="color:#00bfff;">📺 Final Output</h2>
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>
-      `,
-      history: `
-        <h2 style="color:#00bfff;">🗂️ History</h2>
-        <ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>
-      `,
-      trends: `
-        <h2 style="color:#00bfff;">📈 Trends AI</h2>
-        <ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul>
-        <button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>
-      `,
-      settings: `
-        <h2 style="color:#00bfff;">⚙️ Settings</h2>
-        <textarea placeholder="Preferences..."></textarea><br>
-        <button class="generate-btn">Save</button>
-      `
+      upload: `<h2>📤 Upload Strategy</h2><textarea placeholder='Upload goals...'></textarea><br><button class="generate-btn">Optimize</button>`,
+      output: `<h2>📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2>🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
+      trends: `<h2>📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
+      settings: `<h2>⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save</button>`
     };
+
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralContent</li>
+          <li>#OpenRouter</li>
+        `;
+      }
+    }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
       button.addEventListener("click", () => {
@@ -174,22 +214,38 @@
         if (module === "script") {
           const key = localStorage.getItem("openrouter_key");
           const box = document.getElementById("script-key-box");
-          box.innerHTML = key
-            ? `<p style="color: #0f0;">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
-            : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/>
-               <button class="generate-btn" onclick="saveScriptKey()">Save Key</button>`;
+          if (!key) {
+            box.innerHTML = `
+              <input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/>
+              <button class="generate-btn" onclick="saveScriptKey()">Save Key</button>
+            `;
+          } else {
+            box.innerHTML = `<p style="color: #0f0;">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`;
+          }
         }
 
         if (module === "voiceover") {
           const key = localStorage.getItem("elevenlabs_key");
           const box = document.getElementById("key-entry");
-          box.innerHTML = key
-            ? `<p style="color:#0f0;">✅ Key saved</p>`
-            : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/>
-               <button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+          if (!key) {
+            box.innerHTML = `
+              <input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/>
+              <button class="generate-btn" onclick="saveVoiceKey()">Save</button>
+            `;
+          } else {
+            box.innerHTML = `<p style="color:#0f0;">✅ Key saved</p>`;
+          }
         }
       });
     });
+
+    function handleManagerCommand() {
+      const val = document.getElementById("manager-input").value.trim();
+      if (val) {
+        ManagerAIInterface.logAction(`User said: "${val}"`);
+        if (val.includes("script")) ManagerAIInterface.requestModuleControl("script");
+      }
+    }
 
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
@@ -202,14 +258,6 @@
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
       location.reload();
-    }
-
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
     }
 
     async function generateScript() {
@@ -237,9 +285,18 @@
           })
         });
         const data = await res.json();
-        output.innerHTML = data.choices?.[0]?.message?.content || "⚠️ No output.";
+        if (!res.ok || !data.choices) throw new Error(data.error?.message || "OpenRouter error");
+        output.innerHTML = data.choices[0].message.content;
       } catch (err) {
         output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+      }
+    }
+
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
       }
     }
 
@@ -270,43 +327,6 @@
         status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
       }
     }
-
-    async function askManager() {
-      const input = document.getElementById("manager-input").value.trim();
-      const output = document.getElementById("manager-output");
-      if (!input) return output.innerHTML = "Please enter a command.";
-
-      output.innerHTML = "🤖 Thinking...";
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("openrouter_key")}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You're the Manager AI of Boss AI. Respond to user requests and manage the app intelligently." },
-              { role: "user", content: input }
-            ]
-          })
-        });
-        const data = await res.json();
-        output.innerHTML = data.choices?.[0]?.message?.content || "⚠️ No response.";
-      } catch (err) {
-        output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
-      }
-    }
-
-    function updateTrends() {
-      document.querySelector(".trend-list").innerHTML = `
-        <li>#Crypto2025</li>
-        <li>#ViralContent</li>
-        <li>#OpenRouter</li>
-      `;
-    }
   </script>
-
 </body>
 </html>
