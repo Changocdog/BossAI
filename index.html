@@ -41,8 +41,14 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .sidebar button:hover { background: #003366; color: #4fc3f7; }
-    .sidebar button.active { background-color: #007bff; color: white; }
+    .sidebar button:hover {
+      background: #003366;
+      color: #4fc3f7;
+    }
+    .sidebar button.active {
+      background-color: #007bff;
+      color: white;
+    }
     .main {
       flex-grow: 1;
       margin-left: 240px;
@@ -92,6 +98,7 @@
       border-radius: 6px;
       font-size: 15px;
       font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
     }
     ul.trend-list {
       list-style: none;
@@ -142,9 +149,10 @@
     const content = {
       manager: `
         <h2 style="color:#00bfff;">🤖 Manager AI</h2>
-        <textarea id="manager-input" placeholder="Type your command..."></textarea>
-        <button class="generate-btn" onclick="processManagerCommand()">Submit</button>
-        <p id="manager-response" style="margin-top:10px;"></p>
+        <p>I’m your autonomous assistant. You can ask me to change app behavior, update modules, or suggest improvements below:</p>
+        <textarea id="manager-command" placeholder="e.g., Change font size, update trends, etc."></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send to Manager</button>
+        <div id="manager-response" style="margin-top:10px;"></div>
       `,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
       script: `
@@ -173,38 +181,31 @@
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
+        main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
+
+        if (module === "script") {
+          const key = localStorage.getItem("openrouter_key");
+          const box = document.getElementById("script-key-box");
+          if (!key) {
+            box.innerHTML = `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/>
+                             <button class="generate-btn" onclick="saveScriptKey()">Save Key</button>`;
+          } else {
+            box.innerHTML = `<p style="color: #0f0;">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`;
+          }
+        }
+
+        if (module === "voiceover") {
+          const key = localStorage.getItem("elevenlabs_key");
+          const box = document.getElementById("key-entry");
+          if (!key) {
+            box.innerHTML = `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/>
+                             <button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+          } else {
+            box.innerHTML = `<p style="color:#0f0;">✅ Key saved</p>`;
+          }
+        }
       });
     });
-
-    function processManagerCommand() {
-      const input = document.getElementById("manager-input").value.toLowerCase();
-      const response = document.getElementById("manager-response");
-
-      if (input.includes("background") && input.includes("gray")) {
-        document.body.style.background = "#222";
-        response.innerText = "✅ Background changed to dark gray.";
-      } else if (input.includes("update title")) {
-        document.title = "Boss AI Pro";
-        response.innerText = "✅ Title updated.";
-      } else if (input.includes("hide") && input.includes("trends")) {
-        document.querySelector('[data-module="trends"]').style.display = "none";
-        response.innerText = "✅ Trends AI module hidden.";
-      } else {
-        response.innerText = "⚠️ Command not recognized. Try: 'Change background to gray'";
-      }
-    }
-
-    function updateTrends() {
-      const list = document.querySelector(".trend-list");
-      if (list) {
-        list.innerHTML = `
-          <li>#Crypto2025</li>
-          <li>#ViralContent</li>
-          <li>#OpenRouter</li>
-        `;
-      }
-    }
 
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
@@ -232,7 +233,7 @@
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${key}`,
+            "Authorization": "Bearer " + key,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
@@ -284,6 +285,52 @@
         status.innerHTML = "✅ Voiceover playing";
       } catch (err) {
         status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+      }
+    }
+
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralContent</li>
+          <li>#OpenRouter</li>
+        `;
+      }
+    }
+
+    async function runManagerCommand() {
+      const input = document.getElementById("manager-command").value.trim();
+      const responseBox = document.getElementById("manager-response");
+
+      if (!input) {
+        responseBox.innerHTML = "❌ Please enter a command.";
+        return;
+      }
+
+      responseBox.innerHTML = "🧠 Manager AI is thinking...";
+
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + localStorage.getItem("openrouter_key"),
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are Manager AI. You help run and improve the Boss AI app based on user input." },
+              { role: "user", content: input }
+            ]
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.choices) throw new Error("Manager AI error.");
+        responseBox.innerHTML = `✅ ${data.choices[0].message.content}`;
+      } catch (err) {
+        responseBox.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
       }
     }
   </script>
