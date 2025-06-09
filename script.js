@@ -1,48 +1,44 @@
-// ====== Sidebar Toggle ======
 const toggleBtn = document.getElementById("toggle-btn");
 const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("main");
 
+// Toggle sidebar
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("hidden");
   main.classList.toggle("full");
 });
 
-// ====== Content for each module ======
 const content = {
-  manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
-  legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Check copyright and compliance.</p>`,
+  manager: `<h2 class="glow">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
+  legal: `<h2 class="glow">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
   script: `
-    <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
-    <textarea id="script-input" placeholder="Enter your video idea..."></textarea>
+    <h2 class="glow">✍️ Script Writer AI</h2>
+    <textarea id="script-input" placeholder="Enter your video idea..."></textarea><br>
     <div id="script-key-box"></div>
     <button class="generate-btn" onclick="generateScript()">Generate Script</button>
     <p id="script-output" style="margin-top:10px;"></p>
   `,
   voiceover: `
-    <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+    <h2 class="glow">🎤 Voiceover AI</h2>
     <textarea id="voice-text" placeholder="Paste your script..."></textarea>
     <div id="key-entry"></div>
     <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
     <p id="voice-status" style="margin-top:10px;"></p>
   `,
-  upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder='Upload goals...'></textarea><br><button class="generate-btn">Optimize</button>`,
-  output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
-  history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
-  trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#Crypto2025</li><li>#ViralContent</li><li>#BossAI</li></ul>`,
-  settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><button class="generate-btn" onclick="testLog()">Run Logging Test</button>`,
+  upload: `<h2 class="glow">📤 Upload Strategy</h2><textarea placeholder='Upload goals...'></textarea><br><button class="generate-btn">Optimize</button>`,
+  output: `<h2 class="glow">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+  history: `<h2 class="glow">🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
+  trends: `<h2 class="glow">📈 Trends AI</h2><ul class="trend-list"><li>#Crypto2025</li><li>#AIProfits</li><li>#OpenRouter</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
   sheets: `
-    <h2 style="color:#00bfff;">📊 Google Sheets Log</h2>
-    <p>This module sends entries from Boss AI directly to your connected Google Sheet.<br><br>
-    You can view entries like timestamp, input, output, and module used.</p>
-    <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID_HERE/edit"
-       target="_blank" 
-       style="color:#4fc3f7;text-shadow:0 0 6px #00bfff;">
-       🔗 Open Log Sheet
-    </a>`
+    <h2 class="glow">📄 Sheets Logger</h2>
+    <textarea id="sheets-input" placeholder="Enter log message..."></textarea>
+    <button class="generate-btn" onclick="logToSheets()">Send to Google Sheets</button>
+    <p id="sheets-status"></p>
+  `,
+  settings: `<h2 class="glow">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save</button>`
 };
 
-// ====== Load Module Panels ======
+// Module switching logic
 document.querySelectorAll(".sidebar button").forEach(button => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
@@ -78,7 +74,7 @@ document.querySelectorAll(".sidebar button").forEach(button => {
   });
 });
 
-// ====== Save and Clear API Keys ======
+// Save and clear API keys
 function saveScriptKey() {
   const val = document.getElementById("script-key").value.trim();
   if (val.length > 10) {
@@ -98,7 +94,7 @@ function saveVoiceKey() {
   }
 }
 
-// ====== Generate Script ======
+// Script generation
 async function generateScript() {
   const key = localStorage.getItem("openrouter_key");
   const idea = document.getElementById("script-input").value.trim();
@@ -125,15 +121,13 @@ async function generateScript() {
     });
     const data = await res.json();
     if (!res.ok || !data.choices) throw new Error(data.error?.message || "OpenRouter error");
-    const result = data.choices[0].message.content;
-    output.innerHTML = result;
-    logToSheet("Script Writer", idea, result);
+    output.innerHTML = data.choices[0].message.content;
   } catch (err) {
     output.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
 }
 
-// ====== Generate Voice ======
+// Voiceover generation
 async function generateVoice() {
   const key = localStorage.getItem("elevenlabs_key");
   const text = document.getElementById("voice-text").value.trim();
@@ -157,30 +151,41 @@ async function generateVoice() {
     const audio = new Audio(URL.createObjectURL(blob));
     audio.play();
     status.innerHTML = "✅ Voiceover playing";
-    logToSheet("Voiceover", text, "Voiceover generated and played");
   } catch (err) {
     status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
   }
 }
 
-// ====== Log to Google Sheets Webhook ======
-function logToSheet(module, input, output) {
-  fetch("https://script.google.com/macros/s/AKfycbw6mD1MvDv-RND-q2Le0HLvU1QoDA2eWuWJIpnKa1I/dev", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      timestamp: new Date().toISOString(),
-      module: module,
-      input: input,
-      output: output
-    })
-  });
+// Sheets logging
+async function logToSheets() {
+  const val = document.getElementById("sheets-input").value.trim();
+  const status = document.getElementById("sheets-status");
+  if (!val) {
+    status.innerHTML = "❌ Input is empty";
+    return;
+  }
+  status.innerHTML = "Sending...";
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxoa5zUYVLq8PZsB8YY6GlffphQQToCDYpxXED7sWvTj6EjgfTuaiD03WxXISQ7DrIg/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ module: "Sheets", input: val, output: "Manual entry" })
+    });
+    const data = await response.text();
+    status.innerHTML = `✅ Logged to Sheets`;
+  } catch (err) {
+    status.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
+  }
 }
 
-// ====== Manual Logging Test Button ======
-function testLog() {
-  logToSheet("Logger Test", "Test message from Boss AI", "✅ Google Sheet Logging Confirmed");
+// Trends refresh
+function updateTrends() {
+  const list = document.querySelector(".trend-list");
+  if (list) {
+    list.innerHTML = `
+      <li>#CryptoBoom</li>
+      <li>#PassiveIncomeAI</li>
+      <li>#GPTShorts</li>
+    `;
+  }
 }
