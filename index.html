@@ -9,7 +9,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: 'Orbitron', sans-serif;
-      background: #000; color: #00bfff;
+      background: #000; color: #0ff;
       display: flex; height: 100vh; overflow: hidden;
     }
     .sidebar {
@@ -23,17 +23,24 @@
     }
     .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: #121212; color: #00bfff;
-      border: none; padding: 12px;
-      font-size: 14px; text-align: left;
-      border-radius: 6px; cursor: pointer;
-      transition: all 0.3s ease;
+      background: #121212;
+      color: #0ff;
+      border: none;
+      padding: 12px;
+      font-size: 14px;
+      text-align: left;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-shadow: 0 0 6px #0ff;
     }
-    .sidebar button:hover { background: #003366; color: #4fc3f7; }
+    .sidebar button:hover {
+      background: #003366;
+      color: #4fc3f7;
+    }
     .sidebar button.active {
       background-color: #007bff;
       color: white;
-      box-shadow: 0 0 10px #00bfff;
     }
     .main {
       flex-grow: 1; margin-left: 240px;
@@ -42,16 +49,21 @@
       align-items: center; flex-direction: column;
       padding: 20px; text-align: center;
     }
-    .main.full { margin-left: 0; width: 100%; }
+    .main.full {
+      margin-left: 0; width: 100%;
+    }
     #toggle-btn {
-      position: fixed; top: 15px; left: 15px;
+      position: fixed;
+      top: 15px; left: 15px;
       z-index: 1000;
       background-color: #007bff;
-      color: white; padding: 10px 16px;
-      border-radius: 6px; font-size: 16px;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
       font-family: 'Orbitron', sans-serif;
-      border: none; cursor: pointer;
-      box-shadow: 0 0 8px #00bfff;
+      border: none;
+      cursor: pointer;
     }
     textarea, input {
       width: 100%; max-width: 500px;
@@ -60,16 +72,17 @@
       border-radius: 6px;
       border: 1px solid #00bfff;
       background-color: #1a1a1a;
-      color: #00bfff;
+      color: white;
     }
     button.generate-btn {
       background-color: #007bff;
-      color: white; border: none;
-      margin-top: 10px; padding: 10px 16px;
+      color: white;
+      border: none;
+      margin-top: 10px;
+      padding: 10px 16px;
       border-radius: 6px;
       font-size: 15px;
       font-family: 'Orbitron', sans-serif;
-      box-shadow: 0 0 6px #00bfff;
     }
     ul.trend-list {
       list-style: none;
@@ -82,8 +95,6 @@
       padding: 10px;
       border-radius: 6px;
       text-align: left;
-      color: #00bfff;
-      box-shadow: 0 0 5px #00bfff;
     }
   </style>
 </head>
@@ -100,7 +111,6 @@
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
     <button data-module="trends">📈 Trends AI</button>
-    <button data-module="sheets">📊 Google Sheets</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
 
@@ -122,19 +132,32 @@
     const content = {
       manager: `<h2 style="color:#00bfff;">🤖 Manager AI</h2><p>This AI coordinates tasks and sub-AIs.</p>`,
       legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content compliance and copyright risks...</p>`,
-      script: `<h2 style="color:#00bfff;">✍️ Script Writer</h2><textarea placeholder="Describe your video idea..."></textarea><br><button class="generate-btn">Generate</button>`,
-      voiceover: `<h2 style="color:#00bfff;">🎤 Voiceover Generator</h2><textarea placeholder="Paste script here..."></textarea><br><button class="generate-btn">Play Voiceover</button>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Describe your upload goal..."></textarea><br><button class="generate-btn">Generate Strategy</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Preview of your content will appear here.</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History Log</h2><p>Previous scripts and tasks.</p>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#AIshorts</li><li>#PassiveIncome</li><li>#Crypto2025</li></ul><button class="generate-btn">🔄 Refresh</button>`,
-      sheets: `<h2 style="color:#00bfff;">📊 Google Sheets Log</h2><p>Click below to view your live Boss AI Logs:</p><a href="https://docs.google.com/spreadsheets/d/1H16upg0EVwqMcwAnZ8WueQY1k6BY_FmsoAoeNVBGEBY/edit?usp=drivesdk" target="_blank" class="generate-btn">Open Sheets</a>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Adjust preferences here.</p><textarea placeholder="Custom options..."></textarea>`
+      script: `
+        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
+        <textarea placeholder="Enter your video idea..."></textarea><br>
+        <button class="generate-btn">Generate Script</button>
+      `,
+      voiceover: `
+        <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
+        <textarea placeholder="Paste your script..."></textarea><br>
+        <button class="generate-btn">Generate Voiceover</button>
+      `,
+      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Upload goals..."></textarea><br><button class="generate-btn">Optimize</button>`,
+      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><iframe width="100%" height="315" src="https://www.youtube.com/embed/fx1HgAG78qg" frameborder="0" allowfullscreen></iframe>`,
+      history: `<h2 style="color:#00bfff;">🗂️ History</h2><ul><li>Script: “Passive Income”</li><li>Voiceover: “Crypto Tips”</li></ul>`,
+      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><ul class="trend-list"><li>#MakeMoneyOnline</li><li>#GPTBusiness</li><li>#BossAI</li></ul><button class="generate-btn" onclick="updateTrends()">🔄 Refresh</button>`,
+      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><textarea placeholder="Preferences..."></textarea><br><button class="generate-btn">Save</button>`
     };
 
-    function updateMainPanel(module) {
-      const panel = content[module] || "<p>Coming soon...</p>";
-      main.innerHTML = `<div style="max-width:800px;text-align:center">${panel}</div>`;
+    function updateTrends() {
+      const list = document.querySelector(".trend-list");
+      if (list) {
+        list.innerHTML = `
+          <li>#Crypto2025</li>
+          <li>#ViralContent</li>
+          <li>#OpenRouter</li>
+        `;
+      }
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -142,7 +165,7 @@
         document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         const module = button.getAttribute("data-module");
-        updateMainPanel(module);
+        main.innerHTML = `<div style="max-width:800px;text-align:center">${content[module]}</div>`;
       });
     });
   </script>
