@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -41,25 +41,28 @@
       border-radius: 6px;
       cursor: pointer;
       transition: 0.3s;
+      text-shadow: 0 0 8px #00bfff;
     }
     .sidebar button:hover {
       background: #003366;
       color: #4fc3f7;
-      text-shadow: 0 0 8px #00bfff;
+      text-shadow: 0 0 10px #00bfff;
     }
     .sidebar button.active {
       background-color: #007bff;
       color: white;
-      text-shadow: 0 0 10px #00bfff;
+      text-shadow: 0 0 12px #00bfff;
     }
     .main {
       flex-grow: 1;
       margin-left: 240px;
       width: calc(100% - 240px);
       display: flex;
+      justify-content: center;
+      align-items: center;
       flex-direction: column;
       padding: 20px;
-      overflow-y: auto;
+      text-align: center;
     }
     .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
@@ -98,10 +101,6 @@
       font-family: 'Orbitron', sans-serif;
       text-shadow: 0 0 8px #00bfff;
     }
-    h2 {
-      color: #00bfff;
-      text-shadow: 0 0 10px #00bfff;
-    }
     ul.trend-list {
       list-style: none;
       padding-left: 0;
@@ -115,22 +114,9 @@
       border-radius: 6px;
       text-align: left;
     }
-    #chatbox {
-      background: #111;
-      padding: 15px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin-top: 20px;
-    }
-    #chatlog {
-      height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #00bfff;
-      margin-bottom: 10px;
-      background: #000;
+    h2 {
       color: #00bfff;
-      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px #00bfff;
     }
   </style>
 </head>
