@@ -149,21 +149,17 @@
         if (module === "script") {
           const key = localStorage.getItem("openrouter_key");
           const box = document.getElementById("script-key-box");
-          if (!key) {
-            box.innerHTML = `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
-          } else {
-            box.innerHTML = `<p style="color:#0f0;">✅ Key saved <button onclick="clearScriptKey()">Change</button></p>`;
-          }
+          box.innerHTML = key 
+            ? `<p style="color:#0f0;">✅ Key saved <button onclick="clearScriptKey()">Change</button></p>` 
+            : `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
         }
 
         if (module === "voiceover") {
           const key = localStorage.getItem("elevenlabs_key");
           const box = document.getElementById("voice-key-box");
-          if (!key) {
-            box.innerHTML = `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
-          } else {
-            box.innerHTML = `<p style="color:#0f0;">✅ Key saved <button onclick="clearVoiceKey()">Change</button></p>`;
-          }
+          box.innerHTML = key 
+            ? `<p style="color:#0f0;">✅ Key saved <button onclick="clearVoiceKey()">Change</button></p>` 
+            : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
         }
       });
     });
@@ -175,7 +171,7 @@
         out.innerHTML = "❌ Please enter a command.";
         return;
       }
-      out.innerHTML = "Thinking...";
+      out.innerHTML = "🧠 Processing...";
       try {
         const res = await fetch("https://manager-ai-backend-3.onrender.com/api/chat", {
           method: "POST",
@@ -185,17 +181,14 @@
         const data = await res.json();
         out.innerHTML = data.reply || "⚠️ No response received.";
 
-        // Process known commands (basic actions for now)
-        if (input.toLowerCase().includes("switch to script")) {
-          document.querySelector('[data-module="script"]').click();
+        // If Manager AI sends back a command
+        if (data.command) {
+          try {
+            eval(data.command); // Execute frontend command (safe only in controlled environments)
+          } catch (e) {
+            out.innerHTML += `\n⚠️ Failed to execute command: ${e.message}`;
+          }
         }
-        if (input.toLowerCase().includes("switch to voiceover")) {
-          document.querySelector('[data-module="voiceover"]').click();
-        }
-        if (input.toLowerCase().includes("change background")) {
-          document.body.style.backgroundColor = "#111";
-        }
-
       } catch (err) {
         out.innerHTML = "❌ " + err.message;
       }
@@ -283,7 +276,6 @@
       }
     }
 
-    // Load default module
     window.onload = () => {
       document.querySelector('[data-module="manager"]').click();
     };
