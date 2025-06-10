@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -40,6 +40,10 @@
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
+    }
+    .sidebar button:hover {
+      background: #003366;
+      color: #4fc3f7;
     }
     .sidebar button.active {
       background-color: #007bff;
@@ -96,10 +100,22 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
+    ul.trend-list {
+      list-style: none;
+      padding-left: 0;
+      max-width: 500px;
+      margin: auto;
+    }
+    ul.trend-list li {
+      background: #111;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
-
   <button id="toggle-btn">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
@@ -115,7 +131,7 @@
   </div>
 
   <div class="main" id="main">
-    <h1 class="glow-text">Boss AI Dashboard</h1>
+    <h1>Boss AI Dashboard</h1>
     <p>Welcome! Select a module from the menu.</p>
   </div>
 
@@ -132,121 +148,172 @@
     const content = {
       manager: `
         <h2 style="color:#00bfff;">🤖 Manager AI</h2>
-        <p>Command your Boss AI system using natural language. Try "Change layout", "Regenerate script", or "Update trends".</p>
-        <textarea id="manager-command" placeholder="Type a command..."></textarea>
+        <p>Command your Boss AI system using natural language.</p>
+        <textarea id="manager-command" placeholder="Try: Change layout, update module, regenerate script..."></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-        <div id="manager-response" style="margin-top:15px;"></div>
+        <div id="manager-response" style="margin-top:10px;"></div>
       `,
       script: `
-        <h2 style="color:#00bfff;">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Enter your video idea..."></textarea><br>
-        <input id="script-key" placeholder="🔑 OpenRouter API Key" type="password"/>
+        <h2 style="color:#00bfff;">✍️ Script Writer AI</h2>
+        <textarea id="script-input" placeholder="Video idea..."></textarea><br>
+        <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <div id="script-output" style="margin-top:15px;"></div>
+        <p id="script-output" style="margin-top:10px;"></p>
       `,
       voiceover: `
         <h2 style="color:#00bfff;">🎤 Voiceover AI</h2>
-        <textarea id="voice-text" placeholder="Paste your script..."></textarea><br>
-        <input id="voice-key" placeholder="🔑 ElevenLabs API Key" type="password"/>
+        <textarea id="voice-text" placeholder="Paste script..."></textarea>
+        <div id="key-entry"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
-        <div id="voice-status" style="margin-top:15px;"></div>
+        <p id="voice-status" style="margin-top:10px;"></p>
       `,
-      legal: `<h2 style="color:#00bfff;">📜 Legal Review</h2><p>Checking content for copyright or policy risks...</p>`,
-      upload: `<h2 style="color:#00bfff;">📤 Upload Strategy</h2><textarea placeholder="Your upload plan..."></textarea><br><button class="generate-btn">Analyze</button>`,
-      output: `<h2 style="color:#00bfff;">📺 Final Output</h2><p>Final content preview appears here.</p>`,
-      history: `<h2 style="color:#00bfff;">🗂️ History</h2><p>Past tasks and logs will be shown here.</p>`,
-      trends: `<h2 style="color:#00bfff;">📈 Trends AI</h2><p>Trending keywords, topics, and formats...</p>`,
-      settings: `<h2 style="color:#00bfff;">⚙️ Settings</h2><p>Configure your Boss AI preferences here.</p>`
+            legal: `
+        <h2 style="color:#00bfff;">📜 Legal Review AI</h2>
+        <textarea id="legal-text" placeholder="Paste text to review..."></textarea><br>
+        <button class="generate-btn" onclick="runLegalCheck()">Check Legality</button>
+        <p id="legal-result" style="margin-top:10px;"></p>
+      `,
+      upload: `
+        <h2 style="color:#00bfff;">📤 Upload Strategy</h2>
+        <textarea id="upload-text" placeholder="Script or video idea..."></textarea>
+        <button class="generate-btn" onclick="generateUploadPlan()">Suggest Strategy</button>
+        <p id="upload-output" style="margin-top:10px;"></p>
+      `,
+      output: `
+        <h2 style="color:#00bfff;">📺 Final Output</h2>
+        <div id="output-log">Your generated content will appear here.</div>
+      `,
+      history: `
+        <h2 style="color:#00bfff;">🗂️ History</h2>
+        <p>No saved history yet.</p>
+      `,
+      trends: `
+        <h2 style="color:#00bfff;">📈 Trend AI</h2>
+        <ul class="trend-list" id="trend-list"></ul>
+        <button class="generate-btn" onclick="loadTrends()">Refresh Trends</button>
+      `,
+      settings: `
+        <h2 style="color:#00bfff;">⚙️ Settings</h2>
+        <label for="scriptKey">Script Writer Key:</label>
+        <input id="scriptKey" placeholder="Paste GPT API key" onchange="saveKey('script', this.value)" /><br>
+        <label for="voiceKey">Voiceover Key:</label>
+        <input id="voiceKey" placeholder="Paste ElevenLabs API key" onchange="saveKey('voice', this.value)" /><br>
+        <p style="margin-top:10px;">Keys will be saved in localStorage for reuse.</p>
+      `
     };
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
+    const buttons = document.querySelectorAll(".sidebar button");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const module = btn.getAttribute("data-module");
+        main.innerHTML = content[module] || "";
+        if (module === 'settings') {
+          document.getElementById("scriptKey").value = localStorage.getItem("scriptKey") || "";
+          document.getElementById("voiceKey").value = localStorage.getItem("voiceKey") || "";
+        }
       });
     });
 
-    async function runManagerCommand() {
-      const input = document.getElementById("manager-command").value.trim();
-      const responseBox = document.getElementById("manager-response");
-      if (!input) {
-        responseBox.innerHTML = "❌ Please enter a command.";
-        return;
-      }
-
-      responseBox.innerHTML = "🧠 Thinking...";
-      try {
-        const res = await fetch("https://manager-ai-backend-3.onrender.com/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input })
-        });
-        const data = await res.json();
-        responseBox.innerHTML = `<p>✅ ${data.reply}</p>`;
-      } catch (err) {
-        responseBox.innerHTML = `<span style="color:red;">❌ ${err.message}</span>`;
-      }
+    function saveKey(type, val) {
+      if (type === "script") localStorage.setItem("scriptKey", val);
+      if (type === "voice") localStorage.setItem("voiceKey", val);
     }
 
-    async function generateScript() {
-      const key = document.getElementById("script-key").value.trim();
-      const input = document.getElementById("script-input").value.trim();
+    function runManagerCommand() {
+      const input = document.getElementById("manager-command").value;
+      const output = document.getElementById("manager-response");
+      fetch("https://manager-ai-backend-3.onrender.com/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: input })
+      })
+      .then(res => res.json())
+      .then(data => {
+        output.innerHTML = `<pre>${data.response || 'No response'}</pre>`;
+      })
+      .catch(err => {
+        output.innerText = "Error: " + err.message;
+      });
+    }
+
+    function generateScript() {
+      const key = localStorage.getItem("scriptKey");
+      const input = document.getElementById("script-input").value;
       const output = document.getElementById("script-output");
-      if (!key || !input) {
-        output.innerHTML = "❌ Missing key or prompt.";
-        return;
-      }
-      output.innerHTML = "🧠 Writing...";
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You're a viral short-form video script writer." },
-              { role: "user", content: input }
-            ]
-          })
-        });
-        const data = await res.json();
-        output.innerHTML = data.choices[0].message.content;
-      } catch (err) {
-        output.innerHTML = `❌ ${err.message}`;
-      }
+      if (!key) return output.innerText = "Missing API Key.";
+      fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: `Write a YouTube short script: ${input}` }]
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const result = data.choices?.[0]?.message?.content || "No result";
+        output.innerText = result;
+      })
+      .catch(err => {
+        output.innerText = "Error: " + err.message;
+      });
     }
 
-    async function generateVoice() {
-      const key = document.getElementById("voice-key").value.trim();
-      const text = document.getElementById("voice-text").value.trim();
-      const status = document.getElementById("voice-status");
-      if (!key || !text) {
-        status.innerHTML = "❌ Missing key or text.";
-        return;
-      }
-      status.innerHTML = "🎤 Generating...";
-      try {
-        const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-          method: "POST",
-          headers: {
-            "xi-api-key": key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ text })
-        });
-        const blob = await response.blob();
-        const audio = new Audio(URL.createObjectURL(blob));
+    function generateVoice() {
+      const key = localStorage.getItem("voiceKey");
+      const text = document.getElementById("voice-text").value;
+      const output = document.getElementById("voice-status");
+      if (!key) return output.innerText = "Missing API Key.";
+      fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+        method: "POST",
+        headers: {
+          "xi-api-key": key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          text: text,
+          voice_settings: {
+            stability: 0.3,
+            similarity_boost: 0.75
+          }
+        })
+      })
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
         audio.play();
-        status.innerHTML = "✅ Playing audio.";
-      } catch (err) {
-        status.innerHTML = `❌ ${err.message}`;
-      }
+        output.innerHTML = "✅ Voice generated and playing.";
+      })
+      .catch(err => {
+        output.innerText = "Error: " + err.message;
+      });
     }
+
+    function runLegalCheck() {
+      const text = document.getElementById("legal-text").value;
+      const output = document.getElementById("legal-result");
+      output.innerText = text.includes("copyright") ? "⚠️ Potential copyright issue." : "✅ Clear for use.";
+    }
+
+    function generateUploadPlan() {
+      const input = document.getElementById("upload-text").value;
+      const output = document.getElementById("upload-output");
+      output.innerText = `Recommended Platforms: YouTube Shorts, TikTok\nHashtags: #${input.split(" ").slice(0, 3).join(" #")}`;
+    }
+
+    function loadTrends() {
+      const el = document.getElementById("trend-list");
+      el.innerHTML = "<li>📈 Finance Trends: AI Stocks</li><li>📈 Crypto: Ethereum ETFs</li><li>📈 Viral: Motivational Shorts</li>";
+    }
+
+    // Auto-load manager module
+    document.querySelector('button[data-module="manager"]').click();
   </script>
 </body>
 </html>
