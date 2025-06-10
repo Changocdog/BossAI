@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -117,160 +117,157 @@
     .glow-text {
       text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 15px #00bfff;
     }
-    .chat-box {
-      width: 100%;
-      max-width: 600px;
-      background: #111;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: left;
-      margin-bottom: 20px;
-    }
-    .chat-log {
-      max-height: 300px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-    }
-    .chat-log p {
-      margin: 6px 0;
-    }
-    .user-msg {
-      color: #1e90ff;
-    }
-    .ai-msg {
-      color: #00ffcc;
-    }
   </style>
 </head>
 <body>
-    <button id="toggle-btn">☰ Menu</button>
-
+  <button id="toggle-btn">☰ Menu</button>
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="legal">📜 Legal Review</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
-    <button data-module="legal">📜 Legal Review</button>
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="output">📺 Final Output</button>
     <button data-module="history">🗂️ History</button>
     <button data-module="trends">📈 Trends AI</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
-
   <div class="main" id="main">
     <h1 class="glow-text">Boss AI Dashboard</h1>
     <p>Welcome! Select a module from the menu.</p>
   </div>
-
-  <script>
-    const toggleBtn = document.getElementById("toggle-btn");
+    <script>
     const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggle-btn");
     const main = document.getElementById("main");
 
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-      main.classList.toggle("full");
-    });
-
-    const content = {
+    const modules = {
       manager: `
-        <h2 class="glow-text">🤖 Manager AI</h2>
-        <div class="chat-box">
-          <div class="chat-log" id="chat-log"></div>
-          <textarea id="manager-input" placeholder="Say something to Manager AI..."></textarea>
-          <button class="generate-btn" onclick="sendToManager()">Send</button>
+        <h2 class="glow-text">Manager AI</h2>
+        <div style="max-width:600px;margin:auto;">
+          <textarea id="managerPrompt" rows="4" placeholder="Ask Manager AI to control the app..."></textarea>
+          <button class="generate-btn" onclick="runManagerAI()">Run</button>
+          <div id="managerOutput" style="margin-top:15px;"></div>
         </div>
       `,
+      legal: `<h2 class="glow-text">Legal Review</h2><p>Coming soon...</p>`,
       script: `
-        <h2 class="glow-text">✍️ Script Writer</h2>
-        <input type="text" id="openai-key" placeholder="Enter OpenAI Key" /><br>
-        <textarea id="script-input" placeholder="Video idea..."></textarea><br>
+        <h2 class="glow-text">Script Writer AI</h2>
+        <input type="text" id="scriptKey" placeholder="Enter Script API Key" oninput="saveKey('script', this.value)">
+        <textarea id="scriptInput" rows="4" placeholder="Enter your video topic..."></textarea>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <div id="script-output"></div>
+        <div id="scriptOutput"></div>
       `,
       voiceover: `
-        <h2 class="glow-text">🎤 Voiceover AI</h2>
-        <input type="text" id="elevenlabs-key" placeholder="Enter ElevenLabs Key" /><br>
-        <textarea id="voiceover-input" placeholder="Paste script..."></textarea><br>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <div id="voiceover-output"></div>
+        <h2 class="glow-text">Voiceover AI</h2>
+        <input type="text" id="voiceKey" placeholder="Enter Voiceover API Key" oninput="saveKey('voice', this.value)">
+        <textarea id="voiceInput" rows="4" placeholder="Enter the script..."></textarea>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voiceover</button>
+        <div id="voiceOutput"></div>
       `,
-      legal: `<h2 class="glow-text">📜 Legal Review</h2><p>Checking for copyright and compliance risks...</p>`,
-      upload: `<h2 class="glow-text">📤 Upload Strategy</h2><textarea placeholder="Upload plan..."></textarea><br><button class="generate-btn">Plan</button>`,
-      output: `<h2 class="glow-text">📺 Final Output</h2><p>View final video or result here.</p>`,
-      history: `<h2 class="glow-text">🗂️ History</h2><ul><li>Script: Passive Income</li><li>Voiceover: Motivation Tips</li></ul>`,
-      trends: `<h2 class="glow-text">📈 Trends AI</h2><ul class="trend-list"><li>#BossAI</li><li>#2025Tech</li><li>#ViralShorts</li></ul>`,
-      settings: `<h2 class="glow-text">⚙️ Settings</h2><textarea placeholder="Settings..."></textarea><br><button class="generate-btn">Save</button>`
+      upload: `<h2 class="glow-text">Upload Strategy AI</h2><p>Coming soon...</p>`,
+      output: `<h2 class="glow-text">Final Output</h2><p>Coming soon...</p>`,
+      history: `<h2 class="glow-text">History</h2><p>Coming soon...</p>`,
+      trends: `<h2 class="glow-text">Trends AI</h2><p>Coming soon...</p>`,
+      settings: `<h2 class="glow-text">Settings</h2><p>Customize your experience.</p>`,
     };
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        const module = button.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:800px;text-align:center;">${content[module]}</div>`;
-      });
+    toggleBtn.onclick = () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    };
+
+    document.querySelectorAll(".sidebar button").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mod = btn.dataset.module;
+        main.innerHTML = modules[mod];
+        if (mod === "script") document.getElementById("scriptKey").value = localStorage.getItem("scriptKey") || '';
+        if (mod === "voiceover") document.getElementById("voiceKey").value = localStorage.getItem("voiceKey") || '';
+      };
     });
 
-    async function sendToManager() {
-      const input = document.getElementById("manager-input").value;
-      const chatLog = document.getElementById("chat-log");
-      chatLog.innerHTML += `<p class="user-msg"><strong>You:</strong> ${input}</p>`;
-      const res = await fetch("https://manager-ai-backend-3.onrender.com/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input })
-      });
-      const data = await res.json();
-      chatLog.innerHTML += `<p class="ai-msg"><strong>AI:</strong> ${data.reply}</p>`;
-      chatLog.scrollTop = chatLog.scrollHeight;
+    function saveKey(type, value) {
+      localStorage.setItem(type + "Key", value);
     }
 
     async function generateScript() {
-      const apiKey = document.getElementById("openai-key").value;
-      const prompt = document.getElementById("script-input").value;
-      const output = document.getElementById("script-output");
-      output.innerText = "⏳ Generating...";
-      const res = await fetch("https://api.openai.com/v1/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "text-davinci-003",
-          prompt: prompt,
-          max_tokens: 200
-        })
-      });
-      const data = await res.json();
-      output.innerText = data.choices?.[0]?.text || "❌ Failed to generate.";
+      const input = document.getElementById("scriptInput").value;
+      const key = localStorage.getItem("scriptKey");
+      const out = document.getElementById("scriptOutput");
+      if (!key || !input) return out.innerText = "Missing input or key.";
+      out.innerText = "Generating...";
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${key}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: input }]
+          })
+        });
+        const data = await res.json();
+        out.innerText = data.choices?.[0]?.message?.content || "No response.";
+      } catch {
+        out.innerText = "Error generating script.";
+      }
     }
 
     async function generateVoice() {
-      const apiKey = document.getElementById("elevenlabs-key").value;
-      const text = document.getElementById("voiceover-input").value;
-      const output = document.getElementById("voiceover-output");
-      output.innerText = "⏳ Generating voice...";
-      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/default/stream", {
-        method: "POST",
-        headers: {
-          "xi-api-key": apiKey,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          text: text,
-          voice_settings: { stability: 0.75, similarity_boost: 0.75 }
-        })
-      });
-      if (res.ok) {
+      const input = document.getElementById("voiceInput").value;
+      const key = localStorage.getItem("voiceKey");
+      const out = document.getElementById("voiceOutput");
+      if (!key || !input) return out.innerText = "Missing input or key.";
+      out.innerText = "Sending to ElevenLabs...";
+      try {
+        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL", {
+          method: "POST",
+          headers: {
+            "xi-api-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: input,
+            voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+          })
+        });
         const blob = await res.blob();
-        const audioUrl = URL.createObjectURL(blob);
-        output.innerHTML = `<audio controls src="${audioUrl}"></audio>`;
-      } else {
-        output.innerText = "❌ Voice generation failed.";
+        const url = URL.createObjectURL(blob);
+        out.innerHTML = `<audio controls src="${url}"></audio>`;
+      } catch {
+        out.innerText = "Error generating voice.";
       }
     }
+
+    async function runManagerAI() {
+      const prompt = document.getElementById("managerPrompt").value;
+      const out = document.getElementById("managerOutput");
+      out.innerHTML += `<p><strong>You:</strong> ${prompt}</p>`;
+      try {
+        const res = await fetch("https://manager-ai-backend-3.onrender.com/manager", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        const reply = data.reply || "No reply.";
+        out.innerHTML += `<p><strong>Manager:</strong> ${reply}</p>`;
+        if (reply.includes("switch to")) {
+          const target = reply.split("switch to ")[1].trim().toLowerCase();
+          const btn = [...document.querySelectorAll(".sidebar button")].find(b => b.dataset.module === target);
+          if (btn) btn.click();
+        }
+      } catch {
+        out.innerHTML += `<p><strong>Manager:</strong> Error.</p>`;
+      }
+    }
+
+    // Default load
+    document.querySelector("[data-module='manager']").click();
   </script>
 </body>
 </html>
