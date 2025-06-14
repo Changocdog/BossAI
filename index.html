@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -104,6 +104,16 @@
       font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
+    #manager-response {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #007bff;
+      padding: 10px;
+      margin-top: 10px;
+      text-align: left;
+      background: rgba(0,0,0,0.5);
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -132,7 +142,7 @@
         <h2 class="glow">🤖 Manager AI</h2>
         <textarea id="manager-command" placeholder="Try: 'Change background to black' or 'Hide sidebar'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-        <div id="manager-response" style="margin-top:10px;"></div>
+        <div id="manager-response"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
@@ -262,7 +272,7 @@
       const response = data?.choices?.[0]?.message?.content;
       box.innerHTML = response || "❌ No response.";
       try {
-        const code = response.match(/```(?:js)?\\s*([\\s\\S]+?)```/i)?.[1];
+        const code = response.match(/```(?:js)?\s*([\s\S]+?)```/i)?.[1];
         if (code) eval(code);
       } catch (err) {
         box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
