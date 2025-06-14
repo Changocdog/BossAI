@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -43,10 +43,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .sidebar button:hover {
-      background: #003366;
-      color: #4fc3f7;
-    }
     .sidebar button.active {
       background-color: #007bff;
       color: white;
@@ -62,7 +58,10 @@
       padding: 20px;
       overflow-y: auto;
     }
-    .main.full { margin-left: 0; width: 100%; }
+    .main.full {
+      margin-left: 0;
+      width: 100%;
+    }
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -74,6 +73,7 @@
       border-radius: 6px;
       font-size: 16px;
       border: none;
+      cursor: pointer;
     }
     textarea, input {
       width: 100%;
@@ -94,17 +94,15 @@
       padding: 10px 16px;
       border-radius: 6px;
       font-size: 15px;
-      font-family: 'Orbitron', sans-serif;
       cursor: pointer;
     }
     #manager-response {
-      margin-top: 10px;
-      max-height: 200px;
+      max-height: 300px;
       overflow-y: auto;
       padding: 10px;
-      background: #111;
       border: 1px solid #00bfff;
-      border-radius: 8px;
+      margin-top: 10px;
+      background-color: #121212;
     }
   </style>
 </head>
@@ -133,23 +131,23 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Try: 'Change background to black' or 'Hide sidebar'"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-        <div id="manager-response"></div>
+        <div id="manager-response" class="glow"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output" style="margin-top:10px;"></p>
+        <p id="script-output"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Your script here..."></textarea><br>
+        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-status" style="margin-top:10px;"></p>
+        <p id="voice-status"></p>
       `
     };
 
@@ -183,10 +181,12 @@
         location.reload();
       }
     }
+
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
       location.reload();
     }
+
     async function generateScript() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
@@ -202,7 +202,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You're a creative short-form video scriptwriter." },
+            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
             { role: "user", content: input }
           ]
         })
@@ -231,10 +231,15 @@
           "xi-api-key": key,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+        body: JSON.stringify({
+          model_id: "eleven_monolingual_v1",
+          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
+          text
+        })
       });
       const blob = await res.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
+      const audioURL = URL.createObjectURL(blob);
+      const audio = new Audio(audioURL);
       audio.play();
       status.innerHTML = "✅ Playing voice";
     }
@@ -254,7 +259,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are Manager AI. Respond like a helpful assistant and generate JavaScript commands inside ```js blocks when asked to control the app." },
+            { role: "system", content: "You are Manager AI. Generate clear instructions or JavaScript code in ```js blocks to control the app." },
             { role: "user", content: command }
           ]
         })
@@ -263,7 +268,7 @@
       const response = data?.choices?.[0]?.message?.content;
       box.innerHTML = response || "❌ No response.";
       try {
-        const code = response.match(/```(?:js)?\s*([\s\S]+?)```/i)?.[1];
+        const code = response.match(/```js\s*([\s\S]+?)```/)?.[1];
         if (code) eval(code);
       } catch (err) {
         box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
