@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -42,7 +42,6 @@
       text-align: left;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
     .sidebar button:hover {
       background: #003366;
@@ -61,13 +60,9 @@
       align-items: center;
       flex-direction: column;
       padding: 20px;
-      text-align: center;
       overflow-y: auto;
     }
-    .main.full {
-      margin-left: 0;
-      width: 100%;
-    }
+    .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
       position: fixed;
       top: 15px;
@@ -78,9 +73,7 @@
       padding: 10px 16px;
       border-radius: 6px;
       font-size: 16px;
-      font-family: 'Orbitron', sans-serif;
       border: none;
-      cursor: pointer;
     }
     textarea, input {
       width: 100%;
@@ -105,15 +98,13 @@
       cursor: pointer;
     }
     #manager-response {
+      margin-top: 10px;
       max-height: 200px;
       overflow-y: auto;
-      margin-top: 10px;
       padding: 10px;
       background: #111;
-      border-radius: 6px;
       border: 1px solid #00bfff;
-      color: #00ffff;
-      white-space: pre-wrap;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -128,6 +119,7 @@
     <h1 class="glow">Boss AI Dashboard</h1>
     <p class="glow">Welcome. Select a module or give Manager AI a command.</p>
   </div>
+
   <script>
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
@@ -141,20 +133,20 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="e.g. 'Hide sidebar' or 'Change background to red'"></textarea><br>
+        <textarea id="manager-command" placeholder="Try: 'Change background to black' or 'Hide sidebar'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Enter video topic..."></textarea><br>
+        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output" style="margin-top:10px;"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Enter script here..."></textarea><br>
+        <textarea id="voice-text" placeholder="Your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status" style="margin-top:10px;"></p>
@@ -184,10 +176,6 @@
       });
     });
 
-    window.onload = () => {
-      document.querySelector('[data-module="manager"]').click();
-    };
-
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
       if (val.length > 10) {
@@ -195,12 +183,10 @@
         location.reload();
       }
     }
-
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
       location.reload();
     }
-
     async function generateScript() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
@@ -216,7 +202,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are a professional short-form script writer." },
+            { role: "system", content: "You're a creative short-form video scriptwriter." },
             { role: "user", content: input }
           ]
         })
@@ -245,7 +231,7 @@
           "xi-api-key": key,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
       });
       const blob = await res.blob();
       const audio = new Audio(URL.createObjectURL(blob));
@@ -268,7 +254,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are Manager AI. Respond like a helpful assistant and suggest improvements. Output any JavaScript commands in ```js blocks to control the app UI directly." },
+            { role: "system", content: "You are Manager AI. Respond like a helpful assistant and generate JavaScript commands inside ```js blocks when asked to control the app." },
             { role: "user", content: command }
           ]
         })
@@ -277,12 +263,16 @@
       const response = data?.choices?.[0]?.message?.content;
       box.innerHTML = response || "❌ No response.";
       try {
-        const code = response.match(/```(?:js)?\s*([\s\S]+?)```/)?.[1];
+        const code = response.match(/```(?:js)?\s*([\s\S]+?)```/i)?.[1];
         if (code) eval(code);
       } catch (err) {
         box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
       }
     }
+
+    window.onload = () => {
+      document.querySelector('[data-module="manager"]').click();
+    };
   </script>
 </body>
 </html>
