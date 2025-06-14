@@ -1,0 +1,41 @@
+from flask import Flask, request, jsonify
+import os, base64, requests
+
+app = Flask(__name__)
+GITHUB_REPO = os.environ.get("GITHUB_REPO")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
+
+@app.route("/update-code", methods=["POST"])
+def update_code():
+    data = request.json
+    file_path = data.get("path")
+    new_content = data.get("content")
+    commit_msg = data.get("message", "Manager AI update")
+    if not all([file_path, new_content, GITHUB_TOKEN, GITHUB_REPO]):
+        return jsonify({ "error": "Missing data or config" }), 400
+
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json"
+    }
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    get_res = requests.get(url, headers=headers)
+    if get_res.status_code != 200:
+        return jsonify({ "error": "File not found", "detail": get_res.text }), 404
+
+    sha = get_res.json()["sha"]
+    put_res = requests.put(url, headers=headers, json={
+        "message": commit_msg,
+        "content": base64.b64encode(new_content.encode()).decode(),
+        "sha": sha
+    })
+    if put_res.status_code in (200, 201):
+        return jsonify({ "success": True, "commit_url": put_res.json()["commit"]["html_url"] })
+    return jsonify({ "error": "Could not update", "detail": put_res.text }), 500
+
+@app.route("/")
+def index():
+    return jsonify({ "status": "OK - Manager GitHub Backend Live" })
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
