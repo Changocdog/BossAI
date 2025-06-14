@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
@@ -105,15 +105,15 @@
       cursor: pointer;
     }
     #manager-response {
-      background-color: #111;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      max-width: 600px;
-      text-align: left;
-      white-space: pre-wrap;
-      max-height: 300px;
+      max-height: 200px;
       overflow-y: auto;
+      margin-top: 10px;
+      padding: 10px;
+      background: #111;
+      border-radius: 6px;
+      border: 1px solid #00bfff;
+      color: #00ffff;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -128,7 +128,6 @@
     <h1 class="glow">Boss AI Dashboard</h1>
     <p class="glow">Welcome. Select a module or give Manager AI a command.</p>
   </div>
-
   <script>
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
@@ -142,20 +141,20 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Try: 'Change background', 'Add module', 'Update trends'..."></textarea><br>
+        <textarea id="manager-command" placeholder="e.g. 'Hide sidebar' or 'Change background to red'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
+        <textarea id="script-input" placeholder="Enter video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output" style="margin-top:10px;"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Paste your script here..."></textarea><br>
+        <textarea id="voice-text" placeholder="Enter script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status" style="margin-top:10px;"></p>
@@ -168,7 +167,6 @@
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:600px;">${content[mod]}</div>`;
-
         if (mod === "script") {
           const key = localStorage.getItem("openrouter_key");
           const box = document.getElementById("script-key-box");
@@ -185,6 +183,10 @@
         }
       });
     });
+
+    window.onload = () => {
+      document.querySelector('[data-module="manager"]').click();
+    };
 
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
@@ -214,7 +216,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You're a creative script writer for short-form content." },
+            { role: "system", content: "You are a professional short-form script writer." },
             { role: "user", content: input }
           ]
         })
@@ -252,30 +254,35 @@
     }
 
     async function runManagerCommand() {
-      const input = document.getElementById("manager-command").value.trim();
+      const key = localStorage.getItem("openrouter_key");
+      const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
-      if (!input) return (box.innerHTML = "❌ Missing input.");
+      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
       box.innerHTML = "🤖 Thinking...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are Manager AI. Respond like a helpful assistant and suggest improvements. Output any JavaScript commands in ```js blocks to control the app UI directly." },
+            { role: "user", content: command }
+          ]
+        })
+      });
+      const data = await res.json();
+      const response = data?.choices?.[0]?.message?.content;
+      box.innerHTML = response || "❌ No response.";
       try {
-        const res = await fetch("https://manager-ai-github-backend.onrender.com/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input })
-        });
-        const data = await res.json();
-        const reply = data?.reply || "❌ No response.";
-        box.innerHTML = reply;
-
-        const code = reply.match(/```(?:js)?\s*([\s\S]+?)```/i)?.[1];
+        const code = response.match(/```(?:js)?\s*([\s\S]+?)```/)?.[1];
         if (code) eval(code);
       } catch (err) {
         box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
       }
     }
-
-    window.onload = () => {
-      document.querySelector('[data-module="manager"]').click();
-    };
   </script>
 </body>
 </html>
