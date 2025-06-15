@@ -17,6 +17,20 @@
       overflow: hidden;
     }
     .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    #toggle-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-family: 'Orbitron', sans-serif;
+      border: none;
+      cursor: pointer;
+    }
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -68,20 +82,6 @@
       margin-left: 0;
       width: 100%;
     }
-    #toggle-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background-color: #007bff;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-family: 'Orbitron', sans-serif;
-      border: none;
-      cursor: pointer;
-    }
     textarea, input {
       width: 100%;
       max-width: 500px;
@@ -105,7 +105,7 @@
       cursor: pointer;
     }
     #manager-response {
-      max-height: 250px;
+      max-height: 300px;
       overflow-y: auto;
       background: #121212;
       padding: 10px;
@@ -140,7 +140,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Try: 'Push code to GitHub' or 'Fix voice playback'"></textarea><br>
+        <textarea id="manager-command" placeholder="Try: 'Fix layout' or 'Push to GitHub'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -160,7 +160,7 @@
       `,
       video: `
         <h2 class="glow">🎬 Video Generator</h2>
-        <p class="glow">Coming soon: Integration with video AI tools.</p>
+        <p class="glow">Coming soon: full AI-powered video generation.</p>
       `
     };
 
@@ -205,22 +205,26 @@
       const output = document.getElementById("script-output");
       if (!key || !input) return output.innerHTML = "❌ Missing input or key";
       output.innerHTML = "🧠 Writing...";
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You are a professional scriptwriter for short-form videos." },
-            { role: "user", content: input }
-          ]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error generating script.";
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are a professional scriptwriter for short-form videos." },
+              { role: "user", content: input }
+            ]
+          })
+        });
+        const data = await res.json();
+        output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error generating script.";
+      } catch {
+        output.innerHTML = "❌ Failed to fetch script.";
+      }
     }
 
     function saveVoiceKey() {
@@ -237,18 +241,22 @@
       const status = document.getElementById("voice-status");
       if (!key || !text) return status.innerHTML = "❌ Missing input or key";
       status.innerHTML = "🎙 Generating...";
-      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
-      });
-      const blob = await res.blob();
-      const audio = new Audio(URL.createObjectURL(blob));
-      audio.play();
-      status.innerHTML = "✅ Playing voice";
+      try {
+        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+          method: "POST",
+          headers: {
+            "xi-api-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+        });
+        const blob = await res.blob();
+        const audio = new Audio(URL.createObjectURL(blob));
+        audio.play();
+        status.innerHTML = "✅ Playing voice";
+      } catch {
+        status.innerHTML = "❌ Failed to play audio.";
+      }
     }
 
     async function runManagerCommand() {
@@ -257,17 +265,23 @@
       const box = document.getElementById("manager-response");
       if (!key || !command) return box.innerHTML = "❌ Missing input or key";
       box.innerHTML = "🤖 Thinking...";
-      const res = await fetch("https://manager-ai-backend-3.onrender.com/command", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: command, key })
-      });
-      const data = await res.json();
-      box.innerHTML = data.response || "❌ No response.";
       try {
-        if (data.command) eval(data.command);
-      } catch (err) {
-        box.innerHTML += `<br><span style="color:red;">⚠️ Error: ${err.message}</span>`;
+        const res = await fetch("https://manager-ai-backend-3.onrender.com/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: command, key })
+        });
+        const data = await res.json();
+        box.innerHTML = data.response || "❌ No response.";
+        if (data.command) {
+          try {
+            eval(data.command);
+          } catch (err) {
+            box.innerHTML += `<br><span style="color:red;">⚠️ Error: ${err.message}</span>`;
+          }
+        }
+      } catch {
+        box.innerHTML = "❌ Backend unreachable.";
       }
     }
 
