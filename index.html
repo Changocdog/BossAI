@@ -6,58 +6,32 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
+      margin: 0; font-family: 'Orbitron', sans-serif;
       background: linear-gradient(to right, #000000, #0a0a2a);
-      color: #00bfff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      color: #00bfff; display: flex; flex-direction: column; height: 100vh;
     }
     #toggle-btn {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 200;
+      position: fixed; top: 10px; left: 10px; z-index: 200;
+      background: #007bff; color: #fff;
+      padding: 10px 16px; border: none; border-radius: 6px;
+      font-size: 16px; cursor: pointer;
     }
     .sidebar {
-      width: 240px;
-      background: #0d0d0d;
-      padding-top: 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      border-right: 2px solid #1a1a1a;
-      z-index: 100;
+      position: fixed; top: 0; left: 0; height: 100vh;
+      width: 240px; background: #0d0d0d; padding-top: 60px;
+      display: flex; flex-direction: column; gap: 10px;
+      border-right: 2px solid #1a1a1a; transition: transform 0.3s ease;
     }
+    .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
-      background: #121212;
-      color: #00bfff;
-      border: none;
-      padding: 12px;
-      font-size: 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: left;
+      background: #121212; color: #00bfff; border: none;
+      padding: 12px; text-align: left; border-radius: 6px;
+      cursor: pointer; font-size: 14px;
     }
     .sidebar button.active {
-      background-color: #007bff;
-      color: white;
+      background: #007bff; color: #fff;
     }
     .main {
       flex-grow: 1;
@@ -66,66 +40,56 @@
       padding: 20px;
       overflow-y: auto;
       height: calc(100vh - 60px);
+      transition: margin-left 0.3s ease;
     }
+    .main.full { margin-left: 0; }
     textarea, input {
-      width: 100%;
-      max-width: 600px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
+      width: 100%; max-width: 600px;
+      padding: 12px; margin-top: 10px; font-size: 15px;
+      border-radius: 6px; border: 1px solid #00bfff;
+      background: #1a1a1a; color: #fff;
     }
     button.generate-btn {
-      background-color: #007bff;
-      color: white;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 15px;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
+      background: #007bff; color: #fff;
+      border: none; padding: 10px 16px; margin-top: 10px;
+      border-radius: 6px; cursor: pointer;
     }
-    .glow {
-      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
-    }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
     #manager-output {
-      background: #111;
-      border: 1px solid #00bfff;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      max-width: 600px;
-      max-height: 300px;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      background: #111; border: 1px solid #00bfff;
+      padding: 10px; margin-top: 10px; border-radius: 6px;
+      max-width: 600px; max-height: 300px;
+      overflow-y: auto; white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <button id="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
-
+  <button id="toggle-btn">☰ Menu</button>
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
   </div>
-
   <div class="main" id="main">
     <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome! Select a module or ask Manager AI to assist.</p>
+    <p class="glow">Select a module or ask Manager AI for help.</p>
   </div>
-
+  
   <script>
     const main = document.getElementById("main");
+    const sidebar = document.getElementById("sidebar");
+
+    function toggleSidebar() {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    }
+    document.getElementById("toggle-btn").addEventListener("click", toggleSidebar);
 
     const modules = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
         <textarea id="manager-input" placeholder="Ask Manager AI..."></textarea>
-        <button class="generate-btn" onclick="sendToManager()">Send</button>
+        <button class="generate-btn" id="manager-send">Send</button>
         <div id="manager-output"></div>
       `,
       script: `
@@ -137,7 +101,7 @@
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover AI</h2>
-        <textarea id="voice-text" placeholder="Paste your script..."></textarea>
+        <textarea id="voice-text" placeholder="Paste script..."></textarea>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status" class="glow"></p>
@@ -150,127 +114,104 @@
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;">${modules[mod]}</div>`;
+        toggleSidebar();
+        if (mod === "manager") attachManagerHandler();
         if (mod === "script") loadScriptKeyUI();
         if (mod === "voiceover") loadVoiceKeyUI();
       });
     });
 
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.style.display = sidebar.style.display === "none" ? "flex" : "none";
+    function attachManagerHandler() {
+      document.getElementById("manager-send").addEventListener("click", sendToManager);
+      document.getElementById("manager-output").innerHTML = "";
     }
 
     function loadScriptKeyUI() {
-      const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
-      if (key) {
-        box.innerHTML = `<p class="glow">✅ Key saved <button onclick="clearScriptKey()">Change</button></p>`;
-      } else {
-        box.innerHTML = `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/>
-                         <button onclick="saveScriptKey()" class="generate-btn">Save</button>`;
-      }
+      const key = localStorage.getItem("openrouter_key");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved <button onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button onclick="saveScriptKey()" class="generate-btn">Save</button>`;
     }
 
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("openrouter_key", val);
-        location.reload();
-      }
+      if (val.length > 10) { localStorage.setItem("openrouter_key", val); location.reload(); }
     }
 
-    function clearScriptKey() {
-      localStorage.removeItem("openrouter_key");
-      location.reload();
-    }
+    function clearScriptKey() { localStorage.removeItem("openrouter_key"); location.reload(); }
 
     async function generateScript() {
-      const key = localStorage.getItem("openrouter_key");
-      const input = document.getElementById("script-input").value.trim();
-      const output = document.getElementById("script-output");
-      if (!key || !input) return output.innerHTML = "❌ Missing input or API key";
-      output.innerHTML = "⏳ Generating...";
+      const key = localStorage.getItem("openrouter_key"), input = document.getElementById("script-input").value.trim();
+      const out = document.getElementById("script-output");
+      if (!key || !input) return out.innerText = "❌ Missing input or API key";
+      out.innerText = "⏳ Generating...";
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You're a viral short-form video scriptwriter." },
-              { role: "user", content: input }
-            ]
-          })
+          method: "POST", mode: "cors", credentials: "omit",
+          headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "openai/gpt-3.5-turbo", messages:[
+            { role: "system", content: "You're a short-form video scriptwriter." },
+            { role: "user", content: input }
+          ]})
         });
-        const data = await res.json();
-        output.innerHTML = data?.choices?.[0]?.message?.content || "❌ No script returned";
-      } catch (err) {
-        output.innerHTML = "❌ " + err.message;
-      }
+        const d = await res.json();
+        out.innerText = d.choices?.[0]?.message?.content || "❌ No reply.";
+      } catch(e) { out.innerText = "❌ " + e; }
     }
 
     function loadVoiceKeyUI() {
-      const key = localStorage.getItem("elevenlabs_key");
       const box = document.getElementById("voice-key-box");
-      if (key) {
-        box.innerHTML = `<p class="glow">✅ Key saved</p>`;
-      } else {
-        box.innerHTML = `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/>
-                         <button onclick="saveVoiceKey()" class="generate-btn">Save</button>`;
-      }
+      const key = localStorage.getItem("elevenlabs_key");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved <button onclick="clearVoiceKey()">Change</button></p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button onclick="saveVoiceKey()" class="generate-btn">Save</button>`;
     }
 
     function saveVoiceKey() {
       const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
+      if (val.length > 10) { localStorage.setItem("elevenlabs_key", val); location.reload(); }
+    }
+
+    function clearVoiceKey() {
+      localStorage.removeItem("elevenlabs_key"); location.reload();
     }
 
     async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
+      const key = localStorage.getItem("elevenlabs_key"), text = document.getElementById("voice-text").value.trim();
       const status = document.getElementById("voice-status");
-      if (!key || !text) return status.innerHTML = "❌ Missing input or key";
-      status.innerHTML = "🔊 Generating...";
+      if (!key || !text) return status.innerText = "❌ Missing input or API key";
+      status.innerText = "🔊 Generating...";
       try {
         const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-          method: "POST",
-          headers: {
-            "xi-api-key": key,
-            "Content-Type": "application/json"
-          },
+          method: "POST", mode: "cors", credentials: "omit",
+          headers: { "xi-api-key": key, "Content-Type": "application/json" },
           body: JSON.stringify({ text })
         });
         const blob = await res.blob();
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.play();
-        status.innerHTML = "✅ Playing voice";
-      } catch (err) {
-        status.innerHTML = "❌ " + err.message;
-      }
+        new Audio(URL.createObjectURL(blob)).play();
+        status.innerText = "✅ Playing voice";
+      } catch(e) { status.innerText = "❌ " + e; }
     }
 
     async function sendToManager() {
       const input = document.getElementById("manager-input").value.trim();
-      const output = document.getElementById("manager-output");
-      if (!input) return output.innerHTML = "❌ Please enter a command";
-      output.innerHTML = "🤖 Thinking...";
+      const out = document.getElementById("manager-output");
+      if (!input) return out.innerText = "❌ Please enter a command";
+      out.innerText = "🤖 Thinking...";
       try {
         const res = await fetch("https://manager-ai-backend.onrender.com/command", {
-          method: "POST",
+          method: "POST", mode: "cors", credentials: "omit",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt: input })
         });
-        const data = await res.json();
-        output.innerHTML = data.response || "❌ No response from backend";
-      } catch (err) {
-        output.innerHTML = "❌ " + err.message;
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const d = await res.json();
+        out.innerText = d.response || "⚠️ No reply";
+      } catch(e) {
+        out.innerHTML = `❌ ${e.message}<br><button onclick="sendToManager()">Retry</button>`;
       }
+      out.scrollTop = out.scrollHeight;
     }
 
     window.onload = () => {
