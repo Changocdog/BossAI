@@ -106,6 +106,10 @@
       white-space: pre-wrap;
       width: 100%;
     }
+    .error-text {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -153,14 +157,19 @@
       `
     };
 
+    function loadModule(mod) {
+      document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+      document.querySelector(`[data-module="${mod}"]`).classList.add("active");
+      main.innerHTML = `<div style="max-width:600px;">${content[mod]}</div>`;
+      localStorage.setItem("last_module", mod);
+      if (mod === "script") loadScriptKey();
+      if (mod === "voiceover") loadVoiceKey();
+    }
+
     document.querySelectorAll(".sidebar button").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
-        main.innerHTML = `<div style="max-width:600px;">${content[mod]}</div>`;
-        if (mod === "script") loadScriptKey();
-        if (mod === "voiceover") loadVoiceKey();
+        loadModule(mod);
       });
     });
 
@@ -199,22 +208,26 @@
       const output = document.getElementById("script-output");
       if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
       output.innerHTML = "🧠 Writing...";
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
-            { role: "user", content: input }
-          ]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+              { role: "user", content: input }
+            ]
+          })
+        });
+        const data = await res.json();
+        output.innerHTML = data?.choices?.[0]?.message?.content || "<span class='error-text'>❌ Error generating script</span>";
+      } catch (err) {
+        output.innerHTML = `<span class='error-text'>❌ Error: ${err.message}</span>`;
+      }
     }
 
     function saveVoiceKey() {
@@ -231,23 +244,27 @@
       const status = document.getElementById("voice-status");
       if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
       status.innerHTML = "🎙 Generating voice...";
-      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model_id: "eleven_monolingual_v1",
-          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
-          text
-        })
-      });
-      const blob = await res.blob();
-      const audioURL = URL.createObjectURL(blob);
-      const audio = new Audio(audioURL);
-      audio.play();
-      status.innerHTML = "✅ Playing voice";
+      try {
+        const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+          method: "POST",
+          headers: {
+            "xi-api-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model_id: "eleven_monolingual_v1",
+            voice_settings: { stability: 0.5, similarity_boost: 0.5 },
+            text
+          })
+        });
+        const blob = await res.blob();
+        const audioURL = URL.createObjectURL(blob);
+        const audio = new Audio(audioURL);
+        audio.play();
+        status.innerHTML = "✅ Playing voice";
+      } catch (err) {
+        status.innerHTML = `<span class='error-text'>❌ ${err.message}</span>`;
+      }
     }
 
     async function runManagerCommand() {
@@ -266,7 +283,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks if you want to change UI or trigger GitHub/n8n actions." },
+              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout or trigger app actions." },
               { role: "user", content: command }
             ]
           })
@@ -280,16 +297,17 @@
           try {
             eval(match[1]);
           } catch (err) {
-            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+            box.innerHTML += `<br><span class='error-text'>⚠️ JS Error: ${err.message}</span>`;
           }
         }
       } catch (err) {
-        box.innerHTML = "❌ Failed to connect to Manager AI.";
+        box.innerHTML = `<span class='error-text'>❌ Failed to reach Manager AI: ${err.message}</span>`;
       }
     }
 
     window.onload = () => {
-      document.querySelector('[data-module="manager"]').click();
+      const last = localStorage.getItem("last_module") || "manager";
+      loadModule(last);
     };
   </script>
 </body>
