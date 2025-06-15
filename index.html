@@ -28,6 +28,10 @@
       top: 0;
       border-right: 2px solid #1a1a1a;
       z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.hidden {
+      transform: translateX(-100%);
     }
     .sidebar button {
       background: #121212;
@@ -49,6 +53,11 @@
       padding: 20px;
       overflow-y: auto;
       width: calc(100% - 240px);
+      transition: margin-left 0.3s ease;
+    }
+    .main.full {
+      margin-left: 0;
+      width: 100%;
     }
     #toggle-btn {
       position: fixed;
@@ -102,7 +111,7 @@
 </head>
 <body>
 
-  <button id="toggle-btn">☰ Menu</button>
+  <button id="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
@@ -140,6 +149,13 @@
         <p id="voice-status" class="glow"></p>
       `
     };
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const mainPanel = document.getElementById("main");
+      sidebar.classList.toggle("hidden");
+      mainPanel.classList.toggle("full");
+    }
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -269,6 +285,5 @@
       document.querySelector('[data-module="manager"]').click();
     };
   </script>
-
 </body>
 </html>
