@@ -202,6 +202,14 @@
       location.reload();
     }
 
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
+    }
+
     async function generateScript() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
@@ -227,14 +235,6 @@
         output.innerHTML = data?.choices?.[0]?.message?.content || "<span class='error-text'>❌ Error generating script</span>";
       } catch (err) {
         output.innerHTML = `<span class='error-text'>❌ Error: ${err.message}</span>`;
-      }
-    }
-
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
       }
     }
 
@@ -273,6 +273,11 @@
       const box = document.getElementById("manager-response");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
       box.innerHTML = "🤖 Thinking...";
+
+      const history = JSON.parse(localStorage.getItem("manager_conversation") || "[]");
+      history.push({ role: "user", content: command });
+      const limitedHistory = history.slice(-6); // Keep only last 6 interactions
+
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
@@ -284,20 +289,22 @@
             model: "openai/gpt-3.5-turbo",
             messages: [
               { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout or trigger app actions." },
-              { role: "user", content: command }
+              ...limitedHistory
             ]
           })
         });
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
+        localStorage.setItem("manager_conversation", JSON.stringify([...limitedHistory, { role: "assistant", content: reply }]));
 
         const match = reply.match(/```js\s*([\s\S]+?)```/);
         if (match) {
           try {
             eval(match[1]);
+            box.innerHTML += `\n\n✅ Executed JS`;
           } catch (err) {
-            box.innerHTML += `<br><span class='error-text'>⚠️ JS Error: ${err.message}</span>`;
+            box.innerHTML += `\n\n⚠️ Error executing JS: ${err.message}`;
           }
         }
       } catch (err) {
