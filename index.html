@@ -140,6 +140,7 @@
         <h2 class="glow">🤖 Manager AI</h2>
         <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+        <button class="generate-btn" onclick="clearManagerChat()">Clear Chat</button>
         <div id="manager-response" class="glow"></div>
       `,
       script: `
@@ -165,6 +166,11 @@
       localStorage.setItem("last_module", mod);
       if (mod === "script") loadScriptKey();
       if (mod === "voiceover") loadVoiceKey();
+    }
+
+    function clearManagerChat() {
+      localStorage.removeItem("manager_conversation");
+      document.getElementById("manager-response").innerHTML = "🧹 Chat cleared.";
     }
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
@@ -299,7 +305,6 @@
         box.innerHTML = reply;
         localStorage.setItem("manager_conversation", JSON.stringify([...limitedHistory, { role: "assistant", content: reply }]));
 
-        // Scroll to bottom of Manager AI response box
         setTimeout(() => {
           box.scrollTop = box.scrollHeight;
         }, 50);
