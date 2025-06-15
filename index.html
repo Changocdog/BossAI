@@ -274,6 +274,20 @@
       }
     }
 
+    async function triggerN8n(url, payload = {}) {
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        console.log("✅ n8n triggered:", text);
+      } catch (err) {
+        console.error("❌ n8n trigger error:", err.message);
+      }
+    }
+
     async function runManagerCommand() {
       const key = localStorage.getItem("openrouter_key");
       const command = document.getElementById("manager-command").value.trim();
@@ -295,7 +309,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout or trigger app actions." },
+              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout, or trigger n8n webhooks using triggerN8n()." },
               ...limitedHistory
             ]
           })
