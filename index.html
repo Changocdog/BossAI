@@ -64,8 +64,8 @@
     }
     #toggle-btn {
       position: fixed;
-      top: 15px;
-      left: 15px;
+      top: 10px;
+      left: 10px;
       z-index: 1000;
       background-color: #007bff;
       color: white;
@@ -103,16 +103,8 @@
       border: 1px solid #00bfff;
       margin-top: 10px;
       background-color: #121212;
-      font-size: 14px;
-    }
-    #manager-history {
-      margin-top: 10px;
-      max-height: 150px;
-      overflow-y: auto;
-      background: #0f0f0f;
-      border: 1px solid #333;
-      padding: 10px;
-      font-size: 13px;
+      white-space: pre-wrap;
+      width: 100%;
     }
   </style>
 </head>
@@ -132,12 +124,11 @@
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
+
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
       main.classList.toggle("full");
     });
-
-    const historyLog = [];
 
     const content = {
       manager: `
@@ -145,21 +136,20 @@
         <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
-        <div id="manager-history"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
-        <input id="script-key" placeholder="OpenRouter Key"/>
-        <button class="generate-btn" onclick="generateScript()">Generate</button>
-        <div id="script-output"></div>
+        <div id="script-key-box"></div>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <p id="script-output"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Your script here..."></textarea><br>
-        <input id="voice-key" placeholder="ElevenLabs Key"/>
-        <button class="generate-btn" onclick="generateVoice()">Generate</button>
-        <div id="voice-status"></div>
+        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
+        <div id="voice-key-box"></div>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
+        <p id="voice-status"></p>
       `
     };
 
@@ -169,31 +159,132 @@
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:600px;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
       });
     });
 
+    function loadScriptKey() {
+      const key = localStorage.getItem("openrouter_key");
+      const box = document.getElementById("script-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
+    }
+
+    function loadVoiceKey() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const box = document.getElementById("voice-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved.</p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+    }
+
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openrouter_key", val);
+        location.reload();
+      }
+    }
+
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      location.reload();
+    }
+
+    async function generateScript() {
+      const key = localStorage.getItem("openrouter_key");
+      const input = document.getElementById("script-input").value.trim();
+      const output = document.getElementById("script-output");
+      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
+      output.innerHTML = "🧠 Writing...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+      const data = await res.json();
+      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
+    }
+
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
+    }
+
+    async function generateVoice() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const text = document.getElementById("voice-text").value.trim();
+      const status = document.getElementById("voice-status");
+      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
+      status.innerHTML = "🎙 Generating voice...";
+      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
+        method: "POST",
+        headers: {
+          "xi-api-key": key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model_id: "eleven_monolingual_v1",
+          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
+          text
+        })
+      });
+      const blob = await res.blob();
+      const audioURL = URL.createObjectURL(blob);
+      const audio = new Audio(audioURL);
+      audio.play();
+      status.innerHTML = "✅ Playing voice";
+    }
+
     async function runManagerCommand() {
-      const command = document.getElementById("manager-command").value;
+      const key = localStorage.getItem("openrouter_key");
+      const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
-      const history = document.getElementById("manager-history");
-      box.innerHTML = "Thinking...";
+      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
+      box.innerHTML = "🤖 Thinking...";
       try {
-        const res = await fetch("https://manager-ai-backend-3.onrender.com/command", {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: command })
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks if you want to change UI or trigger GitHub/n8n actions." },
+              { role: "user", content: command }
+            ]
+          })
         });
         const data = await res.json();
-        const reply = data.reply || "❌ No response";
+        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
 
-        const jsCode = reply.match(/```js\\s*([\\s\\S]+?)```/);
-        if (jsCode) eval(jsCode[1]);
-
-        historyLog.unshift(`🕒 ${new Date().toLocaleTimeString()}: ${command}`);
-        history.innerHTML = historyLog.slice(0, 5).map(h => `<div>${h}</div>`).join("");
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        if (match) {
+          try {
+            eval(match[1]);
+          } catch (err) {
+            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+          }
+        }
       } catch (err) {
-        box.innerHTML = "❌ Error connecting to Manager AI";
+        box.innerHTML = "❌ Failed to connect to Manager AI.";
       }
     }
 
