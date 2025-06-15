@@ -52,10 +52,10 @@
       margin-left: 240px;
       width: calc(100% - 240px);
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       flex-direction: column;
-      padding: 20px;
+      padding: 80px 20px 20px;
       overflow-y: auto;
     }
     .main.full {
@@ -77,7 +77,7 @@
     }
     textarea, input {
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -103,7 +103,6 @@
       border: 1px solid #00bfff;
       margin-top: 10px;
       background-color: #121212;
-      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -113,11 +112,6 @@
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="legal">⚖️ Legal Review</button>
-    <button data-module="history">📜 Video History</button>
-    <button data-module="trends">📈 Trends</button>
-    <button data-module="settings">⚙️ Settings</button>
   </div>
   <div class="main" id="main">
     <h1 class="glow">Boss AI Dashboard</h1>
@@ -154,15 +148,6 @@
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status"></p>
-      `,
-      upload: `<h2 class="glow">📤 Upload Strategy</h2><p>Coming soon...</p>`,
-      legal: `<h2 class="glow">⚖️ Legal Review</h2><p>Coming soon...</p>`,
-      history: `<h2 class="glow">📜 Video History</h2><p>Coming soon...</p>`,
-      trends: `<h2 class="glow">📈 Trends</h2><p>Coming soon...</p>`,
-      settings: `
-        <h2 class="glow">⚙️ Settings</h2>
-        <button class="generate-btn" onclick="clearAllKeys()">🧹 Clear All API Keys</button>
-        <p class="glow">Use this to reset saved keys if needed.</p>
       `
     };
 
@@ -183,8 +168,8 @@
           const key = localStorage.getItem("elevenlabs_key");
           const box = document.getElementById("voice-key-box");
           box.innerHTML = key
-            ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearVoiceKey()">Change</button></p>`
-            : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+            ? `<p class="glow">✅ Key saved.</p>`
+            : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
         }
       });
     });
@@ -196,24 +181,9 @@
         location.reload();
       }
     }
+
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
-      location.reload();
-    }
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
-    }
-    function clearVoiceKey() {
-      localStorage.removeItem("elevenlabs_key");
-      location.reload();
-    }
-    function clearAllKeys() {
-      localStorage.removeItem("openrouter_key");
-      localStorage.removeItem("elevenlabs_key");
       location.reload();
     }
 
@@ -239,6 +209,14 @@
       });
       const data = await res.json();
       output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
+    }
+
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
     }
 
     async function generateVoice() {
@@ -269,19 +247,18 @@
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
-      if (!command) return (box.innerHTML = "❌ Missing command input.");
+      if (!command) return (box.innerHTML = "❌ Missing command input");
       box.innerHTML = "🤖 Thinking...";
-      const res = await fetch("https://manager-ai-backend.onrender.com/command", {
+      const res = await fetch("https://manager-ai-github-backend.onrender.com/command", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: command })
       });
       const data = await res.json();
-      const response = data?.response || "❌ No response.";
-      box.innerHTML = response;
-
+      const response = data?.response;
+      box.innerHTML = response || "❌ No response.";
       try {
-        const code = response.match(/```js\\s*([\\s\\S]+?)```/)?.[1];
+        const code = response.match(/```js\s*([\s\S]+?)```/)?.[1];
         if (code) eval(code);
       } catch (err) {
         box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
