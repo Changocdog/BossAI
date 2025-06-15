@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: linear-gradient(to right, #000000, #0a0a2a);
       color: #00bfff;
       display: flex;
+      flex-direction: column;
       height: 100vh;
-      overflow: hidden;
+    }
+    #toggle-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 200;
     }
     .sidebar {
       width: 240px;
       background: #0d0d0d;
-      padding: 60px 10px 20px;
+      padding-top: 60px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -28,10 +44,6 @@
       top: 0;
       border-right: 2px solid #1a1a1a;
       z-index: 100;
-      transition: transform 0.3s ease;
-    }
-    .sidebar.hidden {
-      transform: translateX(-100%);
     }
     .sidebar button {
       background: #121212;
@@ -50,27 +62,10 @@
     .main {
       flex-grow: 1;
       margin-left: 240px;
+      margin-top: 60px;
       padding: 20px;
       overflow-y: auto;
-      width: calc(100% - 240px);
-      transition: margin-left 0.3s ease;
-    }
-    .main.full {
-      margin-left: 0;
-      width: 100%;
-    }
-    #toggle-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      background-color: #007bff;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      z-index: 200;
+      height: calc(100vh - 60px);
     }
     textarea, input {
       width: 100%;
@@ -110,7 +105,6 @@
   </style>
 </head>
 <body>
-
   <button id="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
   <div class="sidebar" id="sidebar">
@@ -150,13 +144,6 @@
       `
     };
 
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const mainPanel = document.getElementById("main");
-      sidebar.classList.toggle("hidden");
-      mainPanel.classList.toggle("full");
-    }
-
     document.querySelectorAll(".sidebar button").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
@@ -167,6 +154,11 @@
         if (mod === "voiceover") loadVoiceKeyUI();
       });
     });
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.style.display = sidebar.style.display === "none" ? "flex" : "none";
+    }
 
     function loadScriptKeyUI() {
       const key = localStorage.getItem("openrouter_key");
