@@ -137,7 +137,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Hide voiceover module"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -165,13 +165,6 @@
       if (mod === "script") loadScriptKey();
       if (mod === "voiceover") loadVoiceKey();
     }
-
-    document.querySelectorAll(".sidebar button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const mod = btn.getAttribute("data-module");
-        loadModule(mod);
-      });
-    });
 
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
@@ -210,6 +203,52 @@
       }
     }
 
+    async function runManagerCommand() {
+      const key = localStorage.getItem("openrouter_key");
+      const command = document.getElementById("manager-command").value.trim();
+      const box = document.getElementById("manager-response");
+      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
+      box.innerHTML = "🤖 Thinking...";
+
+      const history = JSON.parse(localStorage.getItem("manager_conversation") || "[]");
+      history.push({ role: "user", content: command });
+      const trimmed = history.slice(-6);
+
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You're Manager AI, a fully autonomous assistant inside a web app. Respond in markdown. If executing actions, wrap JS in ```js blocks. Avoid repeating previous responses. Adapt to user feedback." },
+              ...trimmed
+            ]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
+        box.innerHTML = reply;
+        localStorage.setItem("manager_conversation", JSON.stringify([...trimmed, { role: "assistant", content: reply }]));
+
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        if (match) {
+          try {
+            eval(match[1]);
+            box.innerHTML += `\n\n✅ JS Executed`;
+          } catch (err) {
+            box.innerHTML += `\n⚠️ JS Error: ${err.message}`;
+          }
+        }
+      } catch (err) {
+        box.innerHTML = `<span class='error-text'>❌ Network Error: ${err.message}</span>`;
+      }
+    }
+
     async function generateScript() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
@@ -226,13 +265,13 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+              { role: "system", content: "You're a short-form scriptwriter for TikTok and YouTube. Write concise, punchy scripts." },
               { role: "user", content: input }
             ]
           })
         });
         const data = await res.json();
-        output.innerHTML = data?.choices?.[0]?.message?.content || "<span class='error-text'>❌ Error generating script</span>";
+        output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Failed to generate script.";
       } catch (err) {
         output.innerHTML = `<span class='error-text'>❌ Error: ${err.message}</span>`;
       }
@@ -259,56 +298,10 @@
         });
         const blob = await res.blob();
         const audioURL = URL.createObjectURL(blob);
-        const audio = new Audio(audioURL);
-        audio.play();
-        status.innerHTML = "✅ Playing voice";
+        new Audio(audioURL).play();
+        status.innerHTML = "✅ Voice playback started";
       } catch (err) {
         status.innerHTML = `<span class='error-text'>❌ ${err.message}</span>`;
-      }
-    }
-
-    async function runManagerCommand() {
-      const key = localStorage.getItem("openrouter_key");
-      const command = document.getElementById("manager-command").value.trim();
-      const box = document.getElementById("manager-response");
-      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-      box.innerHTML = "🤖 Thinking...";
-
-      const history = JSON.parse(localStorage.getItem("manager_conversation") || "[]");
-      history.push({ role: "user", content: command });
-      const limitedHistory = history.slice(-6); // Keep only last 6 interactions
-
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout or trigger app actions." },
-              ...limitedHistory
-            ]
-          })
-        });
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        box.innerHTML = reply;
-        localStorage.setItem("manager_conversation", JSON.stringify([...limitedHistory, { role: "assistant", content: reply }]));
-
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
-        if (match) {
-          try {
-            eval(match[1]);
-            box.innerHTML += `\n\n✅ Executed JS`;
-          } catch (err) {
-            box.innerHTML += `\n\n⚠️ Error executing JS: ${err.message}`;
-          }
-        }
-      } catch (err) {
-        box.innerHTML = `<span class='error-text'>❌ Failed to reach Manager AI: ${err.message}</span>`;
       }
     }
 
