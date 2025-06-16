@@ -111,6 +111,17 @@
       color: red;
       font-weight: bold;
     }
+    ul.workflow-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul.workflow-list li {
+      margin-bottom: 10px;
+      padding: 8px;
+      background-color: #121212;
+      border: 1px solid #00bfff;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -119,6 +130,7 @@
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="automation">⚙️ Automation AI</button>
   </div>
   <div class="main" id="main">
     <h1 class="glow">Boss AI Dashboard</h1>
@@ -156,6 +168,14 @@
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status"></p>
+      `,
+      automation: `
+        <h2 class="glow">⚙️ Automation AI</h2>
+        <input id="workflow-name" placeholder="Workflow name"/><br>
+        <textarea id="workflow-steps" placeholder="Describe the steps..."></textarea><br>
+        <button class="generate-btn" onclick="saveWorkflow()">Save Workflow</button>
+        <h3 class="glow">🧩 Saved Workflows</h3>
+        <ul class="workflow-list" id="workflow-list"></ul>
       `
     };
 
@@ -166,6 +186,7 @@
       localStorage.setItem("last_module", mod);
       if (mod === "script") loadScriptKey();
       if (mod === "voiceover") loadVoiceKey();
+      if (mod === "automation") loadWorkflows();
     }
 
     function clearManagerChat() {
@@ -274,18 +295,23 @@
       }
     }
 
-    async function triggerN8n(url, payload = {}) {
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const text = await res.text();
-        console.log("✅ n8n triggered:", text);
-      } catch (err) {
-        console.error("❌ n8n trigger error:", err.message);
-      }
+    function saveWorkflow() {
+      const name = document.getElementById("workflow-name").value.trim();
+      const steps = document.getElementById("workflow-steps").value.trim();
+      if (!name || !steps) return alert("❌ Enter name and steps");
+      const workflows = JSON.parse(localStorage.getItem("automation_workflows") || "[]");
+      workflows.push({ name, steps });
+      localStorage.setItem("automation_workflows", JSON.stringify(workflows));
+      loadWorkflows();
+    }
+
+    function loadWorkflows() {
+      const list = document.getElementById("workflow-list");
+      if (!list) return;
+      const workflows = JSON.parse(localStorage.getItem("automation_workflows") || "[]");
+      list.innerHTML = workflows.map(wf =>
+        `<li><strong>${wf.name}</strong><br>${wf.steps}<br><button onclick="alert('🔁 Triggering: ${wf.name}')">Run</button></li>`
+      ).join("");
     }
 
     async function runManagerCommand() {
@@ -309,7 +335,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout, or trigger n8n webhooks using triggerN8n()." },
+              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to control layout or trigger automation functions." },
               ...limitedHistory
             ]
           })
