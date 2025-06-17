@@ -125,6 +125,12 @@
       cursor: move;
       user-select: none;
     }
+    .line {
+      position: absolute;
+      width: 2px;
+      background: #00bfff;
+      z-index: 0;
+    }
   </style>
 </head>
 <body>
@@ -153,7 +159,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -192,128 +198,20 @@
       });
     });
 
-    function loadScriptKey() {
-      const key = localStorage.getItem("openrouter_key");
-      const box = document.getElementById("script-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
-        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
-    }
-
-    function loadVoiceKey() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const box = document.getElementById("voice-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ Key saved.</p>`
-        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
-    }
-
-    function saveScriptKey() {
-      const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("openrouter_key", val);
-        location.reload();
-      }
-    }
-
-    function clearScriptKey() {
-      localStorage.removeItem("openrouter_key");
-      location.reload();
-    }
-
-    async function generateScript() {
-      const key = localStorage.getItem("openrouter_key");
-      const input = document.getElementById("script-input").value.trim();
-      const output = document.getElementById("script-output");
-      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
-      output.innerHTML = "🧠 Writing...";
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
-            { role: "user", content: input }
-          ]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
-    }
-
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
-    }
-
-    async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
-      const status = document.getElementById("voice-status");
-      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
-      status.innerHTML = "🎙 Generating voice...";
-      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model_id: "eleven_monolingual_v1",
-          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
-          text
-        })
-      });
-      const blob = await res.blob();
-      const audioURL = URL.createObjectURL(blob);
-      const audio = new Audio(audioURL);
-      audio.play();
-      status.innerHTML = "✅ Playing voice";
-    }
-
-    async function runManagerCommand() {
-      const key = localStorage.getItem("openrouter_key");
-      const command = document.getElementById("manager-command").value.trim();
+    function runManagerCommand() {
+      const cmd = document.getElementById("manager-command").value.toLowerCase();
       const box = document.getElementById("manager-response");
-      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-      box.innerHTML = "🤖 Thinking...";
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to switch modules or update interface." },
-              { role: "user", content: command }
-            ]
-          })
-        });
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        box.innerHTML = reply;
-        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
-        if (match) {
-          try { eval(match[1]); } catch (err) {
-            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
-          }
-        }
-      } catch (err) {
-        box.innerHTML = "❌ Failed to connect to Manager AI.";
+      box.innerHTML = "🤖 Processing...";
+      // Natural command detection
+      if (cmd.includes("connect") && cmd.includes("script") && cmd.includes("voice")) {
+        box.innerHTML = "🔧 Connecting Script Writer → Voiceover in Automation AI...";
+        createAutomationConnection("Script Writer", "Voiceover");
+        return;
       }
+      box.innerHTML = "🤖 Unknown command. Try: Connect Script Writer to Voiceover";
     }
 
-    // Automation AI logic
+    // ========== AUTOMATION AI ==========
     let canvas, nodes = [], nodeId = 1;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -321,16 +219,17 @@
       nodes = [];
     }
 
-    function addNode() {
+    function addNode(label = `Node ${nodeId}`) {
       const div = document.createElement("div");
       div.className = "node";
-      div.textContent = `Node ${nodeId}`;
+      div.textContent = label;
       div.dataset.id = nodeId++;
-      div.style.left = "20px";
-      div.style.top = "20px";
+      div.style.left = `${20 + Math.random() * 200}px`;
+      div.style.top = `${20 + Math.random() * 100}px`;
       makeDraggable(div);
       canvas.appendChild(div);
-      nodes.push({ id: div.dataset.id, x: 20, y: 20, label: div.textContent });
+      nodes.push({ id: div.dataset.id, label });
+      return div;
     }
 
     function makeDraggable(el) {
@@ -352,6 +251,29 @@
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       }
+    }
+
+    function createAutomationConnection(fromLabel, toLabel) {
+      document.querySelector('[data-module="automation"]').click();
+      const nodeA = addNode(fromLabel);
+      const nodeB = addNode(toLabel);
+      drawLineBetween(nodeA, nodeB);
+    }
+
+    function drawLineBetween(a, b) {
+      const line = document.createElement("div");
+      line.className = "line";
+      const ax = a.offsetLeft + a.offsetWidth / 2;
+      const ay = a.offsetTop + a.offsetHeight / 2;
+      const bx = b.offsetLeft + b.offsetWidth / 2;
+      const by = b.offsetTop + b.offsetHeight / 2;
+      const length = Math.hypot(bx - ax, by - ay);
+      const angle = Math.atan2(by - ay, bx - ax) * 180 / Math.PI;
+      line.style.left = ax + "px";
+      line.style.top = ay + "px";
+      line.style.height = length + "px";
+      line.style.transform = `rotate(${angle}deg)`;
+      canvas.appendChild(line);
     }
 
     function exportWorkflow() {
