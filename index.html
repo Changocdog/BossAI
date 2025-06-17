@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -113,7 +113,6 @@
       cursor: move;
       user-select: none;
     }
-    .error-text { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -165,7 +164,6 @@
     );
     window.onload = () => loadModule(localStorage.getItem('last_module') || 'manager');
 
-    // Cleaned up Automation module
     let canvas, nodes = [], nodeId = 1;
 
     function initAutomation() {
