@@ -161,7 +161,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -287,9 +287,9 @@
     }
 
     async function runManagerCommand() {
-      const key = localStorage.getItem("openrouter_key");
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
+      const key = localStorage.getItem("openrouter_key");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
       box.innerHTML = "🤖 Thinking...";
       try {
@@ -302,7 +302,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Output javascript code in ```js blocks and it will be auto-executed." },
+              { role: "system", content: "You are Manager AI. When a command says 'Connect X to Y', generate: ```js addNode('X'); addNode('Y'); drawLinkBetweenNodes('X','Y'); ```" },
               { role: "user", content: command }
             ]
           })
@@ -319,11 +319,11 @@
           }
         }
       } catch (err) {
-        box.innerHTML = "❌ Failed to connect to Manager AI.";
+        box.innerHTML = "❌ Failed to connect.";
       }
     }
 
-    // Automation AI Logic
+    // Automation AI logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -333,15 +333,16 @@
     }
 
     function addNode(label) {
-      const div = document.createElement("div");
-      div.className = "node";
-      div.textContent = label;
-      div.dataset.id = ++nodeCount;
-      div.style.left = `${30 + nodeCount * 60}px`;
-      div.style.top = `${30 + nodeCount * 30}px`;
-      makeDraggable(div);
-      canvas.appendChild(div);
-      nodes.push(div);
+      const node = document.createElement("div");
+      node.className = "node";
+      node.textContent = label;
+      node.dataset.label = label;
+      node.dataset.id = ++nodeCount;
+      node.style.left = `${40 + nodeCount * 60}px`;
+      node.style.top = `${40 + nodeCount * 30}px`;
+      makeDraggable(node);
+      canvas.appendChild(node);
+      nodes.push(node);
       drawConnections();
     }
 
@@ -367,25 +368,34 @@
       }
     }
 
+    function drawLinkBetweenNodes(fromLabel, toLabel) {
+      const from = nodes.find(n => n.dataset.label === fromLabel);
+      const to = nodes.find(n => n.dataset.label === toLabel);
+      if (!from || !to) return;
+
+      const svg = canvas.querySelector("svg");
+      const fromRect = from.getBoundingClientRect();
+      const toRect = to.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+
+      const x1 = fromRect.left + fromRect.width / 2 - canvasRect.left;
+      const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
+      const x2 = toRect.left + toRect.width / 2 - canvasRect.left;
+      const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("stroke", "#00bfff");
+      line.setAttribute("stroke-width", 2);
+      svg.appendChild(line);
+    }
+
     function drawConnections() {
       const svg = canvas.querySelector("svg");
       svg.innerHTML = '';
-      for (let i = 0; i < nodes.length - 1; i++) {
-        const from = nodes[i].getBoundingClientRect();
-        const to = nodes[i + 1].getBoundingClientRect();
-        const x1 = from.left + from.width / 2 - canvas.getBoundingClientRect().left;
-        const y1 = from.top + from.height / 2 - canvas.getBoundingClientRect().top;
-        const x2 = to.left + to.width / 2 - canvas.getBoundingClientRect().left;
-        const y2 = to.top + to.height / 2 - canvas.getBoundingClientRect().top;
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", x1);
-        line.setAttribute("y1", y1);
-        line.setAttribute("x2", x2);
-        line.setAttribute("y2", y2);
-        line.setAttribute("stroke", "#00bfff");
-        line.setAttribute("stroke-width", 2);
-        svg.appendChild(line);
-      }
     }
 
     function clearNodes() {
