@@ -94,18 +94,6 @@
       font-size: 15px;
       cursor: pointer;
     }
-    #manager-response {
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #00bfff;
-      margin-top: 10px;
-      background-color: #121212;
-      white-space: pre-wrap;
-      width: 100%;
-      font-size: 14px;
-    }
-    .error-text { color: red; font-weight: bold; }
     #automation-canvas {
       position: relative;
       border: 2px solid #00bfff;
@@ -113,6 +101,7 @@
       width: 100%;
       height: 500px;
       margin-top: 20px;
+      overflow: hidden;
     }
     .node {
       position: absolute;
@@ -121,8 +110,10 @@
       padding: 6px 10px;
       color: #00bfff;
       border-radius: 6px;
-      cursor: grab;
+      cursor: move;
+      user-select: none;
     }
+    .error-text { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -149,32 +140,14 @@
     });
 
     const content = {
-      manager: `
-        <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="E.g. Change title to 'Upload Ready'"></textarea>
-        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-        <button class="generate-btn" onclick="clearManagerChat()">Clear Chat</button>
-        <div id="manager-response" class="glow"></div>
-      `,
-      script: `
-        <h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Your video topic..."></textarea>
-        <div id="script-key-box"></div>
-        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output"></p>
-      `,
-      voiceover: `
-        <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Enter your script here..."></textarea>
-        <div id="voice-key-box"></div>
-        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-status"></p>
-      `,
+      manager: `<h2 class="glow">🤖 Manager AI</h2><textarea placeholder="Type a command..."></textarea>`,
+      script: `<h2 class="glow">✍️ Script Writer</h2><textarea placeholder="Your video topic..."></textarea>`,
+      voiceover: `<h2 class="glow">🎤 Voiceover</h2><textarea placeholder="Enter your script..."></textarea>`,
       automation: `
         <h2 class="glow">⚙️ Automation AI (n8n style)</h2>
         <button class="generate-btn" onclick="addNode()">+ Add Node</button>
-        <button class="generate-btn" onclick="exportWorkflow()">Export Workflow</button>
-        <button class="generate-btn" onclick="importWorkflow()">Import Workflow</button>
+        <button class="generate-btn" onclick="exportWorkflow()">Export</button>
+        <button class="generate-btn" onclick="importWorkflow()">Import</button>
         <div id="automation-canvas"></div>
       `
     };
@@ -184,145 +157,91 @@
       document.querySelector(`[data-module="${mod}"]`).classList.add("active");
       main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
       localStorage.setItem("last_module", mod);
-      if (mod==='script') loadScriptKey();
-      if (mod==='voiceover') loadVoiceKey();
-      if (mod==='automation') initAutomation();
+      if (mod === 'automation') initAutomation();
     }
 
-    document.querySelectorAll('.sidebar button').forEach(b=>b.addEventListener('click', ()=>loadModule(b.getAttribute('data-module'))));
-    window.onload = ()=>loadModule(localStorage.getItem('last_module')||'manager');
+    document.querySelectorAll('.sidebar button').forEach(b =>
+      b.addEventListener('click', () => loadModule(b.getAttribute('data-module')))
+    );
+    window.onload = () => loadModule(localStorage.getItem('last_module') || 'manager');
 
-    function clearManagerChat(){
-      localStorage.removeItem("manager_conversation");
-      document.getElementById("manager-response").innerHTML="🧹 Chat cleared.";
-    }
+    // Cleaned up Automation module
+    let canvas, nodes = [], nodeId = 1;
 
-    /* Script & Voice */
-    function loadScriptKey(){
-      const box=document.getElementById("script-key-box"),
-            key=localStorage.getItem("openrouter_key");
-      box.innerHTML = key
-        ? `<p class="glow">✅ Key saved. <button onclick="clearScriptKey()">Change</button></p>`
-        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button onclick="saveScriptKey()">Save</button>`;
-    }
-    function saveScriptKey(){
-      let v=document.getElementById("script-key").value.trim();
-      if(v.length>10){localStorage.setItem("openrouter_key",v);loadModule('script');}
-    }
-    function clearScriptKey(){localStorage.removeItem("openrouter_key");loadModule('script');}
-    async function generateScript(){
-      let key=localStorage.getItem("openrouter_key"),inp=document.getElementById("script-input").value.trim(),out=document.getElementById("script-output");
-      if(!key||!inp)return out.innerHTML="❌ Missing input or key";
-      out.innerHTML="🧠 Writing...";
-      try{
-        let res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
-          method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
-          body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"system",content:"..."},{role:"user",content:inp}]})
-        });
-        let j=await res.json();
-        out.innerHTML=j.choices?.[0]?.message?.content||"<span class='error-text'>❌Error</span>";
-      }catch(e){out.innerHTML=`<span class='error-text'>❌ ${e.message}</span>`;}
-    }
-
-    function loadVoiceKey(){
-      const box=document.getElementById("voice-key-box"),key=localStorage.getItem("elevenlabs_key");
-      box.innerHTML = key
-        ? `<p class="glow">✅ Key saved. <button onclick="clearVoiceKey()">Change</button></p>`
-        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button onclick="saveVoiceKey()">Save</button>`;
-    }
-    function saveVoiceKey(){
-      let v=document.getElementById("voice-key").value.trim();
-      if(v.length>10){localStorage.setItem("elevenlabs_key",v);loadModule('voiceover');}
-    }
-    function clearVoiceKey(){localStorage.removeItem("elevenlabs_key");loadModule('voiceover');}
-    async function generateVoice(){
-      let key=localStorage.getItem("elevenlabs_key"),txt=document.getElementById("voice-text").value.trim(),st=document.getElementById("voice-status");
-      if(!key||!txt)return st.innerHTML="❌ Missing input or key";
-      st.innerHTML="🎙 Generating...";
-      try{
-        let res=await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB",{
-          method:"POST",headers:{"xi-api-key":key,"Content-Type":"application/json"},
-          body:JSON.stringify({model_id:"eleven_monolingual_v1",voice_settings:{stability:0.5,similarity_boost:0.5},text:txt})
-        });
-        let blob=await res.blob();
-        let url=URL.createObjectURL(blob);
-        new Audio(url).play();
-        st.innerHTML="✅ Playing voice";
-      }catch(e){st.innerHTML=`<span class='error-text'>❌ ${e.message}</span>`;}
-    }
-
-    /* Manager AI with context & automation trigger */
-    async function runManagerCommand(){
-      let key=localStorage.getItem("openrouter_key"),cmd=document.getElementById("manager-command").value.trim(),box=document.getElementById("manager-response");
-      if(!key||!cmd)return box.innerHTML="❌Missing input or key";box.innerHTML="🤖Thinking...";
-      let history=JSON.parse(localStorage.getItem("manager_conversation")||"[]");
-      history.push({role:"user",content:cmd});
-      let limited=history.slice(-6);
-      try{
-        let res=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"system",content:"You are Manager AI. Output JS using triggerAutomation('...') to add automation nodes."},...limited]})});
-        let j=await res.json(),reply=j.choices?.[0]?.message?.content||"❌ No response";
-        box.innerHTML=reply;
-        localStorage.setItem("manager_conversation",JSON.stringify([...limited,{role:"assistant",content:reply}]));
-        scrollBottom(box);
-
-        let js=reply.match(/```js\s*([\s\S]+?)```/);
-        if(js){try{eval(js[1]);box.innerHTML+="\n\n✅ Executed JS"}catch(e){box.innerHTML+=`\n\n⚠️JS Error:${e.message}`}}
-      }catch(e){box.innerHTML=`<span class='error-text'>❌Failed:${e.message}</span>`;}
-    }
-    function scrollBottom(el){setTimeout(()=>el.scrollTop=el.scrollHeight,50)}
-
-    /* Automation-n8n style */
-    let canvas, nodes=[], nodeId=1;
-    function initAutomation(){
+    function initAutomation() {
       canvas = document.getElementById("automation-canvas");
-      canvas.innerHTML="";
-      nodes=[];
+      canvas.innerHTML = '';
+      nodes = [];
     }
 
-    function addNode(){
-      const div=document.createElement("div");
-      div.className="node";
-      div.textContent="Node "+nodeId;
-      div.dataset.id=nodeId++;
-      div.style.top="20px";div.style.left="20px";
+    function addNode() {
+      const div = document.createElement("div");
+      div.className = "node";
+      div.textContent = `Node ${nodeId}`;
+      div.dataset.id = nodeId++;
+      div.style.left = "20px";
+      div.style.top = "20px";
       makeDraggable(div);
       canvas.appendChild(div);
-      nodes.push({id:div.dataset.id,x:20,y:20,label:div.textContent});
+      nodes.push({ id: div.dataset.id, x: 20, y: 20, label: div.textContent });
     }
-    function makeDraggable(el){
-      let ox,oy;
-      el.addEventListener("mousedown", e=>{
-        ox=e.offsetX;oy=e.offsetY;
-        function move(ev){
-          el.style.left=(ev.clientX-ox-(sidebar.classList.contains("hidden")?0: sidebar.offsetWidth))+"px";
-          el.style.top=(ev.clientY-oy-10)+"px";
-        }
-        function up(){document.removeEventListener("mousemove",move);document.removeEventListener("mouseup",up);}
-        document.addEventListener("mousemove",move);
-        document.addEventListener("mouseup",up);
+
+    function makeDraggable(el) {
+      let offsetX = 0, offsetY = 0, dragging = false;
+      el.addEventListener("mousedown", e => {
+        dragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
       });
+
+      function onMouseMove(e) {
+        if (!dragging) return;
+        el.style.left = `${e.clientX - offsetX}px`;
+        el.style.top = `${e.clientY - offsetY}px`;
+      }
+
+      function onMouseUp() {
+        dragging = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
     }
-    function exportWorkflow(){
-      const w=nodes.map(n=>({id:n.id,x:document.querySelector(`.node[data-id="${n.id}"]`).offsetLeft,y:document.querySelector(`.node[data-id="${n.id}"]`).offsetTop,label:document.querySelector(`.node[data-id="${n.id}"]`).textContent}));
-      prompt("Workflow JSON:",JSON.stringify(w,null,2));
+
+    function exportWorkflow() {
+      const data = nodes.map(n => {
+        const el = document.querySelector(`.node[data-id="${n.id}"]`);
+        return {
+          id: n.id,
+          x: el.offsetLeft,
+          y: el.offsetTop,
+          label: el.textContent
+        };
+      });
+      prompt("Workflow JSON:", JSON.stringify(data, null, 2));
     }
-    function importWorkflow(){
-      let txt=prompt("Paste workflow JSON:");
-      if(!txt)return;
-      try{
-        let arr=JSON.parse(txt);
+
+    function importWorkflow() {
+      const input = prompt("Paste workflow JSON:");
+      if (!input) return;
+      try {
+        const data = JSON.parse(input);
         initAutomation();
-        arr.forEach(n=>{
-          const div=document.createElement("div");
-          div.className="node";
-          div.dataset.id=n.id;
-          div.textContent=n.label;
-          div.style.left=n.x+"px";div.style.top=n.y+"px";
+        data.forEach(n => {
+          const div = document.createElement("div");
+          div.className = "node";
+          div.dataset.id = n.id;
+          div.textContent = n.label;
+          div.style.left = n.x + "px";
+          div.style.top = n.y + "px";
           makeDraggable(div);
           canvas.appendChild(div);
           nodes.push(n);
         });
-      }catch(e){alert("Invalid JSON");}
+      } catch (e) {
+        alert("Invalid JSON");
+      }
     }
   </script>
 </body>
