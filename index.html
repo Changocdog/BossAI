@@ -161,7 +161,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -184,9 +184,7 @@
         <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
         <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
         <button class="generate-btn" onclick="clearNodes()">Reset</button>
-        <div id="automation-canvas">
-          <svg class="connector"></svg>
-        </div>
+        <div id="automation-canvas"><svg class="connector"></svg></div>
       `
     };
 
@@ -304,7 +302,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in js blocks to switch modules or update interface." },
+              { role: "system", content: "You are Manager AI. Connect and control modules. Respond with markdown and javascript code inside ```js blocks." },
               { role: "user", content: command }
             ]
           })
@@ -312,7 +310,7 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
         if (match) {
           try { eval(match[1]); } catch (err) {
             box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
@@ -323,7 +321,7 @@
       }
     }
 
-    // Wiring Logic
+    // Automation AI logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
