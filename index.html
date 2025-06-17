@@ -161,7 +161,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -208,12 +208,9 @@
         : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
 
-    function loadVoiceKey() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const box = document.getElementById("voice-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ Key saved.</p>`
-        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      location.reload();
     }
 
     function saveScriptKey() {
@@ -224,9 +221,12 @@
       }
     }
 
-    function clearScriptKey() {
-      localStorage.removeItem("openrouter_key");
-      location.reload();
+    function loadVoiceKey() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const box = document.getElementById("voice-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved.</p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
 
     function saveVoiceKey() {
@@ -302,7 +302,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Connect and control modules. Respond with markdown and javascript code inside ```js blocks." },
+              { role: "system", content: "You are Manager AI. Output javascript code in ```js blocks and it will be auto-executed." },
               { role: "user", content: command }
             ]
           })
@@ -310,9 +310,11 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
         if (match) {
-          try { eval(match[1]); } catch (err) {
+          try {
+            eval(match[1]);
+          } catch (err) {
             box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
           }
         }
@@ -321,18 +323,19 @@
       }
     }
 
-    // Automation AI logic
+    // Automation AI Logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
       canvas.innerHTML = '<svg class="connector"></svg>';
       nodes = [];
+      nodeCount = 0;
     }
 
-    function addNode(type) {
+    function addNode(label) {
       const div = document.createElement("div");
       div.className = "node";
-      div.textContent = type;
+      div.textContent = label;
       div.dataset.id = ++nodeCount;
       div.style.left = `${30 + nodeCount * 60}px`;
       div.style.top = `${30 + nodeCount * 30}px`;
