@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -94,6 +94,18 @@
       font-size: 15px;
       cursor: pointer;
     }
+    #manager-response {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid #00bfff;
+      margin-top: 10px;
+      background-color: #121212;
+      white-space: pre-wrap;
+      width: 100%;
+      font-size: 14px;
+    }
+    .error-text { color: red; font-weight: bold; }
     #automation-canvas {
       position: relative;
       border: 2px solid #00bfff;
@@ -101,7 +113,6 @@
       width: 100%;
       height: 500px;
       margin-top: 20px;
-      overflow: hidden;
     }
     .node {
       position: absolute;
@@ -110,8 +121,12 @@
       padding: 6px 10px;
       color: #00bfff;
       border-radius: 6px;
-      cursor: move;
-      user-select: none;
+      cursor: grab;
+    }
+    .connector {
+      position: absolute;
+      height: 2px;
+      background: #00bfff;
     }
   </style>
 </head>
@@ -139,14 +154,19 @@
     });
 
     const content = {
-      manager: `<h2 class="glow">🤖 Manager AI</h2><textarea placeholder="Type a command..."></textarea>`,
-      script: `<h2 class="glow">✍️ Script Writer</h2><textarea placeholder="Your video topic..."></textarea>`,
-      voiceover: `<h2 class="glow">🎤 Voiceover</h2><textarea placeholder="Enter your script..."></textarea>`,
+      manager: `
+        <h2 class="glow">🤖 Manager AI</h2>
+        <textarea id="manager-command" placeholder="E.g. 'Add voiceover node and connect it to script'"></textarea>
+        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+        <button class="generate-btn" onclick="clearManagerChat()">Clear Chat</button>
+        <div id="manager-response" class="glow"></div>
+      `,
+      script: `<h2 class="glow">✍️ Script Writer</h2><textarea placeholder="Video topic..."></textarea>`,
+      voiceover: `<h2 class="glow">🎤 Voiceover</h2><textarea placeholder="Script for voiceover..."></textarea>`,
       automation: `
         <h2 class="glow">⚙️ Automation AI (n8n style)</h2>
-        <button class="generate-btn" onclick="addNode()">+ Add Node</button>
-        <button class="generate-btn" onclick="exportWorkflow()">Export</button>
-        <button class="generate-btn" onclick="importWorkflow()">Import</button>
+        <button class="generate-btn" onclick="addNode('Script')">+ Script Node</button>
+        <button class="generate-btn" onclick="addNode('Voiceover')">+ Voiceover Node</button>
         <div id="automation-canvas"></div>
       `
     };
@@ -155,7 +175,6 @@
       document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
       document.querySelector(`[data-module="${mod}"]`).classList.add("active");
       main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
-      localStorage.setItem("last_module", mod);
       if (mod === 'automation') initAutomation();
     }
 
@@ -164,82 +183,90 @@
     );
     window.onload = () => loadModule(localStorage.getItem('last_module') || 'manager');
 
-    let canvas, nodes = [], nodeId = 1;
+    function clearManagerChat(){
+      localStorage.removeItem("manager_conversation");
+      document.getElementById("manager-response").innerHTML="🧹 Chat cleared.";
+    }
+
+    let canvas, nodes = [], nodeId = 1, connectors = [];
 
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
       canvas.innerHTML = '';
       nodes = [];
+      connectors = [];
     }
 
-    function addNode() {
+    function addNode(label) {
       const div = document.createElement("div");
       div.className = "node";
-      div.textContent = `Node ${nodeId}`;
+      div.textContent = label + " Node " + nodeId;
       div.dataset.id = nodeId++;
-      div.style.left = "20px";
-      div.style.top = "20px";
+      div.style.top = (20 + Math.random()*100) + "px";
+      div.style.left = (20 + Math.random()*200) + "px";
       makeDraggable(div);
       canvas.appendChild(div);
-      nodes.push({ id: div.dataset.id, x: 20, y: 20, label: div.textContent });
+      nodes.push(div);
+    }
+
+    function connectNodes(fromLabel, toLabel) {
+      const from = nodes.find(n => n.textContent.toLowerCase().includes(fromLabel.toLowerCase()));
+      const to = nodes.find(n => n.textContent.toLowerCase().includes(toLabel.toLowerCase()));
+      if (!from || !to) return;
+
+      const line = document.createElement("div");
+      line.className = "connector";
+
+      const x1 = from.offsetLeft + from.offsetWidth / 2;
+      const y1 = from.offsetTop + from.offsetHeight / 2;
+      const x2 = to.offsetLeft + to.offsetWidth / 2;
+      const y2 = to.offsetTop + to.offsetHeight / 2;
+
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      line.style.width = length + "px";
+      line.style.left = x1 + "px";
+      line.style.top = y1 + "px";
+      line.style.transformOrigin = "0 0";
+      line.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`;
+
+      canvas.appendChild(line);
+      connectors.push(line);
     }
 
     function makeDraggable(el) {
-      let offsetX = 0, offsetY = 0, dragging = false;
+      let offsetX, offsetY;
       el.addEventListener("mousedown", e => {
-        dragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+        function move(ev) {
+          el.style.left = ev.clientX - offsetX - sidebar.offsetWidth + "px";
+          el.style.top = ev.clientY - offsetY + "px";
+        }
+        function up() {
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", up);
+        }
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", up);
       });
-
-      function onMouseMove(e) {
-        if (!dragging) return;
-        el.style.left = `${e.clientX - offsetX}px`;
-        el.style.top = `${e.clientY - offsetY}px`;
-      }
-
-      function onMouseUp() {
-        dragging = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      }
     }
 
-    function exportWorkflow() {
-      const data = nodes.map(n => {
-        const el = document.querySelector(`.node[data-id="${n.id}"]`);
-        return {
-          id: n.id,
-          x: el.offsetLeft,
-          y: el.offsetTop,
-          label: el.textContent
-        };
-      });
-      prompt("Workflow JSON:", JSON.stringify(data, null, 2));
-    }
+    // Manager AI logic
+    async function runManagerCommand(){
+      const cmd = document.getElementById("manager-command").value.trim();
+      const box = document.getElementById("manager-response");
+      if (!cmd) return box.innerHTML = "❌ Missing command";
+      box.innerHTML = "🤖 Processing...";
 
-    function importWorkflow() {
-      const input = prompt("Paste workflow JSON:");
-      if (!input) return;
-      try {
-        const data = JSON.parse(input);
-        initAutomation();
-        data.forEach(n => {
-          const div = document.createElement("div");
-          div.className = "node";
-          div.dataset.id = n.id;
-          div.textContent = n.label;
-          div.style.left = n.x + "px";
-          div.style.top = n.y + "px";
-          makeDraggable(div);
-          canvas.appendChild(div);
-          nodes.push(n);
-        });
-      } catch (e) {
-        alert("Invalid JSON");
+      // Fake response for local logic
+      if (cmd.toLowerCase().includes("add voiceover")) addNode("Voiceover");
+      if (cmd.toLowerCase().includes("add script")) addNode("Script");
+      if (cmd.toLowerCase().includes("connect")) {
+        const match = cmd.match(/connect (\w+) to (\w+)/i);
+        if (match) connectNodes(match[1], match[2]);
       }
+
+      box.innerHTML = `✅ Executed: ${cmd}`;
     }
   </script>
 </body>
