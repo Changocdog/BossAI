@@ -1,4 +1,3 @@
-<!-- FULL UPDATED CODE HERE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,8 +136,8 @@
     <button data-module="automation">⚙️ Automation AI</button>
   </div>
   <div class="main" id="main">
-    <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome. Select a module or give Manager AI a command.</p>
+    <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
+    <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
 
   <script>
@@ -154,7 +153,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Type a command like: Switch to Voiceover or Change background to green"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Change title to 'Upload Ready'"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -181,21 +180,17 @@
       `
     };
 
-    function loadModule(mod) {
-      document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
-      document.querySelector(`[data-module="${mod}"]`).classList.add("active");
-      main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
-      localStorage.setItem("last_module", mod);
-      if (mod === "script") loadScriptKey();
-      if (mod === "voiceover") loadVoiceKey();
-      if (mod === "automation") initAutomation();
-    }
-
-    document.querySelectorAll(".sidebar button").forEach(btn =>
-      btn.addEventListener("click", () => loadModule(btn.getAttribute("data-module")))
-    );
-
-    window.onload = () => loadModule(localStorage.getItem("last_module") || "manager");
+    document.querySelectorAll(".sidebar button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mod = btn.getAttribute("data-module");
+        main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
+        if (mod === "automation") initAutomation();
+      });
+    });
 
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
@@ -226,14 +221,6 @@
       location.reload();
     }
 
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
-    }
-
     async function generateScript() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
@@ -258,6 +245,14 @@
       output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
     }
 
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
+    }
+
     async function generateVoice() {
       const key = localStorage.getItem("elevenlabs_key");
       const text = document.getElementById("voice-text").value.trim();
@@ -278,7 +273,8 @@
       });
       const blob = await res.blob();
       const audioURL = URL.createObjectURL(blob);
-      new Audio(audioURL).play();
+      const audio = new Audio(audioURL);
+      audio.play();
       status.innerHTML = "✅ Playing voice";
     }
 
@@ -298,7 +294,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Output any JavaScript UI commands in ```js blocks. You can switch modules, change layout, etc." },
+              { role: "system", content: "You are Manager AI. Respond in markdown. Output javascript code in ```js blocks to switch modules or update interface." },
               { role: "user", content: command }
             ]
           })
@@ -312,11 +308,12 @@
             box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
           }
         }
-      } catch {
+      } catch (err) {
         box.innerHTML = "❌ Failed to connect to Manager AI.";
       }
     }
 
+    // Automation AI logic
     let canvas, nodes = [], nodeId = 1;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -387,10 +384,14 @@
           canvas.appendChild(div);
           nodes.push(n);
         });
-      } catch {
+      } catch (e) {
         alert("Invalid JSON");
       }
     }
+
+    window.onload = () => {
+      document.querySelector('[data-module="manager"]').click();
+    };
   </script>
 </body>
 </html>
