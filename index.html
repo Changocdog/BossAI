@@ -160,7 +160,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="e.g., Connect script writer ai to voiceover ai"></textarea><br>
+        <textarea id="manager-command" placeholder="e.g., Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -236,22 +236,14 @@
       }
     }
 
-    // Normalize input like "script writer ai" to "Script Writer"
-    function normalizeLabel(label) {
-      return label
-        .replace(/ai/gi, '')
-        .trim()
-        .split(' ')
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-        .join(' ');
-    }
-
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
       const key = localStorage.getItem("openrouter_key");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
+
       box.innerHTML = "🤖 Thinking...";
+
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
@@ -262,28 +254,32 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You're Manager AI. If user says 'Connect A to B', just reply 'OK'." },
+              { role: "system", content: "You are Manager AI inside a dashboard. Respond helpfully and naturally to the user like ChatGPT. If a command like 'connect A to B' is given, still reply naturally, but also include JavaScript in ```js code blocks to connect the nodes." },
               { role: "user", content: command }
             ]
           })
         });
+
         const data = await res.json();
-        box.innerHTML = "✅ OK";
-        const match = command.match(/connect (.+) to (.+)/i);
+        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
+        box.innerHTML = reply;
+
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
         if (match) {
-          const from = normalizeLabel(match[1]);
-          const to = normalizeLabel(match[2]);
-          addNode(from);
-          addNode(to);
-          drawLinkBetweenNodes(from, to);
+          try {
+            eval(match[1]);
+          } catch (err) {
+            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+          }
         }
+
       } catch (err) {
         box.innerHTML = "❌ Failed to connect.";
       }
     }
 
-    // Automation logic
     let canvas, nodes = [], nodeCount = 0;
+
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
       canvas.innerHTML = '<svg class="connector"></svg>';
@@ -292,8 +288,7 @@
     }
 
     function addNode(label) {
-      if (!canvas) canvas = document.getElementById("automation-canvas");
-      if (nodes.some(n => n.dataset.label === label)) return;
+      canvas = document.getElementById("automation-canvas");
       const node = document.createElement("div");
       node.className = "node";
       node.textContent = label;
@@ -304,20 +299,24 @@
       makeDraggable(node);
       canvas.appendChild(node);
       nodes.push(node);
+      drawConnections();
     }
 
     function drawLinkBetweenNodes(fromLabel, toLabel) {
       const from = nodes.find(n => n.dataset.label === fromLabel);
       const to = nodes.find(n => n.dataset.label === toLabel);
       if (!from || !to || !canvas) return;
+
       const svg = canvas.querySelector("svg");
       const fromRect = from.getBoundingClientRect();
       const toRect = to.getBoundingClientRect();
       const canvasRect = canvas.getBoundingClientRect();
+
       const x1 = fromRect.left + fromRect.width / 2 - canvasRect.left;
       const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
       const x2 = toRect.left + toRect.width / 2 - canvasRect.left;
       const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
+
       const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
       line.setAttribute("x1", x1);
       line.setAttribute("y1", y1);
@@ -326,6 +325,15 @@
       line.setAttribute("stroke", "#00bfff");
       line.setAttribute("stroke-width", 2);
       svg.appendChild(line);
+    }
+
+    function drawConnections() {
+      const svg = canvas.querySelector("svg");
+      svg.innerHTML = '';
+    }
+
+    function clearNodes() {
+      initAutomation();
     }
 
     function makeDraggable(el) {
@@ -342,10 +350,6 @@
           document.onmouseup = null;
         };
       };
-    }
-
-    function clearNodes() {
-      initAutomation();
     }
 
     window.onload = () => {
