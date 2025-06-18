@@ -200,6 +200,7 @@
       });
     });
 
+    // Persistent Key Storage (unchanged)
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
@@ -237,55 +238,7 @@
       }
     }
 
-    async function generateScript() {
-      const key = localStorage.getItem("openrouter_key");
-      const input = document.getElementById("script-input").value.trim();
-      const output = document.getElementById("script-output");
-      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
-      output.innerHTML = "🧠 Writing...";
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
-            { role: "user", content: input }
-          ]
-        })
-      });
-      const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
-    }
-
-    async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
-      const status = document.getElementById("voice-status");
-      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
-      status.innerHTML = "🎙 Generating voice...";
-      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model_id: "eleven_monolingual_v1",
-          voice_settings: { stability: 0.5, similarity_boost: 0.5 },
-          text
-        })
-      });
-      const blob = await res.blob();
-      const audioURL = URL.createObjectURL(blob);
-      const audio = new Audio(audioURL);
-      audio.play();
-      status.innerHTML = "✅ Playing voice";
-    }
-
+    // Manager AI logic
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
@@ -302,7 +255,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. When a command says 'Connect X to Y', generate: ```js addNode('X'); addNode('Y'); drawLinkBetweenNodes('X','Y'); ```" },
+              { role: "system", content: "You are Manager AI. If user says 'connect A to B', return: ```js addNode('A'); addNode('B'); drawLinkBetweenNodes('A','B'); ```" },
               { role: "user", content: command }
             ]
           })
@@ -310,11 +263,9 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
         if (match) {
-          try {
-            eval(match[1]);
-          } catch (err) {
+          try { eval(match[1]); } catch (err) {
             box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
           }
         }
@@ -323,7 +274,7 @@
       }
     }
 
-    // Automation AI logic
+    // Automation AI node logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -333,6 +284,7 @@
     }
 
     function addNode(label) {
+      canvas = document.getElementById("automation-canvas");
       const node = document.createElement("div");
       node.className = "node";
       node.textContent = label;
@@ -346,43 +298,18 @@
       drawConnections();
     }
 
-    function makeDraggable(el) {
-      let offsetX = 0, offsetY = 0, dragging = false;
-      el.addEventListener("mousedown", e => {
-        dragging = true;
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
-      });
-      function onMouseMove(e) {
-        if (!dragging) return;
-        el.style.left = `${e.clientX - offsetX}px`;
-        el.style.top = `${e.clientY - offsetY}px`;
-        drawConnections();
-      }
-      function onMouseUp() {
-        dragging = false;
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      }
-    }
-
     function drawLinkBetweenNodes(fromLabel, toLabel) {
       const from = nodes.find(n => n.dataset.label === fromLabel);
       const to = nodes.find(n => n.dataset.label === toLabel);
-      if (!from || !to) return;
-
+      if (!from || !to || !canvas) return;
       const svg = canvas.querySelector("svg");
       const fromRect = from.getBoundingClientRect();
       const toRect = to.getBoundingClientRect();
       const canvasRect = canvas.getBoundingClientRect();
-
       const x1 = fromRect.left + fromRect.width / 2 - canvasRect.left;
       const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
       const x2 = toRect.left + toRect.width / 2 - canvasRect.left;
       const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
-
       const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
       line.setAttribute("x1", x1);
       line.setAttribute("y1", y1);
