@@ -160,7 +160,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="e.g., Connect Script Writer to Voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="e.g., Connect script writer ai to voiceover ai"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -199,7 +199,6 @@
       });
     });
 
-    // Persistent key logic
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
@@ -237,7 +236,16 @@
       }
     }
 
-    // Manager AI logic
+    // Normalize input like "script writer ai" to "Script Writer"
+    function normalizeLabel(label) {
+      return label
+        .replace(/ai/gi, '')
+        .trim()
+        .split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+    }
+
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
@@ -254,30 +262,27 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You're Manager AI. When user says 'Connect A to B', respond with 'OK', and run JavaScript to call addNode(A); addNode(B); drawLinkBetweenNodes(A,B);" },
+              { role: "system", content: "You're Manager AI. If user says 'Connect A to B', just reply 'OK'." },
               { role: "user", content: command }
             ]
           })
         });
         const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        if (reply.includes("Connect")) {
-          const parts = command.match(/Connect (.+) to (.+)/i);
-          if (parts) {
-            const from = parts[1].trim(), to = parts[2].trim();
-            addNode(from); addNode(to);
-            drawLinkBetweenNodes(from, to);
-            box.innerHTML = "✅ Connection complete.";
-          }
-        } else {
-          box.innerHTML = reply;
+        box.innerHTML = "✅ OK";
+        const match = command.match(/connect (.+) to (.+)/i);
+        if (match) {
+          const from = normalizeLabel(match[1]);
+          const to = normalizeLabel(match[2]);
+          addNode(from);
+          addNode(to);
+          drawLinkBetweenNodes(from, to);
         }
       } catch (err) {
         box.innerHTML = "❌ Failed to connect.";
       }
     }
 
-    // Automation node logic
+    // Automation logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -288,6 +293,7 @@
 
     function addNode(label) {
       if (!canvas) canvas = document.getElementById("automation-canvas");
+      if (nodes.some(n => n.dataset.label === label)) return;
       const node = document.createElement("div");
       node.className = "node";
       node.textContent = label;
@@ -322,10 +328,6 @@
       svg.appendChild(line);
     }
 
-    function clearNodes() {
-      initAutomation();
-    }
-
     function makeDraggable(el) {
       let offsetX = 0, offsetY = 0;
       el.onmousedown = function(e) {
@@ -340,6 +342,10 @@
           document.onmouseup = null;
         };
       };
+    }
+
+    function clearNodes() {
+      initAutomation();
     }
 
     window.onload = () => {
