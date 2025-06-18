@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
@@ -147,6 +146,7 @@
     <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
     <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
+
   <script>
     const toggleBtn = document.getElementById("toggle-btn"),
           sidebar = document.getElementById("sidebar"),
@@ -160,7 +160,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="e.g., Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -168,14 +168,14 @@
         <h2 class="glow">✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
-        <button class="generate-btn">Generate Script</button>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
         <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
-        <button class="generate-btn">Generate Voice</button>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status"></p>
       `,
       automation: `
@@ -193,10 +193,51 @@
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
         if (mod === "automation") initAutomation();
       });
     });
 
+    // Persistent key logic
+    function loadScriptKey() {
+      const key = localStorage.getItem("openrouter_key");
+      const box = document.getElementById("script-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
+    }
+
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      location.reload();
+    }
+
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openrouter_key", val);
+        location.reload();
+      }
+    }
+
+    function loadVoiceKey() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const box = document.getElementById("voice-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved.</p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+    }
+
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
+    }
+
+    // Manager AI logic
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
@@ -213,26 +254,30 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. If user says 'connect A to B', return: ```js addNode('A'); addNode('B'); drawLinkBetweenNodes('A','B'); ```" },
+              { role: "system", content: "You're Manager AI. When user says 'Connect A to B', respond with 'OK', and run JavaScript to call addNode(A); addNode(B); drawLinkBetweenNodes(A,B);" },
               { role: "user", content: command }
             ]
           })
         });
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        box.innerHTML = reply;
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
-        if (match) {
-          try { eval(match[1]); } catch (err) {
-            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+        if (reply.includes("Connect")) {
+          const parts = command.match(/Connect (.+) to (.+)/i);
+          if (parts) {
+            const from = parts[1].trim(), to = parts[2].trim();
+            addNode(from); addNode(to);
+            drawLinkBetweenNodes(from, to);
+            box.innerHTML = "✅ Connection complete.";
           }
+        } else {
+          box.innerHTML = reply;
         }
       } catch (err) {
         box.innerHTML = "❌ Failed to connect.";
       }
     }
 
-    // Automation AI logic
+    // Automation node logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -242,23 +287,23 @@
     }
 
     function addNode(label) {
+      if (!canvas) canvas = document.getElementById("automation-canvas");
       const node = document.createElement("div");
       node.className = "node";
       node.textContent = label;
       node.dataset.label = label;
       node.dataset.id = ++nodeCount;
-      node.style.left = `${60 + nodeCount * 50}px`;
-      node.style.top = `${60 + nodeCount * 40}px`;
+      node.style.left = `${40 + nodeCount * 60}px`;
+      node.style.top = `${40 + nodeCount * 30}px`;
       makeDraggable(node);
       canvas.appendChild(node);
       nodes.push(node);
-      drawConnections();
     }
 
     function drawLinkBetweenNodes(fromLabel, toLabel) {
       const from = nodes.find(n => n.dataset.label === fromLabel);
       const to = nodes.find(n => n.dataset.label === toLabel);
-      if (!from || !to) return;
+      if (!from || !to || !canvas) return;
       const svg = canvas.querySelector("svg");
       const fromRect = from.getBoundingClientRect();
       const toRect = to.getBoundingClientRect();
@@ -277,32 +322,24 @@
       svg.appendChild(line);
     }
 
-    function drawConnections() {
-      const svg = canvas.querySelector("svg");
-      svg.innerHTML = '';
-      // TODO: redraw all connections
-    }
-
     function clearNodes() {
       initAutomation();
     }
 
     function makeDraggable(el) {
-      let offsetX, offsetY, isDragging = false;
-      el.addEventListener("mousedown", (e) => {
-        isDragging = true;
+      let offsetX = 0, offsetY = 0;
+      el.onmousedown = function(e) {
         offsetX = e.clientX - el.offsetLeft;
         offsetY = e.clientY - el.offsetTop;
-      });
-      window.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        el.style.left = `${e.clientX - offsetX}px`;
-        el.style.top = `${e.clientY - offsetY}px`;
-        drawConnections();
-      });
-      window.addEventListener("mouseup", () => {
-        isDragging = false;
-      });
+        document.onmousemove = function(e) {
+          el.style.left = (e.clientX - offsetX) + "px";
+          el.style.top = (e.clientY - offsetY) + "px";
+        };
+        document.onmouseup = function() {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
     }
 
     window.onload = () => {
