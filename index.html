@@ -95,15 +95,13 @@
       font-size: 15px;
       cursor: pointer;
     }
-    #manager-response {
-      max-height: 300px;
-      overflow-y: auto;
+    .glow-box {
+      max-width: 500px;
       padding: 10px;
+      background: #121212;
       border: 1px solid #00bfff;
       margin-top: 10px;
-      background-color: #121212;
       white-space: pre-wrap;
-      width: 100%;
     }
     #automation-canvas {
       position: relative;
@@ -141,6 +139,7 @@
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
     <button data-module="automation">⚙️ Automation AI</button>
+    <button data-module="upload">📤 Upload Strategy</button>
   </div>
   <div class="main" id="main">
     <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
@@ -162,21 +161,21 @@
         <h2 class="glow">🤖 Manager AI</h2>
         <textarea id="manager-command" placeholder="e.g., Connect Script Writer to Voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-        <div id="manager-response" class="glow"></div>
+        <div id="manager-response" class="glow-box"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output"></p>
+        <p id="script-output" class="glow-box"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
         <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-status"></p>
+        <audio id="voice-player" controls style="margin-top: 10px;"></audio>
       `,
       automation: `
         <h2 class="glow">⚙️ Automation AI</h2>
@@ -184,6 +183,12 @@
         <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
         <button class="generate-btn" onclick="clearNodes()">Reset</button>
         <div id="automation-canvas"><svg class="connector"></svg></div>
+      `,
+      upload: `
+        <h2 class="glow">📤 Upload Strategy AI</h2>
+        <textarea id="upload-input" placeholder="Enter your script or video idea..."></textarea><br>
+        <button class="generate-btn" onclick="generateUploadStrategy()">Generate Strategy</button>
+        <p id="upload-output" class="glow-box"></p>
       `
     };
 
@@ -241,44 +246,100 @@
       const box = document.getElementById("manager-response");
       const key = localStorage.getItem("openrouter_key");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-
-      box.innerHTML = `🧠 Thinking: <i>"${command}"</i>`;
-
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content: `You are Manager AI. When the user says 'Connect X to Y', respond with something encouraging and execute: addNode(X); addNode(Y); drawLinkBetweenNodes(X, Y);`
-              },
-              { role: "user", content: command }
-            ]
-          })
-        });
-
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "🤖 No response.";
-        const match = command.match(/connect (.+?) to (.+)/i);
-        if (match) {
-          const from = match[1].trim(), to = match[2].trim();
-          addNode(from); addNode(to);
-          drawLinkBetweenNodes(from, to);
-          box.innerHTML = `✅ Connection established: <b>${from}</b> → <b>${to}</b>`;
-        } else {
-          box.innerHTML = reply;
-        }
-      } catch (err) {
-        box.innerHTML = "❌ Manager AI failed to respond.";
+      box.innerHTML = "🤖 Thinking...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are Manager AI. Execute commands and respond clearly." },
+            { role: "user", content: command }
+          ]
+        })
+      });
+      const data = await res.json();
+      const reply = data?.choices?.[0]?.message?.content || "❌ No response.";
+      const match = command.match(/connect (.+?) to (.+)/i);
+      if (match) {
+        const from = match[1].trim(), to = match[2].trim();
+        addNode(from); addNode(to);
+        drawLinkBetweenNodes(from, to);
+        box.innerHTML = `✅ Connected <b>${from}</b> → <b>${to}</b>`;
+      } else {
+        box.innerHTML = reply;
       }
     }
 
+    async function generateScript() {
+      const key = localStorage.getItem("openrouter_key");
+      const input = document.getElementById("script-input").value.trim();
+      const output = document.getElementById("script-output");
+      if (!key || !input) return (output.innerText = "❌ Missing input or key");
+      output.innerText = "✍️ Writing script...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [{ role: "user", content: input }]
+        })
+      });
+      const data = await res.json();
+      output.innerText = data?.choices?.[0]?.message?.content || "⚠️ No script generated.";
+    }
+
+    async function generateVoice() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const text = document.getElementById("voice-text").value;
+      const player = document.getElementById("voice-player");
+      if (!key || !text) return alert("Missing input or key");
+      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/audio", {
+        method: "POST",
+        headers: {
+          "xi-api-key": key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+      });
+      const blob = await res.blob();
+      player.src = URL.createObjectURL(blob);
+    }
+
+    async function generateUploadStrategy() {
+      const key = localStorage.getItem("openrouter_key");
+      const input = document.getElementById("upload-input").value.trim();
+      const out = document.getElementById("upload-output");
+      if (!key || !input) return (out.innerText = "❌ Missing key or input.");
+      out.innerText = "📤 Generating strategy...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: "You are Upload Strategy AI. Given a video topic or script, suggest platform, best time to post, title, and hashtags."
+            },
+            { role: "user", content: input }
+          ]
+        })
+      });
+      const data = await res.json();
+      out.innerText = data?.choices?.[0]?.message?.content || "⚠️ No strategy generated.";
+    }
+
+    // Automation logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -321,10 +382,6 @@
       line.setAttribute("stroke", "#00bfff");
       line.setAttribute("stroke-width", 2);
       svg.appendChild(line);
-    }
-
-    function clearNodes() {
-      initAutomation();
     }
 
     function makeDraggable(el) {
