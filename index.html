@@ -5,6 +5,7 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
@@ -14,6 +15,7 @@
       height: 100vh;
       overflow: hidden;
     }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
     .sidebar {
       width: 240px;
       background: #0d0d0d;
@@ -27,7 +29,9 @@
       top: 0;
       border-right: 2px solid #1a1a1a;
       z-index: 100;
+      transition: transform 0.3s ease;
     }
+    .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button {
       background: #121212;
       color: #00bfff;
@@ -47,10 +51,15 @@
       margin-left: 240px;
       width: calc(100% - 240px);
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
+      flex-direction: column;
       padding: 20px;
       overflow-y: auto;
+    }
+    .main.full {
+      margin-left: 0;
+      width: 100%;
     }
     #toggle-btn {
       position: fixed;
@@ -134,13 +143,19 @@
     <button data-module="automation">⚙️ Automation AI</button>
   </div>
   <div class="main" id="main">
-    <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome. Select a module or give Manager AI a command.</p>
+    <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
+    <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
 
   <script>
-    const sidebar = document.getElementById("sidebar"),
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
           main = document.getElementById("main");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
 
     const content = {
       manager: `
@@ -184,6 +199,7 @@
       });
     });
 
+    // Persistent key logic
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
@@ -221,12 +237,12 @@
       }
     }
 
+    // Manager AI logic
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
       const key = localStorage.getItem("openrouter_key");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-
       box.innerHTML = "🤖 Thinking...";
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -238,26 +254,30 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond like ChatGPT with helpful assistant messages. If the user says 'Connect A to B', output a friendly confirmation and then use this format in a js block:\n```js\naddNode('A'); addNode('B'); drawLinkBetweenNodes('A','B');\n```" },
+              { role: "system", content: "You're Manager AI. When user says 'Connect A to B', respond with 'OK', and run JavaScript to call addNode(A); addNode(B); drawLinkBetweenNodes(A,B);" },
               { role: "user", content: command }
             ]
           })
         });
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        box.innerHTML = reply;
-
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
-        if (match) {
-          try { eval(match[1]); } catch (err) {
-            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+        if (reply.includes("Connect")) {
+          const parts = command.match(/Connect (.+) to (.+)/i);
+          if (parts) {
+            const from = parts[1].trim(), to = parts[2].trim();
+            addNode(from); addNode(to);
+            drawLinkBetweenNodes(from, to);
+            box.innerHTML = "✅ Connection complete.";
           }
+        } else {
+          box.innerHTML = reply;
         }
       } catch (err) {
         box.innerHTML = "❌ Failed to connect.";
       }
     }
 
+    // Automation node logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
@@ -281,8 +301,8 @@
     }
 
     function drawLinkBetweenNodes(fromLabel, toLabel) {
-      const from = nodes.find(n => n.dataset.label.toLowerCase() === fromLabel.toLowerCase());
-      const to = nodes.find(n => n.dataset.label.toLowerCase() === toLabel.toLowerCase());
+      const from = nodes.find(n => n.dataset.label === fromLabel);
+      const to = nodes.find(n => n.dataset.label === toLabel);
       if (!from || !to || !canvas) return;
       const svg = canvas.querySelector("svg");
       const fromRect = from.getBoundingClientRect();
