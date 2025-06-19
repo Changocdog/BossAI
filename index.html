@@ -5,71 +5,134 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
   <style>
-    /* ======== CORE LAYOUT & THEME ===================================================== */
     * { box-sizing: border-box; }
-    body{
-      margin:0;
-      font-family:'Orbitron',sans-serif;
-      background:linear-gradient(to right,#000000,#0a0a2a);
-      color:#00bfff;
-      display:flex;
-      height:100vh;
-      overflow:hidden;
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to right, #000000, #0a0a2a);
+      color: #00bfff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
     }
-    .glow{ text-shadow:0 0 5px #00bfff,0 0 10px #00bfff;}
-    /* ======== SIDEBAR ================================================================ */
-    .sidebar{
-      width:240px;background:#0d0d0d;padding:60px 10px 20px;
-      display:flex;flex-direction:column;gap:10px;height:100vh;
-      position:fixed;left:0;top:0;border-right:2px solid #1a1a1a;
-      z-index:100;transition:transform .3s ease;
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    .sidebar {
+      width: 240px;
+      background: #0d0d0d;
+      padding: 60px 10px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      border-right: 2px solid #1a1a1a;
+      z-index: 100;
+      transition: transform 0.3s ease;
     }
-    .sidebar.hidden{ transform:translateX(-100%);}
-    .sidebar button{
-      background:#121212;color:#00bfff;border:none;padding:12px;font-size:14px;
-      text-align:left;border-radius:6px;cursor:pointer;
+    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar button {
+      background: #121212;
+      color: #00bfff;
+      border: none;
+      padding: 12px;
+      font-size: 14px;
+      text-align: left;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    .sidebar button.active{ background:#007bff;color:#fff;}
-    /* ======== MAIN AREA ============================================================== */
-    .main{
-      flex-grow:1;margin-left:240px;width:calc(100% - 240px);
-      display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
-      padding:20px;overflow-y:auto;
+    .sidebar button.active {
+      background-color: #007bff;
+      color: white;
     }
-    .main.full{ margin-left:0;width:100%;}
-    #toggle-btn{
-      position:fixed;top:10px;left:10px;z-index:1000;
-      background:#007bff;color:#fff;border:none;border-radius:6px;font-size:16px;
-      padding:10px 16px;cursor:pointer;
+    .main {
+      flex-grow: 1;
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
     }
-    /* ======== FORM ELEMENTS ========================================================== */
-    textarea,input{
-      width:100%;max-width:500px;padding:12px;margin-top:10px;font-size:15px;
-      border-radius:6px;border:1px solid #00bfff;background:#1a1a1a;color:#fff;
+    .main.full {
+      margin-left: 0;
+      width: 100%;
     }
-    button.generate-btn{
-      background:#007bff;color:#fff;border:none;margin-top:10px;
-      padding:10px 16px;border-radius:6px;font-size:15px;cursor:pointer;
+    #toggle-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
     }
-    .glow-box{
-      max-width:800px;max-height:300px;overflow-y:auto;
-      padding:10px;background:#121212;border:1px solid #00bfff;
-      margin-top:10px;white-space:pre-wrap;
+    textarea, input {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #00bfff;
+      background-color: #1a1a1a;
+      color: white;
     }
-    /* ======== AUTOMATION CANVAS ====================================================== */
-    #automation-canvas{
-      position:relative;border:2px solid #00bfff;background:#1a1a1a;
-      width:100%;height:500px;margin-top:20px;overflow:hidden;
+    button.generate-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 10px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
     }
-    .node{
-      position:absolute;background:#121212;border:1px solid #00bfff;
-      padding:6px 10px;color:#00bfff;border-radius:6px;cursor:move;user-select:none;
+    .glow-box {
+      max-width: 800px;
+      padding: 10px;
+      background: #121212;
+      border: 1px solid #00bfff;
+      margin-top: 10px;
+      white-space: pre-wrap;
     }
-    svg.connector{ position:absolute;top:0;left:0;pointer-events:none;width:100%;height:100%;}
+    #automation-canvas {
+      position: relative;
+      border: 2px solid #00bfff;
+      background: #1a1a1a;
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .node {
+      position: absolute;
+      background: #121212;
+      border: 1px solid #00bfff;
+      padding: 6px 10px;
+      color: #00bfff;
+      border-radius: 6px;
+      cursor: move;
+      user-select: none;
+    }
+    svg.connector {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
-  <!-- ======== SIDEBAR ======== -->
   <button id="toggle-btn">☰ Menu</button>
   <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
@@ -83,23 +146,14 @@
     <button data-module="history">🗂️ History</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
-
-  <!-- ======== MAIN PANEL ======== -->
   <div class="main" id="main">
     <h1 class="glow">Boss AI Dashboard</h1>
     <p class="glow">Welcome. Select a module or command Manager AI.</p>
   </div>
-
-  <!-- ======== SCRIPT & LOGIC ======== -->
-  <script>
-    /* ----------------------------------------------------------------------- *
-     *  GLOBAL HANDLES + DYNAMIC MODULE TEMPLATES                              *
-     * ----------------------------------------------------------------------- */
-    const toggleBtn  = document.getElementById('toggle-btn');
-    const sidebarEl  = document.getElementById('sidebar');
-    const mainEl     = document.getElementById('main');
-    const HISTORY_KEY = 'boss_ai_history';
-    const MEMORY_KEY  = 'manager_memory';
+    <script>
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
+          main = document.getElementById("main");
 
     const content = {
       manager: `
@@ -120,7 +174,7 @@
         <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <audio id="voice-player" controls style="margin-top:10px;"></audio>
+        <audio id="voice-player" controls style="margin-top: 10px;"></audio>
       `,
       automation: `
         <h2 class="glow">⚙️ Automation AI</h2>
@@ -149,13 +203,11 @@
       `,
       output: `
         <h2 class="glow">📦 Final Output</h2>
-        <div class="glow-box" id="final-output-box">Your final script and voiceover will appear here.</div>
+        <div class="glow-box" id="final-output-box">Your final script and voiceover will appear here after processing.</div>
       `,
       history: `
         <h2 class="glow">🗂️ History Log</h2>
-        <div class="glow-box" id="history-log">Loading history...</div>
-        <button class="generate-btn" onclick="exportHistory()">Export ⬇️</button>
-        <button class="generate-btn" onclick="clearHistory()">Clear History</button>
+        <div class="glow-box" id="history-log">No history saved in this session.</div>
       `,
       settings: `
         <h2 class="glow">⚙️ Settings</h2>
@@ -165,260 +217,256 @@
       `
     };
 
-    /* ----------------------------------------------------------------------- *
-     *  SIDEBAR NAVIGATION                                                     *
-     * ----------------------------------------------------------------------- */
-    sidebarEl.querySelectorAll('button').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        sidebarEl.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const mod = btn.dataset.module;
-        mainEl.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
-        // After mount – setup module-specific UI:
-        if(mod==='script')   initScriptModule();
-        if(mod==='voiceover')initVoiceModule();
-        if(mod==='automation')initAutomation();
-        if(mod==='history')  loadHistory();
+    document.querySelectorAll(".sidebar button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mod = btn.getAttribute("data-module");
+        main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
+        if (mod === "automation") initAutomation();
       });
     });
 
-    toggleBtn.addEventListener('click',()=>{
-      sidebarEl.classList.toggle('hidden');
-      mainEl.classList.toggle('full');
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
     });
 
-    /* ----------------------------------------------------------------------- *
-     *  UTILITY: TIME STAMP                                                    *
-     * ----------------------------------------------------------------------- */
-    const now = ()=> new Date().toLocaleString();
-
-    /* ----------------------------------------------------------------------- *
-     *  HISTORY UTILITIES                                                      *
-     * ----------------------------------------------------------------------- */
-    function addHistory(type,text){
-      const entry = { time:now(), type, text };
-      const list = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-      list.push(entry);
-      localStorage.setItem(HISTORY_KEY,JSON.stringify(list));
-    }
-    function loadHistory(){
-      const box = document.getElementById('history-log');
-      const list = JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-      box.textContent = list.length? list.map(e=>`[${e.time}] ${e.type}: ${e.text}`).join('\n') : 'No history yet.';
-    }
-    function clearHistory(){
-      localStorage.removeItem(HISTORY_KEY);
-      loadHistory();
-    }
-    function exportHistory(){
-      const data = localStorage.getItem(HISTORY_KEY)||'[]';
-      const blob = new Blob([data],{type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href=url;a.download='boss_ai_history.json';a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  MODULE INITIALISERS                                                    *
-     * ----------------------------------------------------------------------- */
-    function initScriptModule(){ loadScriptKey(); }
-    function initVoiceModule(){  loadVoiceKey();  }
-
-    /* ----------------------------------------------------------------------- *
-     *  KEY MANAGEMENT                                                         *
-     * ----------------------------------------------------------------------- */
-    function loadScriptKey(){
-      const key = localStorage.getItem('openrouter_key')||'';
-      const box = document.getElementById('script-key-box');
-      if(!box) return;
+    // --- KEY MANAGEMENT ---
+    function loadScriptKey() {
+      const key = localStorage.getItem("openrouter_key");
+      const box = document.getElementById("script-key-box");
       box.innerHTML = key
-       ?`<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
-       :`<input id="script-key" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
-    function saveScriptKey(){
-      const val = document.getElementById('script-key').value.trim();
-      if(val.length>10){ localStorage.setItem('openrouter_key',val); loadScriptKey(); }
-    }
-    function clearScriptKey(){ localStorage.removeItem('openrouter_key'); loadScriptKey();}
-    function loadVoiceKey(){
-      const key = localStorage.getItem('elevenlabs_key')||'';
-      const box = document.getElementById('voice-key-box');
-      if(!box) return;
+    function loadVoiceKey() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const box = document.getElementById("voice-key-box");
       box.innerHTML = key
-       ?`<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearVoiceKey()">Change</button></p>`
-       :`<input id="voice-key" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearVoiceKey()">Change</button></p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
-    function saveVoiceKey(){
-      const val = document.getElementById('voice-key').value.trim();
-      if(val.length>10){ localStorage.setItem('elevenlabs_key',val); loadVoiceKey(); }
-    }
-    function clearVoiceKey(){ localStorage.removeItem('elevenlabs_key'); loadVoiceKey();}
-    function clearAllKeys(){
-      localStorage.removeItem('openrouter_key');
-      localStorage.removeItem('elevenlabs_key');
-      localStorage.removeItem(MEMORY_KEY);
-      alert('All keys & manager memory cleared.');
-    }
-    function testKeys(){
-      const open = localStorage.getItem('openrouter_key')?'✅':'❌';
-      const ele  = localStorage.getItem('elevenlabs_key')?'✅':'❌';
-      document.getElementById('settings-output').textContent = `OpenRouter: ${open}\nElevenLabs: ${ele}`;
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  MANAGER AI WITH MEMORY                                                 *
-     * ----------------------------------------------------------------------- */
-    let managerMemory = JSON.parse(localStorage.getItem(MEMORY_KEY)||'[]');
-    async function runManagerCommand(){
-      const cmd = document.getElementById('manager-command').value.trim();
-      const box = document.getElementById('manager-response');
-      const key = localStorage.getItem('openrouter_key');
-      if(!cmd){ box.textContent='Enter a command.'; return; }
-      if(!key){ box.textContent='OpenRouter key required.'; return; }
-      box.textContent='🤖 Thinking...';
-      managerMemory.push({ role:'user',content:cmd });
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-        body:JSON.stringify({ model:'openai/gpt-3.5-turbo', messages:managerMemory.slice(-10) })
-      }).then(r=>r.json()).catch(()=>'');
-      const reply = res?.choices?.[0]?.message?.content || 'No response.';
-      managerMemory.push({ role:'assistant',content:reply });
-      localStorage.setItem(MEMORY_KEY,JSON.stringify(managerMemory.slice(-20)));
-      box.textContent = reply;
-      addHistory('Manager AI',cmd+' => '+reply);
-      const match = cmd.match(/connect (.+?) to (.+)/i);
-      if(match){ addNode(match[1].trim()); addNode(match[2].trim()); drawLinkBetweenNodes(match[1].trim(),match[2].trim()); }
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  SCRIPT WRITER                                                          *
-     * ----------------------------------------------------------------------- */
-    async function generateScript(){
-      const topic = document.getElementById('script-input').value.trim();
-      const out   = document.getElementById('script-output');
-      const key   = localStorage.getItem('openrouter_key');
-      if(!topic){ out.textContent='Topic required.'; return;}
-      if(!key){   out.textContent='OpenRouter key missing.'; return;}
-      out.textContent='✍️ Writing...';
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-        body:JSON.stringify({ model:'openai/gpt-3.5-turbo', messages:[{role:'user',content:`Write a viral 60-second script about ${topic}.`}] })
-      }).then(r=>r.json()).catch(()=>'');
-      const script = res?.choices?.[0]?.message?.content || 'No script.';
-      out.textContent = script;
-      document.getElementById('final-output-box').textContent += '\n\n--- Script ---\n'+script;
-      addHistory('Script',topic);
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  VOICE-OVER                                                             *
-     * ----------------------------------------------------------------------- */
-    async function generateVoice(){
-      const text = document.getElementById('voice-text').value.trim();
-      const key  = localStorage.getItem('elevenlabs_key');
-      const player = document.getElementById('voice-player');
-      if(!text){ alert('Text required.'); return;}
-      if(!key){  alert('ElevenLabs key missing.'); return;}
-      player.src='';player.load();
-      const blob = await fetch('https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/stream',{
-        method:'POST',
-        headers:{'xi-api-key':key,'Content-Type':'application/json'},
-        body:JSON.stringify({ text, model_id:'eleven_monolingual_v1',voice_settings:{stability:0.35,similarity_boost:0.85} })
-      }).then(r=>r.blob()).catch(()=>null);
-      if(!blob){ alert('Voice generation failed.'); return;}
-      player.src=URL.createObjectURL(blob);
-      player.play();
-      addHistory('Voice','Voice generated.');
-      document.getElementById('final-output-box').textContent += '\n\n--- Voice generated (audio) ---';
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  UPLOAD STRATEGY / TRENDS / LEGAL REVIEW                                *
-     * ----------------------------------------------------------------------- */
-    function generateUploadStrategy(){
-      const idea = document.getElementById('upload-input').value.trim();
-      const out  = document.getElementById('upload-output');
-      if(!idea){ out.textContent='Provide an idea.'; return;}
-      out.textContent = `📤 Best platform: TikTok\n⏰ Post time: 7 PM local\n🔑 Title: "${idea} in 60 seconds"\n#️⃣ Hashtags: #${idea.replace(/\s+/g,'')} #fyp`;
-      addHistory('Upload',idea);
-    }
-    function generateTrends(){
-      const niche = document.getElementById('trends-input').value.trim();
-      const out   = document.getElementById('trends-output');
-      if(!niche){ out.textContent='Enter a niche.'; return;}
-      out.textContent=`🔥 Top trends in ${niche} today:\n• AI hacks\n• 30-day challenges\n• Retro tech\n• Minimal living`;
-      addHistory('Trends',niche);
-    }
-    function generateLegalReview(){
-      const txt = document.getElementById('legal-input').value.trim();
-      const out = document.getElementById('legal-output');
-      if(!txt){ out.textContent='Paste text to review.'; return;}
-      out.textContent=`✅ No copyright or trademark issues detected.\n⚠️ Ensure all third-party clips are under 15 s and fair-use.`;
-      addHistory('Legal','Reviewed');
-    }
-
-    /* ----------------------------------------------------------------------- *
-     *  AUTOMATION CANVAS                                                      *
-     * ----------------------------------------------------------------------- */
-    let nodes=[],links=[],nodeCount=0,svgEl;
-    function initAutomation(){
-      const canvas=document.getElementById('automation-canvas');
-      if(!canvas) return;
-      svgEl = canvas.querySelector('svg');
-      canvas.addEventListener('mousedown',dragStart);
-    }
-    function addNode(label){
-      const canvas=document.getElementById('automation-canvas');
-      if(!canvas) return;
-      const n=document.createElement('div');
-      n.className='node';n.textContent=label;n.dataset.id=++nodeCount;
-      n.style.left=40+nodeCount*30+'px';n.style.top=40+nodeCount*20+'px';
-      canvas.appendChild(n);nodes.push(n);
-    }
-    function drawLinkBetweenNodes(fromLabel,toLabel){
-      const from=nodes.find(n=>n.textContent===fromLabel);
-      const to  =nodes.find(n=>n.textContent===toLabel);
-      if(!from||!to) return;
-      links.push({from,to}); renderLinks();
-    }
-    function renderLinks(){
-      if(!svgEl) return; svgEl.innerHTML='';
-      links.forEach(l=>{
-        const x1=l.from.offsetLeft+l.from.offsetWidth/2;
-        const y1=l.from.offsetTop +l.from.offsetHeight/2;
-        const x2=l.to.offsetLeft  +l.to.offsetWidth/2;
-        const y2=l.to.offsetTop   +l.to.offsetHeight/2;
-        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1',x1);line.setAttribute('y1',y1);
-        line.setAttribute('x2',x2);line.setAttribute('y2',y2);
-        line.setAttribute('stroke','#00bfff');line.setAttribute('stroke-width','2');
-        svgEl.appendChild(line);
-      });
-    }
-    function dragStart(e){
-      const target=e.target;
-      if(!target.classList.contains('node')) return;
-      const shiftX=e.clientX-target.offsetLeft;
-      const shiftY=e.clientY-target.offsetTop;
-      function move(ev){
-        target.style.left=ev.clientX-shiftX+'px';
-        target.style.top =ev.clientY-shiftY+'px';
-        renderLinks();
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openrouter_key", val);
+        loadScriptKey();
       }
-      document.addEventListener('mousemove',move);
-      document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',move),{once:true});
     }
-    function clearNodes(){
-      nodes.forEach(n=>n.remove());nodes=[];links=[];renderLinks();
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        loadVoiceKey();
+      }
+    }
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      loadScriptKey();
+    }
+    function clearVoiceKey() {
+      localStorage.removeItem("elevenlabs_key");
+      loadVoiceKey();
+    }
+    function clearAllKeys() {
+      localStorage.clear();
+      alert("All saved keys cleared.");
+      location.reload();
     }
 
-    /* ----------------------------------------------------------------------- *
-     *  PAGE LOAD DEFAULTS                                                     *
-     * ----------------------------------------------------------------------- */
-    window.onload=()=>{ sidebarEl.querySelector('[data-module="manager"]').click(); };
+    // --- FUNCTIONAL MODULES ---
+    async function runManagerCommand() {
+      const input = document.getElementById("manager-command").value;
+      const box = document.getElementById("manager-response");
+      const key = localStorage.getItem("openrouter_key");
+      if (!input || !key) return (box.innerText = "❌ Missing input or OpenRouter key");
+      box.innerText = "🤖 Thinking...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are Manager AI. Respond like ChatGPT and control the app interface using commands." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+      const data = await res.json();
+      const reply = data?.choices?.[0]?.message?.content || "⚠️ No response.";
+      box.innerHTML = reply;
+
+      const match = input.match(/connect (.+?) to (.+)/i);
+      if (match) {
+        addNode(match[1].trim()); addNode(match[2].trim());
+        drawLinkBetweenNodes(match[1].trim(), match[2].trim());
+      }
+    }
+
+    async function generateScript() {
+      const key = localStorage.getItem("openrouter_key");
+      const input = document.getElementById("script-input").value;
+      const output = document.getElementById("script-output");
+      if (!key || !input) return (output.innerText = "❌ Missing input or key.");
+      output.innerText = "⏳ Generating...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [{ role: "user", content: input }]
+        })
+      });
+      const data = await res.json();
+      output.innerText = data?.choices?.[0]?.message?.content || "⚠️ No response.";
+    }
+
+    async function generateVoice() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const text = document.getElementById("voice-text").value;
+      const player = document.getElementById("voice-player");
+      if (!key || !text) return alert("❌ Missing input or key.");
+      const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/audio", {
+        method: "POST",
+        headers: {
+          "xi-api-key": key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text, voice_settings: { stability: 0.5, similarity_boost: 0.5 } })
+      });
+      const blob = await res.blob();
+      player.src = URL.createObjectURL(blob);
+    }
+
+    async function generateUploadStrategy() {
+      const input = document.getElementById("upload-input").value;
+      const box = document.getElementById("upload-output");
+      const key = localStorage.getItem("openrouter_key");
+      if (!key || !input) return (box.innerText = "❌ Missing input or key.");
+      box.innerText = "⏳ Generating...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are Upload Strategy AI. Provide tips on platform, posting time, title, hashtags." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+      const data = await res.json();
+      box.innerText = data?.choices?.[0]?.message?.content || "⚠️ No response.";
+    }
+
+    async function generateTrends() {
+      const input = document.getElementById("trends-input").value;
+      const box = document.getElementById("trends-output");
+      const key = localStorage.getItem("openrouter_key");
+      if (!key || !input) return (box.innerText = "❌ Missing input or key.");
+      box.innerText = "⏳ Getting trends...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [{ role: "user", content: "What are trending video topics for: " + input }]
+        })
+      });
+      const data = await res.json();
+      box.innerText = data?.choices?.[0]?.message?.content || "⚠️ No results.";
+    }
+
+    async function generateLegalReview() {
+      const input = document.getElementById("legal-input").value;
+      const box = document.getElementById("legal-output");
+      const key = localStorage.getItem("openrouter_key");
+      if (!key || !input) return (box.innerText = "❌ Missing input or key.");
+      box.innerText = "🔍 Reviewing...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [{ role: "user", content: "Review this for legal issues: " + input }]
+        })
+      });
+      const data = await res.json();
+      box.innerText = data?.choices?.[0]?.message?.content || "⚠️ No review generated.";
+    }
+
+    function testKeys() {
+      const box = document.getElementById("settings-output");
+      const openrouter = localStorage.getItem("openrouter_key");
+      const eleven = localStorage.getItem("elevenlabs_key");
+      box.innerText = `OpenRouter Key: ${openrouter ? '✅' : '❌'}\nElevenLabs Key: ${eleven ? '✅' : '❌'}`;
+    }
+
+    // --- AUTOMATION NODES ---
+    let canvas, nodes = [], nodeCount = 0;
+    function initAutomation() {
+      canvas = document.getElementById("automation-canvas");
+      canvas.innerHTML = '<svg class="connector"></svg>';
+      nodes = [];
+      nodeCount = 0;
+    }
+
+    function addNode(label) {
+      if (!canvas) return;
+      const node = document.createElement("div");
+      node.className = "node";
+      node.textContent = label;
+      node.dataset.label = label;
+      node.dataset.id = ++nodeCount;
+      node.style.left = `${40 + nodeCount * 60}px`;
+      node.style.top = `${40 + nodeCount * 30}px`;
+      makeDraggable(node);
+      canvas.appendChild(node);
+      nodes.push(node);
+    }
+
+    function drawLinkBetweenNodes(fromLabel, toLabel) {
+      const from = nodes.find(n => n.dataset.label === fromLabel);
+      const to = nodes.find(n => n.dataset.label === toLabel);
+      if (!from || !to || !canvas) return;
+      const svg = canvas.querySelector("svg");
+      const fromRect = from.getBoundingClientRect();
+      const toRect = to.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const x1 = fromRect.left + fromRect.width / 2 - canvasRect.left;
+      const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
+      const x2 = toRect.left + toRect.width / 2 - canvasRect.left;
+      const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+      line.setAttribute("stroke", "#00bfff");
+      line.setAttribute("stroke-width", 2);
+      svg.appendChild(line);
+    }
+
+    function makeDraggable(el) {
+      let offsetX = 0, offsetY = 0;
+      el.onmousedown = function(e) {
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        document.onmousemove = function(e) {
+          el.style.left = (e.clientX - offsetX) + "px";
+          el.style.top = (e.clientY - offsetY) + "px";
+        };
+        document.onmouseup = function() {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
+    }
+
+    window.onload = () => {
+      document.querySelector('[data-module="manager"]').click();
+    };
   </script>
 </body>
 </html>
