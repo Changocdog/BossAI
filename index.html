@@ -199,7 +199,6 @@
       });
     });
 
-    // Persistent key logic
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
@@ -237,13 +236,14 @@
       }
     }
 
-    // Manager AI logic
     async function runManagerCommand() {
       const command = document.getElementById("manager-command").value.trim();
       const box = document.getElementById("manager-response");
       const key = localStorage.getItem("openrouter_key");
       if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-      box.innerHTML = "🤖 Thinking...";
+
+      box.innerHTML = `🧠 Thinking: <i>"${command}"</i>`;
+
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
@@ -254,30 +254,31 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You're Manager AI. When user says 'Connect A to B', respond with 'OK', and run JavaScript to call addNode(A); addNode(B); drawLinkBetweenNodes(A,B);" },
+              {
+                role: "system",
+                content: `You are Manager AI. When the user says 'Connect X to Y', respond with something encouraging and execute: addNode(X); addNode(Y); drawLinkBetweenNodes(X, Y);`
+              },
               { role: "user", content: command }
             ]
           })
         });
+
         const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        if (reply.includes("Connect")) {
-          const parts = command.match(/Connect (.+) to (.+)/i);
-          if (parts) {
-            const from = parts[1].trim(), to = parts[2].trim();
-            addNode(from); addNode(to);
-            drawLinkBetweenNodes(from, to);
-            box.innerHTML = "✅ Connection complete.";
-          }
+        const reply = data?.choices?.[0]?.message?.content || "🤖 No response.";
+        const match = command.match(/connect (.+?) to (.+)/i);
+        if (match) {
+          const from = match[1].trim(), to = match[2].trim();
+          addNode(from); addNode(to);
+          drawLinkBetweenNodes(from, to);
+          box.innerHTML = `✅ Connection established: <b>${from}</b> → <b>${to}</b>`;
         } else {
           box.innerHTML = reply;
         }
       } catch (err) {
-        box.innerHTML = "❌ Failed to connect.";
+        box.innerHTML = "❌ Manager AI failed to respond.";
       }
     }
 
-    // Automation node logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
