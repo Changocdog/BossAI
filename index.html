@@ -1,5 +1,3 @@
-<!-- PART 1: START OF FULL UPDATED CODE -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,8 +25,7 @@
       gap: 10px;
       height: 100vh;
       position: fixed;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       border-right: 2px solid #1a1a1a;
       z-index: 100;
       transition: transform 0.3s ease;
@@ -52,40 +49,26 @@
       flex-grow: 1;
       margin-left: 240px;
       width: calc(100% - 240px);
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-start;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       padding: 20px;
       overflow-y: auto;
     }
-    .main.full {
-      margin-left: 0;
-      width: 100%;
-    }
+    .main.full { margin-left: 0; width: 100%; }
     #toggle-btn {
-      position: fixed;
-      top: 10px;
-      left: 10px;
+      position: fixed; top: 10px; left: 10px;
       z-index: 1000;
       background-color: #007bff;
       color: white;
       padding: 10px 16px;
       border-radius: 6px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
+      font-size: 16px; border: none; cursor: pointer;
     }
     textarea, input {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 15px;
-      border-radius: 6px;
+      width: 100%; max-width: 500px;
+      padding: 12px; margin-top: 10px;
+      font-size: 15px; border-radius: 6px;
       border: 1px solid #00bfff;
-      background-color: #1a1a1a;
-      color: white;
+      background-color: #1a1a1a; color: white;
     }
     button.generate-btn {
       background-color: #007bff;
@@ -125,12 +108,8 @@
       user-select: none;
     }
     svg.connector {
-      position: absolute;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
+      position: absolute; top: 0; left: 0;
+      pointer-events: none; width: 100%; height: 100%;
     }
   </style>
 </head>
@@ -150,398 +129,297 @@
   </div>
   <div class="main" id="main">
     <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome. Select a module or command Manager AI.</p>
+    <p class="glow">Welcome. Use Manager AI to start an automated content flow.</p>
   </div>
 
-<script>
-const toggleBtn = document.getElementById("toggle-btn"),
-      sidebar = document.getElementById("sidebar"),
-      main = document.getElementById("main");
+  <script>
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
+          main = document.getElementById("main");
 
-const moduleDescriptions = {
-  "Manager AI": "Controls the app interface and interconnects modules via natural language.",
-  "Script Writer": "Generates video scripts from topics using GPT.",
-  "Voiceover": "Turns text into voice using ElevenLabs API.",
-  "Automation AI": "Connects modules like a flowchart; wires nodes visually.",
-  "Upload Strategy": "Suggests platforms, times, and hashtags for uploading content.",
-  "Trends": "Gathers trending content ideas based on topic or niche.",
-  "Legal Review": "Reviews content for copyright and legal issues.",
-  "Final Output": "Displays final assets like script and voiceover output.",
-  "History": "Shows saved or previous sessions.",
-  "Settings": "Manages app keys and storage."
-};
-</script>
-<!-- PART 2: CONTINUED CODE -->
+    const content = {
+      manager: `
+        <h2 class="glow">🤖 Manager AI</h2>
+        <textarea id="manager-command" placeholder="e.g., Generate script on cats then voiceover"></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+        <div id="manager-response" class="glow-box"></div>
+      `,
+      script: `
+        <h2 class="glow">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder="Topic for script..."></textarea><br>
+        <div id="script-key-box"></div>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <p id="script-output" class="glow-box"></p>
+      `,
+      voiceover: `
+        <h2 class="glow">🎤 Voiceover</h2>
+        <textarea id="voice-text" placeholder="Script text for voice..."></textarea><br>
+        <div id="voice-key-box"></div>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
+        <audio id="voice-player" controls style="margin-top:10px;"></audio>
+      `,
+      automation: `
+        <h2 class="glow">⚙️ Automation AI</h2>
+        <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
+        <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
+        <button class="generate-btn" onclick="clearNodes()">Reset</button>
+        <div id="automation-canvas"><svg class="connector"></svg></div>
+      `,
+      upload: `
+        <h2 class="glow">📤 Upload Strategy</h2>
+        <textarea id="upload-input" placeholder="Describe video for strategy..."></textarea><br>
+        <button class="generate-btn" onclick="generateUploadStrategy()">Generate Strategy</button>
+        <div id="upload-output" class="glow-box"></div>
+      `,
+      trends: `
+        <h2 class="glow">📈 Trends & Topic AI</h2>
+        <textarea id="trends-input" placeholder="Your niche/topic..."></textarea><br>
+        <button class="generate-btn" onclick="generateTrends()">Get Trends</button>
+        <div id="trends-output" class="glow-box"></div>
+      `,
+      legal: `
+        <h2 class="glow">📑 Legal Review</h2>
+        <textarea id="legal-input" placeholder="Script or plan..."></textarea><br>
+        <button class="generate-btn" onclick="generateLegalReview()">Review</button>
+        <div id="legal-output" class="glow-box"></div>
+      `,
+      output: `
+        <h2 class="glow">📦 Final Output</h2>
+        <div id="final-output-box" class="glow-box">Outputs appear here after workflow runs.</div>
+      `,
+      history: `
+        <h2 class="glow">🗂️ History Log</h2>
+        <div id="history-log" class="glow-box">History will show here.</div>
+      `,
+      settings: `
+        <h2 class="glow">⚙️ Settings</h2>
+        <button class="generate-btn" onclick="clearAllKeys()">Clear All Keys</button><br>
+        <button class="generate-btn" onclick="testKeys()">Test Keys</button>
+        <div id="settings-output" class="glow-box"></div>
+      `
+    };
 
-<script>
-const content = {
-  manager: `
-    <h2 class="glow">🤖 Manager AI</h2>
-    <textarea id="manager-command" placeholder="e.g., Connect Script Writer to Voiceover"></textarea>
-    <button class="generate-btn" onclick="runManagerCommand()">Send</button>
-    <div class="glow-box" id="manager-response"></div>
-  `,
-  script: `
-    <h2 class="glow">✍️ Script Writer</h2>
-    <textarea id="script-input" placeholder="Enter your video topic..."></textarea>
-    <div id="script-key-box"></div>
-    <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-    <div class="glow-box" id="script-output"></div>
-  `,
-  voiceover: `
-    <h2 class="glow">🎤 Voiceover</h2>
-    <textarea id="voice-text" placeholder="Enter your script here..."></textarea>
-    <div id="voice-key-box"></div>
-    <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-    <p class="glow" id="voice-status"></p>
-  `,
-  automation: `
-    <h2 class="glow">⚙️ Automation AI</h2>
-    <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
-    <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
-    <button class="generate-btn" onclick="clearNodes()">Reset</button>
-    <div id="automation-canvas"><svg class="connector"></svg></div>
-  `,
-  upload: `
-    <h2 class="glow">📤 Upload Strategy AI</h2>
-    <textarea id="upload-input" placeholder="Describe your content..."></textarea>
-    <button class="generate-btn" onclick="generateUploadStrategy()">Generate Strategy</button>
-    <div class="glow-box" id="upload-output"></div>
-  `,
-  trends: `
-    <h2 class="glow">📈 Trends</h2>
-    <textarea id="trend-input" placeholder="Topic or niche (e.g. finance, comedy)..."></textarea>
-    <button class="generate-btn" onclick="fetchTrends()">Get Trends</button>
-    <div class="glow-box" id="trend-output"></div>
-  `,
-  legal: `
-    <h2 class="glow">📑 Legal Review</h2>
-    <textarea id="legal-input" placeholder="Paste script or content for review..."></textarea>
-    <button class="generate-btn" onclick="runLegalReview()">Run Legal Review</button>
-    <div class="glow-box" id="legal-output"></div>
-  `,
-  output: `
-    <h2 class="glow">📦 Final Output</h2>
-    <div class="glow-box">
-      <strong>Last Script:</strong>
-      <div id="final-script-output"></div><br>
-      <strong>Last Audio:</strong>
-      <audio id="final-audio" controls></audio>
-    </div>
-  `,
-  history: `
-    <h2 class="glow">🗂️ History</h2>
-    <p class="glow">Coming soon: View saved sessions and outputs.</p>
-  `,
-  settings: `
-    <h2 class="glow">⚙️ Settings</h2>
-    <p class="glow">Manage keys and preferences.</p>
-    <button class="generate-btn" onclick="clearAllKeys()">Clear All Saved Keys</button>
-  `
-};
+    let historyLog = [];
+    let canvas, nodes = [], nodeCount = 0;
 
-document.querySelectorAll(".sidebar button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    const mod = btn.getAttribute("data-module");
-    main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
-    if (mod === "script") loadScriptKey();
-    if (mod === "voiceover") loadVoiceKey();
-    if (mod === "automation") initAutomation();
-    if (mod === "output") loadFinalOutput();
-  });
-});
-
-function loadScriptKey() {
-  const key = localStorage.getItem("openrouter_key");
-  const box = document.getElementById("script-key-box");
-  box.innerHTML = key
-    ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
-    : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
-}
-function clearScriptKey() { localStorage.removeItem("openrouter_key"); location.reload(); }
-function saveScriptKey() {
-  const val = document.getElementById("script-key").value.trim();
-  if (val.length > 10) {
-    localStorage.setItem("openrouter_key", val);
-    location.reload();
-  }
-}
-function loadVoiceKey() {
-  const key = localStorage.getItem("elevenlabs_key");
-  const box = document.getElementById("voice-key-box");
-  box.innerHTML = key
-    ? `<p class="glow">✅ Key saved.</p>`
-    : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
-}
-function saveVoiceKey() {
-  const val = document.getElementById("voice-key").value.trim();
-  if (val.length > 10) {
-    localStorage.setItem("elevenlabs_key", val);
-    location.reload();
-  }
-}
-function clearAllKeys() {
-  localStorage.clear();
-  alert("All saved keys cleared.");
-  location.reload();
-}
-<!-- PART 3: MANAGER AI LOGIC + MODULE FUNCTIONALITY -->
-<script>
-async function runManagerCommand() {
-  const command = document.getElementById("manager-command").value.trim();
-  const box = document.getElementById("manager-response");
-  const key = localStorage.getItem("openrouter_key");
-  if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
-
-  const context = [
-    { role: "system", content: "You are Manager AI. Your job is to understand the app layout and execute JavaScript when needed. If a user says 'Connect A to B', you will run addNode(A); addNode(B); drawLinkBetweenNodes(A,B). Modules: Manager AI, Script Writer, Voiceover, Automation AI, Upload Strategy AI, Trends AI, Legal Review AI, Final Output, History, Settings. You have access to Automation AI canvas." },
-    { role: "user", content: command }
-  ];
-
-  box.innerHTML = "🤖 Thinking...";
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ model: "openai/gpt-3.5-turbo", messages: context })
+    document.querySelectorAll(".sidebar button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const mod = btn.getAttribute("data-module");
+        main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
+        if (mod === "automation") initAutomation();
+      });
     });
-    const data = await res.json();
-    const reply = data?.choices?.[0]?.message?.content || "❌ No response";
 
-    // Parse basic command
-    const connectMatch = command.match(/Connect (.+) to (.+)/i);
-    if (connectMatch) {
-      const from = connectMatch[1].trim();
-      const to = connectMatch[2].trim();
-      addNode(from);
-      addNode(to);
-      drawLinkBetweenNodes(from, to);
-      box.innerHTML = "✅ Connected " + from + " → " + to;
-    } else {
-      box.innerHTML = reply;
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
+
+    // — Key functions
+    function loadScriptKey() {
+      const k = localStorage.getItem("openrouter_key");
+      const bx = document.getElementById("script-key-box");
+      bx.innerHTML = k
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
-  } catch (err) {
-    box.innerHTML = "❌ Connection error";
-  }
-}
+    function loadVoiceKey() {
+      const k = localStorage.getItem("elevenlabs_key");
+      const bx = document.getElementById("voice-key-box");
+      bx.innerHTML = k
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearVoiceKey()">Change</button></p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+    }
+    function saveScriptKey() {
+      const v = document.getElementById("script-key").value.trim();
+      if (v.length>10) { localStorage.setItem("openrouter_key",v); loadScriptKey(); }
+    }
+    function saveVoiceKey() {
+      const v = document.getElementById("voice-key").value.trim();
+      if (v.length>10) { localStorage.setItem("elevenlabs_key",v); loadVoiceKey(); }
+    }
+    function clearScriptKey() { localStorage.removeItem("openrouter_key"); loadScriptKey(); }
+    function clearVoiceKey() { localStorage.removeItem("elevenlabs_key"); loadVoiceKey(); }
+    function clearAllKeys() { localStorage.clear(); alert("All keys cleared"); location.reload(); }
+    function testKeys() {
+      const o = !!localStorage.getItem("openrouter_key");
+      const e = !!localStorage.getItem("elevenlabs_key");
+      document.getElementById("settings-output").innerText = `OpenRouter: ${o?'✅':'❌'}\nElevenLabs: ${e?'✅':'❌'}`;
+    }
 
-// AUTOMATION NODE SYSTEM
-let canvas, nodes = [], nodeCount = 0;
+    // — Module functions
+    async function generateScript() {
+      const k = localStorage.getItem("openrouter_key"), inp = document.getElementById("script-input").value;
+      const out = document.getElementById("script-output");
+      if (!k||!inp) return out.innerText="❌ Missing input or key";
+      out.innerText="⏳ Generating...";
+      const r = await fetch("https://openrouter.ai/api/v1/chat/completions",{
+        method:"POST",headers:{"Authorization":"Bearer "+k,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"user",content:inp}]})
+      });
+      const d=await r.json();
+      out.innerText = d?.choices?.[0]?.message?.content||"⚠️ No response";
+      logHistory('Script', inp, out.innerText);
+    }
+    async function generateVoice() {
+      const k=localStorage.getItem("elevenlabs_key"), txt=document.getElementById("voice-text").value,
+            player=document.getElementById("voice-player");
+      if (!k||!txt) return alert("❌ Missing input or key");
+      const r=await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/audio",{
+        method:"POST", headers:{"xi-api-key":k,"Content-Type":"application/json"},
+        body:JSON.stringify({text:txt,voice_settings:{stability:0.5,similarity_boost:0.5}})
+      });
+      const blob=await r.blob();
+      player.src=URL.createObjectURL(blob);
+      logHistory('Voice', txt, '[Audio generated]');
+    }
+    async function generateUploadStrategy() {
+      const k=localStorage.getItem("openrouter_key"), inp=document.getElementById("upload-input").value;
+      const out=document.getElementById("upload-output");
+      if(!k||!inp) return out.innerText="❌ Missing input or key";
+      out.innerText="⏳ Generating...";
+      const r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+k,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"system",content:"You are Upload Strategy AI. Provide platform/time/title hashtags."},{role:"user",content:inp}]})
+      });
+      const d=await r.json(); out.innerText=d?.choices?.[0]?.message?.content||"⚠️ No response";
+      logHistory('UploadStrategy', inp, out.innerText);
+    }
+    async function generateTrends() {
+      const k=localStorage.getItem("openrouter_key"), inp=document.getElementById("trends-input").value;
+      const out=document.getElementById("trends-output");
+      if(!k||!inp) return out.innerText="❌ Missing input or key";
+      out.innerText="⏳ Generating...";
+      const r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+k,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"user",content:"What are trending video topics for: "+inp}]})
+      });
+      const d=await r.json(); out.innerText=d?.choices?.[0]?.message?.content||"⚠️ No response";
+      logHistory('Trends', inp, out.innerText);
+    }
+    async function generateLegalReview() {
+      const k=localStorage.getItem("openrouter_key"), inp=document.getElementById("legal-input").value;
+      const out=document.getElementById("legal-output");
+      if(!k||!inp) return out.innerText="❌ Missing input or key";
+      out.innerText="🔍 Reviewing...";
+      const r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+k,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[{role:"user",content:"Review for legal issues: "+inp}]})
+      });
+      const d=await r.json(); out.innerText=d?.choices?.[0]?.message?.content||"⚠️ No response";
+      logHistory('Legal', inp, out.innerText);
+    }
 
-function initAutomation() {
-  canvas = document.getElementById("automation-canvas");
-  canvas.innerHTML = '<svg class="connector"></svg>';
-  nodes = [];
-  nodeCount = 0;
-}
+    // — Automation UI
+    function initAutomation() {
+      canvas=document.getElementById("automation-canvas");
+      canvas.innerHTML='<svg class="connector"></svg>';
+      nodes=[]; nodeCount=0;
+    }
+    function addNode(label) {
+      if(!canvas)return;
+      const n=document.createElement("div");
+      n.className="node"; n.textContent=label;
+      n.dataset.id=++nodeCount; n.dataset.label=label;
+      n.style.left=`${40+nodeCount*60}px`; n.style.top=`${40+nodeCount*30}px`;
+      makeDraggable(n); canvas.appendChild(n); nodes.push(n);
+    }
+    function clearNodes() {
+      initAutomation();
+    }
+    function drawLinkBetweenNodes(f,t) {
+      const fm=nodes.find(n=>n.dataset.label===f), to=nodes.find(n=>n.dataset.label===t);
+      if(!fm||!to)return;
+      const svg=canvas.querySelector("svg"), r1=fm.getBoundingClientRect(), r2=to.getBoundingClientRect(),
+            cr=canvas.getBoundingClientRect(),
+            x1=r1.left+r1.width/2-cr.left, y1=r1.top+r1.height/2-cr.top,
+            x2=r2.left+r2.width/2-cr.left, y2=r2.top+r2.height/2-cr.top;
+      const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+      line.setAttribute("x1",x1); line.setAttribute("y1",y1);
+      line.setAttribute("x2",x2); line.setAttribute("y2",y2);
+      line.setAttribute("stroke","#00bfff"); line.setAttribute("stroke-width","2");
+      svg.appendChild(line);
+    }
+    function makeDraggable(el) {
+      let offX=0, offY=0;
+      el.onmousedown = function(e) {
+        offX=e.clientX-el.offsetLeft; offY=e.clientY-el.offsetTop;
+        document.onmousemove = e2 => { el.style.left=e2.clientX-offX+"px"; el.style.top=e2.clientY-offY+"px"; };
+        document.onmouseup = ()=>{ document.onmousemove=null; document.onmouseup=null; };
+      };
+    }
 
-function addNode(label) {
-  if (!canvas) canvas = document.getElementById("automation-canvas");
-  const node = document.createElement("div");
-  node.className = "node";
-  node.textContent = label;
-  node.dataset.label = label;
-  node.dataset.id = ++nodeCount;
-  node.style.left = `${60 + nodeCount * 50}px`;
-  node.style.top = `${40 + nodeCount * 30}px`;
-  makeDraggable(node);
-  canvas.appendChild(node);
-  nodes.push(node);
-}
+    // — History logging
+    function logHistory(module, input, output) {
+      const ts = new Date().toLocaleTimeString();
+      historyLog.push({ts, module, input, output});
+      const el = document.getElementById("history-log");
+      if(el) {
+        el.innerText = historyLog.map(h=>`[${h.ts}] ${h.module} → input: ${h.input} | output: ${h.output.substring(0,60)}...`).join("\n");
+      }
+    }
 
-function drawLinkBetweenNodes(fromLabel, toLabel) {
-  const from = nodes.find(n => n.dataset.label === fromLabel);
-  const to = nodes.find(n => n.dataset.label === toLabel);
-  if (!from || !to || !canvas) return;
-  const svg = canvas.querySelector("svg");
-  const fromRect = from.getBoundingClientRect();
-  const toRect = to.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-  const x1 = fromRect.left + fromRect.width / 2 - canvasRect.left;
-  const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
-  const x2 = toRect.left + toRect.width / 2 - canvasRect.left;
-  const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
-  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  line.setAttribute("x1", x1);
-  line.setAttribute("y1", y1);
-  line.setAttribute("x2", x2);
-  line.setAttribute("y2", y2);
-  line.setAttribute("stroke", "#00bfff");
-  line.setAttribute("stroke-width", 2);
-  svg.appendChild(line);
-}
+    // — Manager controller
+    async function runManagerCommand() {
+      const cmd = document.getElementById("manager-command").value.trim();
+      const out = document.getElementById("manager-response");
+      const key = localStorage.getItem("openrouter_key");
+      if(!cmd || !key) return out.innerText="❌ Missing command or OpenRouter key";
+      out.innerText="🤖 Thinking...";
+      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"openai/gpt-3.5-turbo",messages:[
+          {role:"system",content:"You are Manager AI. Interpret commands to control other modules."},
+          {role:"user",content:cmd}
+        ]})
+      });
+      const data=await resp.json();
+      const reply=data?.choices?.[0]?.message?.content||"⚠️ No response.";
+      out.innerText=reply;
+      logHistory('Manager', cmd, reply);
+      interpretManager(cmd);
+    }
+    function interpretManager(cmd) {
+      const lc = cmd.toLowerCase();
+      if(lc.includes("script")) {
+        selectModule('script');
+        document.getElementById("script-input").value = extractAfter(cmd,"script on",cmd);
+        generateScript();
+      }
+      if(lc.includes("voiceover")) {
+        selectModule('voiceover');
+        document.getElementById("voice-text").value = extractAfter(cmd,"voiceover for",cmd) || document.getElementById("script-output").innerText;
+        generateVoice();
+      }
+      if(lc.includes("upload strategy")) {
+        selectModule('upload');
+        document.getElementById("upload-input").value = extractAfter(cmd,"upload strategy for",cmd)||document.getElementById("script-output").innerText;
+        generateUploadStrategy();
+      }
+      if(lc.includes("trends")) {
+        selectModule('trends');
+        document.getElementById("trends-input").value = extractAfter(cmd,"trends in",cmd)||"";
+        generateTrends();
+      }
+      if(lc.includes("legal")) {
+        selectModule('legal');
+        document.getElementById("legal-input").value = extractAfter(cmd,"legal review for",cmd)||document.getElementById("script-output").innerText;
+        generateLegalReview();
+      }
+      selectModule('output');
+    }
+    function extractAfter(full, keyphrase, fallback) {
+      const idx=full.toLowerCase().indexOf(keyphrase);
+      return idx>=0?full.substring(idx+keyphrase.length).trim():fallback;
+    }
 
-function makeDraggable(el) {
-  let offsetX = 0, offsetY = 0;
-  el.onmousedown = function(e) {
-    offsetX = e.clientX - el.offsetLeft;
-    offsetY = e.clientY - el.offsetTop;
-    document.onmousemove = function(e) {
-      el.style.left = (e.clientX - offsetX) + "px";
-      el.style.top = (e.clientY - offsetY) + "px";
+    function selectModule(mod){
+      document.querySelector(`[data-module="${mod}"]`).click();
+    }
+
+    window.onload = () => {
+      selectModule('manager');
     };
-    document.onmouseup = function() {
-      document.onmousemove = null;
-      document.onmouseup = null;
-    };
-  };
-}
-
-// SCRIPT WRITER FUNCTION
-async function generateScript() {
-  const input = document.getElementById("script-input").value.trim();
-  const key = localStorage.getItem("openrouter_key");
-  const out = document.getElementById("script-output");
-  if (!input || !key) return (out.innerText = "❌ Missing input or key");
-  out.innerText = "📝 Writing script...";
-  try {
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "You are a short-form YouTube script writer. Generate engaging scripts under 60 seconds." },
-          { role: "user", content: input }
-        ]
-      })
-    });
-    const data = await res.json();
-    const text = data?.choices?.[0]?.message?.content || "❌ No response";
-    out.innerText = text;
-    localStorage.setItem("last_script", text);
-  } catch {
-    out.innerText = "❌ Error generating script";
-  }
-}
-
-// VOICEOVER FUNCTION
-async function generateVoice() {
-  const text = document.getElementById("voice-text").value.trim();
-  const key = localStorage.getItem("elevenlabs_key");
-  const status = document.getElementById("voice-status");
-  if (!text || !key) return (status.innerText = "❌ Missing text or key");
-
-  status.innerText = "🔊 Generating audio...";
-  try {
-    const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/TxGEqnHWrfWFTfGW9XjX", {
-      method: "POST",
-      headers: {
-        "xi-api-key": key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        text: text,
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-      })
-    });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = document.getElementById("final-audio");
-    audio.src = url;
-    status.innerText = "✅ Voice generated";
-  } catch {
-    status.innerText = "❌ Error generating voice";
-  }
-}
-
-// OTHER MODULES
-function generateUploadStrategy() {
-  const input = document.getElementById("upload-input").value.trim();
-  const key = localStorage.getItem("openrouter_key");
-  const out = document.getElementById("upload-output");
-  if (!input || !key) return (out.innerText = "❌ Missing input or key");
-  out.innerText = "📤 Analyzing upload strategy...";
-  fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + key,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You're a YouTube upload strategist." },
-        { role: "user", content: input }
-      ]
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    out.innerText = data?.choices?.[0]?.message?.content || "❌ No response";
-  }).catch(() => {
-    out.innerText = "❌ Error generating strategy";
-  });
-}
-
-function fetchTrends() {
-  const input = document.getElementById("trend-input").value.trim();
-  const key = localStorage.getItem("openrouter_key");
-  const out = document.getElementById("trend-output");
-  if (!input || !key) return (out.innerText = "❌ Missing input or key");
-  out.innerText = "📈 Fetching trends...";
-  fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + key,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a social media trend expert." },
-        { role: "user", content: input }
-      ]
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    out.innerText = data?.choices?.[0]?.message?.content || "❌ No response";
-  }).catch(() => {
-    out.innerText = "❌ Error fetching trends";
-  });
-}
-
-function runLegalReview() {
-  const input = document.getElementById("legal-input").value.trim();
-  const key = localStorage.getItem("openrouter_key");
-  const out = document.getElementById("legal-output");
-  if (!input || !key) return (out.innerText = "❌ Missing input or key");
-  out.innerText = "📑 Reviewing legality...";
-  fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + key,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You're a legal compliance checker. Review the content and respond with any legal risks." },
-        { role: "user", content: input }
-      ]
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    out.innerText = data?.choices?.[0]?.message?.content || "❌ No response";
-  }).catch(() => {
-    out.innerText = "❌ Error during legal review";
-  });
-}
-
-function loadFinalOutput() {
-  const script = localStorage.getItem("last_script");
-  if (script) document.getElementById("final-script-output").innerText = script;
-}
-</script>
+  </script>
 </body>
 </html>
