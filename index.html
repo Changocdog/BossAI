@@ -207,12 +207,10 @@
         ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
         : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
-
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
       location.reload();
     }
-
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
       if (val.length > 10) {
@@ -228,7 +226,6 @@
         ? `<p class="glow">✅ Key saved.</p>`
         : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
-
     function saveVoiceKey() {
       const val = document.getElementById("voice-key").value.trim();
       if (val.length > 10) {
@@ -310,7 +307,7 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
         if (match) {
           try {
             eval(match[1]);
@@ -398,4 +395,3 @@
   </script>
 </body>
 </html>
-
