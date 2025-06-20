@@ -149,46 +149,43 @@
   </div>
 
   <script>
-    // Load and apply saved module keys
-    function loadKey(type, boxId) {
-      const key = localStorage.getItem(type + "_key");
-      const box = document.getElementById(boxId);
-      if (key) {
-        box.innerHTML = '<p class="glow">✅ Key saved.</p>';
-      } else {
-        box.innerHTML = \`<input id="\${type}-key" type="password" placeholder="🔑 Enter \${type} key"/>
-        <button class="generate-btn" onclick="saveKey('\${type}', '\${boxId}')">Save</button>\`;
-      }
-    }
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
+          main = document.getElementById("main");
 
-    function saveKey(type, boxId) {
-      const val = document.getElementById(type + "-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem(type + "_key", val);
-        loadKey(type, boxId);
-      }
-    }
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
 
-    // Main module loader
-    const modules = {
-      manager: \`<h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-input" placeholder="Ask anything or give commands..."></textarea>
-        <button class="generate-btn" onclick="runManagerAI()">Send</button>
-        <div id="manager-response" class="glow"></div>\`,
-      script: \`<h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Enter script topic..."></textarea>
-        <div id="script-box"></div>
-        <button class="generate-btn" onclick="generateScript()">Generate</button>
-        <p id="script-output"></p>\`,
-      voiceover: \`<h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Enter script text..."></textarea>
-        <div id="voice-box"></div>
-        <button class="generate-btn" onclick="generateVoice()">Play Voice</button>
-        <p id="voice-status"></p>\`,
-      automation: \`<h2 class="glow">⚙️ Automation AI</h2>
-        <button class="generate-btn" onclick="addNode('Script Writer')">+ Script</button>
-        <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice</button>
-        <div id="automation-canvas"><svg class="connector"></svg></div>\`
+    const content = {
+      manager: `
+        <h2 class="glow">🤖 Manager AI</h2>
+        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+        <div id="manager-response" class="glow"></div>
+      `,
+      script: `
+        <h2 class="glow">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
+        <div id="script-key-box"></div>
+        <button class="generate-btn" onclick="generateScript()">Generate Script</button>
+        <p id="script-output"></p>
+      `,
+      voiceover: `
+        <h2 class="glow">🎤 Voiceover</h2>
+        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
+        <div id="voice-key-box"></div>
+        <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
+        <p id="voice-status"></p>
+      `,
+      automation: `
+        <h2 class="glow">⚙️ Automation AI</h2>
+        <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
+        <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
+        <button class="generate-btn" onclick="clearNodes()">Reset</button>
+        <div id="automation-canvas"><svg class="connector"></svg></div>
+      `
     };
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
@@ -196,19 +193,56 @@
         document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
-        document.getElementById("main").innerHTML = modules[mod];
-        if (mod === "script") loadKey("script", "script-box");
-        if (mod === "voiceover") loadKey("voice", "voice-box");
+        main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
+        if (mod === "script") loadScriptKey();
+        if (mod === "voiceover") loadVoiceKey();
+        if (mod === "automation") initAutomation();
       });
     });
 
-    // Script Generator
+    function loadScriptKey() {
+      const key = localStorage.getItem("openrouter_key");
+      const box = document.getElementById("script-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
+    }
+
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      location.reload();
+    }
+
+    function saveScriptKey() {
+      const val = document.getElementById("script-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("openrouter_key", val);
+        location.reload();
+      }
+    }
+
+    function loadVoiceKey() {
+      const key = localStorage.getItem("elevenlabs_key");
+      const box = document.getElementById("voice-key-box");
+      box.innerHTML = key
+        ? `<p class="glow">✅ Key saved.</p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+    }
+
+    function saveVoiceKey() {
+      const val = document.getElementById("voice-key").value.trim();
+      if (val.length > 10) {
+        localStorage.setItem("elevenlabs_key", val);
+        location.reload();
+      }
+    }
+
     async function generateScript() {
-      const key = localStorage.getItem("script_key");
+      const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
-      const out = document.getElementById("script-output");
-      if (!key || !input) return out.textContent = "❌ Missing input or key.";
-      out.textContent = "Generating...";
+      const output = document.getElementById("script-output");
+      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
+      output.innerHTML = "🧠 Writing...";
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -217,20 +251,22 @@
         },
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
-          messages: [{ role: "system", content: "You are a short-form video scriptwriter." }, { role: "user", content: input }]
+          messages: [
+            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+            { role: "user", content: input }
+          ]
         })
       });
       const data = await res.json();
-      out.textContent = data?.choices?.[0]?.message?.content || "Error generating script.";
+      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
     }
 
-    // Voice Generator
     async function generateVoice() {
-      const key = localStorage.getItem("voice_key");
+      const key = localStorage.getItem("elevenlabs_key");
       const text = document.getElementById("voice-text").value.trim();
-      const out = document.getElementById("voice-status");
-      if (!key || !text) return out.textContent = "❌ Missing input or key.";
-      out.textContent = "Generating voice...";
+      const status = document.getElementById("voice-status");
+      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
+      status.innerHTML = "🎙 Generating voice...";
       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
         method: "POST",
         headers: {
@@ -238,57 +274,124 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          text,
+          model_id: "eleven_monolingual_v1",
           voice_settings: { stability: 0.5, similarity_boost: 0.5 },
-          model_id: "eleven_monolingual_v1"
+          text
         })
       });
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      new Audio(url).play();
-      out.textContent = "✅ Playing voice";
+      const audioURL = URL.createObjectURL(blob);
+      const audio = new Audio(audioURL);
+      audio.play();
+      status.innerHTML = "✅ Playing voice";
     }
 
-    // Manager AI Handler
-    async function runManagerAI() {
-      const key = localStorage.getItem("script_key");
-      const input = document.getElementById("manager-input").value;
-      const out = document.getElementById("manager-response");
-      if (!key || !input) return (out.textContent = "❌ Missing input or key.");
-      out.textContent = "Thinking...";
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-4",
-          messages: [{ role: "system", content: "You are Boss AI’s Manager. Respond like ChatGPT and include JS in ```js blocks when needed." }, { role: "user", content: input }]
-        })
-      });
-      const data = await res.json();
-      const reply = data?.choices?.[0]?.message?.content || "❌ Error.";
-      out.innerHTML = reply;
-      const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
-      if (match) {
-        try { eval(match[1]); } catch (e) { out.innerHTML += "<br>⚠️ JS Error: " + e.message; }
+    async function runManagerCommand() {
+      const key = localStorage.getItem("openrouter_key");
+      const command = document.getElementById("manager-command").value.trim();
+      const box = document.getElementById("manager-response");
+      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
+      box.innerHTML = "🤖 Thinking...";
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are Manager AI. Output JavaScript code inside ```js blocks. Speak naturally." },
+              { role: "user", content: command }
+            ]
+          })
+        });
+        const data = await res.json();
+        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
+        box.innerHTML = reply;
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        if (match) {
+          try {
+            eval(match[1]);
+          } catch (err) {
+            box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
+          }
+        }
+      } catch (err) {
+        box.innerHTML = "❌ Failed to connect to Manager AI.";
       }
     }
 
-    // Automation Canvas
-    let canvas, nodes = [];
-    function addNode(name) {
+    // Automation AI logic
+    let canvas, nodes = [], nodeCount = 0;
+    function initAutomation() {
       canvas = document.getElementById("automation-canvas");
-      const n = document.createElement("div");
-      n.className = "node";
-      n.textContent = name;
-      n.style.left = Math.random() * 300 + "px";
-      n.style.top = Math.random() * 200 + "px";
-      canvas.appendChild(n);
+      canvas.innerHTML = '<svg class="connector"></svg>';
+      nodes = [];
+      nodeCount = 0;
     }
 
-    // Init
+    function addNode(label) {
+      const div = document.createElement("div");
+      div.className = "node";
+      div.textContent = label;
+      div.dataset.id = ++nodeCount;
+      div.style.left = `${30 + nodeCount * 60}px`;
+      div.style.top = `${30 + nodeCount * 30}px`;
+      makeDraggable(div);
+      canvas.appendChild(div);
+      nodes.push(div);
+      drawConnections();
+    }
+
+    function makeDraggable(el) {
+      let offsetX = 0, offsetY = 0, dragging = false;
+      el.addEventListener("mousedown", e => {
+        dragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+      function onMouseMove(e) {
+        if (!dragging) return;
+        el.style.left = `${e.clientX - offsetX}px`;
+        el.style.top = `${e.clientY - offsetY}px`;
+        drawConnections();
+      }
+      function onMouseUp() {
+        dragging = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+    }
+
+    function drawConnections() {
+      const svg = canvas.querySelector("svg");
+      svg.innerHTML = '';
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const from = nodes[i].getBoundingClientRect();
+        const to = nodes[i + 1].getBoundingClientRect();
+        const x1 = from.left + from.width / 2 - canvas.getBoundingClientRect().left;
+        const y1 = from.top + from.height / 2 - canvas.getBoundingClientRect().top;
+        const x2 = to.left + to.width / 2 - canvas.getBoundingClientRect().left;
+        const y2 = to.top + to.height / 2 - canvas.getBoundingClientRect().top;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#00bfff");
+        line.setAttribute("stroke-width", 2);
+        svg.appendChild(line);
+      }
+    }
+
+    function clearNodes() {
+      initAutomation();
+    }
+
     window.onload = () => {
       document.querySelector('[data-module="manager"]').click();
     };
