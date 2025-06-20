@@ -147,7 +147,6 @@
     <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
     <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
-
   <script>
     const toggleBtn = document.getElementById("toggle-btn"),
           sidebar = document.getElementById("sidebar"),
@@ -300,9 +299,12 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
+            model: "openai/gpt-4",
             messages: [
-              { role: "system", content: "You are Manager AI. Output JavaScript code inside ```js blocks. Speak naturally." },
+              {
+                role: "system",
+                content: "You are the powerful Manager AI inside the Boss AI app. You control all modules including Script Writer, Voiceover AI, and Automation AI. You know all module functions. When the user gives a command, explain your reasoning in plain text, then output any JavaScript in ```js blocks and it will be auto-executed. Keep your memory across responses using reasoning from prior chat."
+              },
               { role: "user", content: command }
             ]
           })
@@ -323,7 +325,7 @@
       }
     }
 
-    // Automation AI logic
+    // Automation AI
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
