@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
     body {
@@ -299,9 +300,9 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "openai/gpt-4",
+            model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Output JavaScript in ```js blocks and it will be auto-executed." },
+              { role: "system", content: "You are Manager AI. Output JavaScript code in ```js blocks and it will be executed." },
               { role: "user", content: command }
             ]
           })
@@ -322,6 +323,7 @@
       }
     }
 
+    // Automation AI logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
