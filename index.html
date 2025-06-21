@@ -127,6 +127,7 @@
     <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
     <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
+
   <script>
     const toggleBtn = document.getElementById("toggle-btn"),
           sidebar = document.getElementById("sidebar"),
@@ -140,29 +141,32 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Ask anything or give a command..."></textarea><br>
+        <textarea id="manager-command" placeholder="Try: Generate a script about AI and read it"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
-      script: `<h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
-        <div id="script-key-box"></div>
+      script: `
+        <h2 class="glow">✍️ Script Writer</h2>
+        <textarea id="script-input" placeholder="Enter video topic..."></textarea><br>
+        <input id="script-key" type="password" placeholder="OpenRouter API Key"/><br>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
-        <p id="script-output"></p>`,
-      voiceover: `<h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
-        <div id="voice-key-box"></div>
+        <p id="script-output"></p>
+      `,
+      voiceover: `
+        <h2 class="glow">🎤 Voiceover</h2>
+        <textarea id="voice-text" placeholder="Enter script to narrate..."></textarea><br>
+        <input id="voice-key" type="password" placeholder="ElevenLabs API Key"/><br>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
-        <p id="voice-status"></p>`,
-      automation: `<h2 class="glow">⚙️ Automation AI</h2><p>(Coming soon)</p>`,
-      upload: `<h2 class="glow">📤 Upload Strategy</h2><p>(Coming soon)</p>`,
-      trends: `<h2 class="glow">📈 Trends AI</h2><p>(Coming soon)</p>`,
-      legal: `<h2 class="glow">⚖️ Legal Review</h2><p>(Coming soon)</p>`,
-      output: `<h2 class="glow">📦 Final Output</h2><p>(Coming soon)</p>`,
-      history: `<h2 class="glow">🕓 History</h2><p>(Coming soon)</p>`,
-      sheets: `<h2 class="glow">🧾 Google Sheets Log</h2><p>(Coming soon)</p>`,
-      settings: `<h2 class="glow">⚙️ Settings</h2>
-        <button class="generate-btn" onclick="localStorage.clear();location.reload()">🗑 Clear Saved Keys</button>`
+        <p id="voice-status"></p>
+      `,
+      automation: `<h2 class="glow">⚙️ Automation AI</h2><p>(coming soon)</p>`,
+      upload: `<h2 class="glow">📤 Upload Strategy</h2><p>(coming soon)</p>`,
+      trends: `<h2 class="glow">📈 Trends AI</h2><p>(coming soon)</p>`,
+      legal: `<h2 class="glow">⚖️ Legal Review</h2><p>(coming soon)</p>`,
+      output: `<h2 class="glow">📦 Final Output</h2><p>(coming soon)</p>`,
+      history: `<h2 class="glow">🕓 History</h2><p>(coming soon)</p>`,
+      sheets: `<h2 class="glow">🧾 Sheets Log</h2><p>(coming soon)</p>`,
+      settings: `<h2 class="glow">⚙️ Settings</h2><button onclick="localStorage.clear();location.reload()" class="generate-btn">Clear All Saved Keys</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
@@ -171,49 +175,16 @@
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
         main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
-        if (mod === "script") loadScriptKey();
-        if (mod === "voiceover") loadVoiceKey();
       });
     });
 
-    function loadScriptKey() {
-      const key = localStorage.getItem("openrouter_key");
-      const box = document.getElementById("script-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ OpenRouter key saved. <button onclick="clearScriptKey()">Change</button></p>`
-        : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button onclick="saveScriptKey()">Save</button>`;
-    }
-    function clearScriptKey() { localStorage.removeItem("openrouter_key"); location.reload(); }
-    function saveScriptKey() {
-      const val = document.getElementById("script-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("openrouter_key", val);
-        location.reload();
-      }
-    }
-
-    function loadVoiceKey() {
-      const key = localStorage.getItem("elevenlabs_key");
-      const box = document.getElementById("voice-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ ElevenLabs key saved. <button onclick="clearVoiceKey()">Change</button></p>`
-        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button onclick="saveVoiceKey()">Save</button>`;
-    }
-    function clearVoiceKey() { localStorage.removeItem("elevenlabs_key"); location.reload(); }
-    function saveVoiceKey() {
-      const val = document.getElementById("voice-key").value.trim();
-      if (val.length > 10) {
-        localStorage.setItem("elevenlabs_key", val);
-        location.reload();
-      }
-    }
-
     async function generateScript() {
-      const key = localStorage.getItem("openrouter_key");
+      const key = document.getElementById("script-key").value || localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
       const output = document.getElementById("script-output");
-      if (!key || !input) return output.innerHTML = "❌ Missing input or key.";
-      output.innerHTML = "✍️ Writing...";
+      if (key.length > 10) localStorage.setItem("openrouter_key", key);
+      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
+      output.innerHTML = "🧠 Writing...";
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -223,21 +194,22 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You write viral, engaging short-form video scripts for TikTok and YouTube Shorts." },
+            { role: "system", content: "You're a script writer for YouTube Shorts." },
             { role: "user", content: input }
           ]
         })
       });
       const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error generating script.";
+      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
     }
 
     async function generateVoice() {
-      const key = localStorage.getItem("elevenlabs_key");
+      const key = document.getElementById("voice-key").value || localStorage.getItem("elevenlabs_key");
       const text = document.getElementById("voice-text").value.trim();
       const status = document.getElementById("voice-status");
-      if (!key || !text) return status.innerHTML = "❌ Missing input or key.";
-      status.innerHTML = "🎤 Generating voice...";
+      if (key.length > 10) localStorage.setItem("elevenlabs_key", key);
+      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
+      status.innerHTML = "🎙 Generating voice...";
       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
         method: "POST",
         headers: {
@@ -251,16 +223,16 @@
         })
       });
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      new Audio(url).play();
+      const audioURL = URL.createObjectURL(blob);
+      new Audio(audioURL).play();
       status.innerHTML = "✅ Playing voice";
     }
 
     async function runManagerCommand() {
       const key = localStorage.getItem("openrouter_key");
-      const command = document.getElementById("manager-command").value.trim();
+      const input = document.getElementById("manager-command").value;
       const box = document.getElementById("manager-response");
-      if (!key || !command) return box.innerHTML = "❌ Missing input or key.";
+      if (!key || !input) return box.innerHTML = "❌ Missing key or command";
       box.innerHTML = "🤖 Thinking...";
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -270,22 +242,22 @@
         },
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "You are Manager AI. Respond as a helpful assistant. When needed, output JavaScript code inside ```js blocks for the app to execute." },
-            { role: "user", content: command }
-          ]
+          messages: JSON.parse(localStorage.getItem("manager_memory") || "[]").concat([
+            { role: "user", content: input }
+          ])
         })
       });
       const data = await res.json();
-      const reply = data?.choices?.[0]?.message?.content || "❌ No response.";
+      const reply = data?.choices?.[0]?.message?.content || "❌ No response";
       box.innerHTML = reply;
+      const newHistory = JSON.parse(localStorage.getItem("manager_memory") || "[]");
+      newHistory.push({ role: "user", content: input });
+      newHistory.push({ role: "assistant", content: reply });
+      localStorage.setItem("manager_memory", JSON.stringify(newHistory.slice(-10))); // keep short history
       const match = reply.match(/```js\s*([\s\S]+?)```/);
       if (match) {
-        try {
-          eval(match[1]);
-        } catch (err) {
-          box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`;
-        }
+        try { eval(match[1]); }
+        catch (err) { box.innerHTML += `<br><span style="color:red;">⚠️ JS Error: ${err.message}</span>`; }
       }
     }
 
