@@ -18,7 +18,7 @@
     }
     .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
     .sidebar {
-      width: 240px;
+      width: 250px;
       background: #0d0d0d;
       padding: 60px 10px 20px;
       display: flex;
@@ -49,11 +49,11 @@
     }
     .main {
       flex-grow: 1;
-      margin-left: 240px;
-      width: calc(100% - 240px);
+      margin-left: 250px;
+      width: calc(100% - 250px);
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       flex-direction: column;
       padding: 20px;
       overflow-y: auto;
@@ -77,7 +77,7 @@
     }
     textarea, input {
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       padding: 12px;
       margin-top: 10px;
       font-size: 15px;
@@ -142,12 +142,18 @@
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
     <button data-module="automation">⚙️ Automation AI</button>
+    <button data-module="upload">📤 Upload Strategy</button>
+    <button data-module="trends">📈 Trends AI</button>
+    <button data-module="legal">⚖️ Legal Review</button>
+    <button data-module="output">📦 Final Output</button>
+    <button data-module="history">🕓 History</button>
+    <button data-module="sheets">🧾 Sheets Log</button>
+    <button data-module="settings">⚙️ Settings</button>
   </div>
   <div class="main" id="main">
     <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
     <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
-
   <script>
     const toggleBtn = document.getElementById("toggle-btn"),
           sidebar = document.getElementById("sidebar"),
@@ -161,30 +167,52 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Ex: Connect script to voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
-      script: `
-        <h2 class="glow">✍️ Script Writer</h2>
+      script: `<h2 class="glow">✍️ Script Writer</h2>
         <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output"></p>
       `,
-      voiceover: `
-        <h2 class="glow">🎤 Voiceover</h2>
+      voiceover: `<h2 class="glow">🎤 Voiceover</h2>
         <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status"></p>
       `,
-      automation: `
-        <h2 class="glow">⚙️ Automation AI</h2>
+      automation: `<h2 class="glow">⚙️ Automation AI</h2>
         <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
         <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
         <button class="generate-btn" onclick="clearNodes()">Reset</button>
         <div id="automation-canvas"><svg class="connector"></svg></div>
+      `,
+      upload: `<h2 class="glow">📤 Upload Strategy</h2>
+        <textarea id="upload-input" placeholder="Describe your content and goals..."></textarea><br>
+        <button class="generate-btn" onclick="alert('Strategy logic coming soon.')">Generate Strategy</button>
+      `,
+      trends: `<h2 class="glow">📈 Trends AI</h2>
+        <textarea placeholder="Enter niche or keyword to get trending data..."></textarea><br>
+        <button class="generate-btn" onclick="alert('Trend lookup not yet implemented.')">Get Trends</button>
+      `,
+      legal: `<h2 class="glow">⚖️ Legal Review</h2>
+        <textarea placeholder="Paste your script or content here..."></textarea><br>
+        <button class="generate-btn" onclick="alert('Legal review tool not yet implemented.')">Run Legal Check</button>
+      `,
+      output: `<h2 class="glow">📦 Final Output Log</h2>
+        <p>View completed script, voice, and strategy results here soon.</p>
+      `,
+      history: `<h2 class="glow">🕓 History</h2>
+        <p>Past logs of your generated content will appear here.</p>
+      `,
+      sheets: `<h2 class="glow">🧾 Google Sheets Logger</h2>
+        <p>Automatically sends data to a shared spreadsheet (feature coming soon).</p>
+      `,
+      settings: `<h2 class="glow">⚙️ Settings</h2>
+        <p>App settings and saved API keys go here.</p>
+        <button class="generate-btn" onclick="localStorage.clear(); location.reload()">🗑 Clear All Saved Keys</button>
       `
     };
 
@@ -204,15 +232,13 @@
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
       box.innerHTML = key
-        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
+        ? `<p class="glow">✅ OpenRouter key saved. <button class="generate-btn" onclick="clearScriptKey()">Change</button></p>`
         : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
-
     function clearScriptKey() {
       localStorage.removeItem("openrouter_key");
       location.reload();
     }
-
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
       if (val.length > 10) {
@@ -220,15 +246,13 @@
         location.reload();
       }
     }
-
     function loadVoiceKey() {
       const key = localStorage.getItem("elevenlabs_key");
       const box = document.getElementById("voice-key-box");
       box.innerHTML = key
-        ? `<p class="glow">✅ Key saved.</p>`
+        ? `<p class="glow">✅ ElevenLabs key saved.</p>`
         : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
-
     function saveVoiceKey() {
       const val = document.getElementById("voice-key").value.trim();
       if (val.length > 10) {
@@ -252,7 +276,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You write viral YouTube Shorts scripts." },
+            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
             { role: "user", content: input }
           ]
         })
@@ -302,7 +326,7 @@
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond naturally, and when needed, include JavaScript in ```js blocks to control the app." },
+              { role: "system", content: "You are Manager AI. Respond naturally and embed JS inside ```js blocks to be executed." },
               { role: "user", content: command }
             ]
           })
@@ -310,7 +334,7 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
+        const match = reply.match(/```js\s*([\s\S]+?)```/);
         if (match) {
           try {
             eval(match[1]);
