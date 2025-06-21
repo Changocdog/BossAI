@@ -106,6 +106,33 @@
       white-space: pre-wrap;
       width: 100%;
     }
+    #automation-canvas {
+      position: relative;
+      border: 2px solid #00bfff;
+      background: #1a1a1a;
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .node {
+      position: absolute;
+      background: #121212;
+      border: 1px solid #00bfff;
+      padding: 6px 10px;
+      color: #00bfff;
+      border-radius: 6px;
+      cursor: move;
+      user-select: none;
+    }
+    svg.connector {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
@@ -114,51 +141,64 @@
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
+    <button data-module="automation">⚙️ Automation AI</button>
     <button data-module="upload">📤 Upload Strategy</button>
     <button data-module="trends">📈 Trends AI</button>
     <button data-module="legal">⚖️ Legal Review</button>
     <button data-module="output">📦 Final Output</button>
     <button data-module="history">🕓 History</button>
+    <button data-module="sheets">🧾 Sheets Log</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
   <div class="main" id="main">
-    <h1 class="glow">Boss AI Dashboard</h1>
-    <div id="module-content">
-      <h2 class="glow">🤖 Manager AI</h2>
-      <textarea id="manager-command" placeholder="Ask anything or say a command like: Generate a video script."></textarea><br>
-      <button class="generate-btn" onclick="runManager()">Submit</button>
-      <div id="manager-response" class="glow"></div>
-    </div>
+    <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
+    <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
-
   <script>
-    const modules = {
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
+          main = document.getElementById("main");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+      main.classList.toggle("full");
+    });
+
+    const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Ask anything or say a command like: Generate a video script."></textarea><br>
-        <button class="generate-btn" onclick="runManager()">Submit</button>
+        <textarea id="manager-command" placeholder="Example: Connect Script Writer to Voiceover"></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Describe your topic..."></textarea><br>
+        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Paste your script here..."></textarea><br>
+        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <p id="voice-status"></p>
       `,
-      upload: `<h2 class="glow">📤 Upload Strategy</h2><p>Coming soon...</p>`,
-      trends: `<h2 class="glow">📈 Trends AI</h2><p>Coming soon...</p>`,
-      legal: `<h2 class="glow">⚖️ Legal Review</h2><p>Coming soon...</p>`,
-      output: `<h2 class="glow">📦 Final Output</h2><p>Coming soon...</p>`,
-      history: `<h2 class="glow">🕓 History</h2><p>Coming soon...</p>`,
-      settings: `<h2 class="glow">⚙️ Settings</h2><p>App settings coming soon.</p><button class="generate-btn" onclick="localStorage.clear();location.reload()">Clear All Saved Keys</button>`
+      automation: `
+        <h2 class="glow">⚙️ Automation AI</h2>
+        <button class="generate-btn" onclick="addNode('Script Writer')">+ Script Node</button>
+        <button class="generate-btn" onclick="addNode('Voiceover')">+ Voice Node</button>
+        <button class="generate-btn" onclick="clearNodes()">Reset</button>
+        <div id="automation-canvas"><svg class="connector"></svg></div>
+      `,
+      upload: `<h2 class="glow">📤 Upload Strategy</h2><p>Coming soon.</p>`,
+      trends: `<h2 class="glow">📈 Trends AI</h2><p>Coming soon.</p>`,
+      legal: `<h2 class="glow">⚖️ Legal Review</h2><p>Coming soon.</p>`,
+      output: `<h2 class="glow">📦 Final Output Log</h2><p>Coming soon.</p>`,
+      history: `<h2 class="glow">🕓 History</h2><p>Coming soon.</p>`,
+      sheets: `<h2 class="glow">🧾 Google Sheets Logger</h2><p>Coming soon.</p>`,
+      settings: `<h2 class="glow">⚙️ Settings</h2><button class="generate-btn" onclick="localStorage.clear();location.reload()">🗑 Clear All Saved Keys</button>`
     };
 
     document.querySelectorAll(".sidebar button").forEach(btn => {
@@ -166,23 +206,17 @@
         document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const mod = btn.getAttribute("data-module");
-        document.getElementById("module-content").innerHTML = modules[mod];
+        main.innerHTML = `<div style="max-width:800px;width:100%;">${content[mod]}</div>`;
         if (mod === "script") loadScriptKey();
         if (mod === "voiceover") loadVoiceKey();
+        if (mod === "automation") initAutomation();
       });
-    });
-
-    document.getElementById("toggle-btn").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("hidden");
-      document.querySelector(".main").classList.toggle("full");
     });
 
     function loadScriptKey() {
       const key = localStorage.getItem("openrouter_key");
       const box = document.getElementById("script-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ OpenRouter key saved. <button onclick="clearScriptKey()">Change</button></p>`
-        : `<input id="script-key" placeholder="Enter OpenRouter API Key"/><button onclick="saveScriptKey()">Save</button>`;
+      box.innerHTML = key ? `✅ Key saved.` : `<input id="script-key" placeholder="🔑 OpenRouter Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
@@ -191,17 +225,11 @@
         location.reload();
       }
     }
-    function clearScriptKey() {
-      localStorage.removeItem("openrouter_key");
-      location.reload();
-    }
 
     function loadVoiceKey() {
       const key = localStorage.getItem("elevenlabs_key");
       const box = document.getElementById("voice-key-box");
-      box.innerHTML = key
-        ? `<p class="glow">✅ ElevenLabs key saved.</p>`
-        : `<input id="voice-key" placeholder="Enter ElevenLabs Key"/><button onclick="saveVoiceKey()">Save</button>`;
+      box.innerHTML = key ? `✅ Key saved.` : `<input id="voice-key" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
     function saveVoiceKey() {
       const val = document.getElementById("voice-key").value.trim();
@@ -215,8 +243,8 @@
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("script-input").value.trim();
       const output = document.getElementById("script-output");
-      if (!key || !input) return (output.innerHTML = "❌ Missing input or key");
-      output.innerHTML = "🧠 Writing...";
+      if (!key || !input) return output.innerText = "Missing key or input.";
+      output.innerText = "Generating...";
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -226,21 +254,21 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+            { role: "system", content: "You're a scriptwriter for YouTube and TikTok." },
             { role: "user", content: input }
           ]
         })
       });
       const data = await res.json();
-      output.innerHTML = data?.choices?.[0]?.message?.content || "❌ Error.";
+      output.innerText = data.choices?.[0]?.message?.content || "Failed to generate.";
     }
 
     async function generateVoice() {
       const key = localStorage.getItem("elevenlabs_key");
       const text = document.getElementById("voice-text").value.trim();
       const status = document.getElementById("voice-status");
-      if (!key || !text) return (status.innerHTML = "❌ Missing input or key");
-      status.innerHTML = "🎙 Generating...";
+      if (!key || !text) return status.innerText = "Missing key or text.";
+      status.innerText = "Generating voice...";
       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/pNInz6obpgDQGcFmaJgB", {
         method: "POST",
         headers: {
@@ -254,51 +282,101 @@
         })
       });
       const blob = await res.blob();
-      const audioURL = URL.createObjectURL(blob);
-      const audio = new Audio(audioURL);
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
       audio.play();
-      status.innerHTML = "✅ Playing voice";
+      status.innerText = "✅ Playing voice.";
     }
 
-    async function runManager() {
+    async function runManagerCommand() {
       const key = localStorage.getItem("openrouter_key");
       const input = document.getElementById("manager-command").value.trim();
-      const box = document.getElementById("manager-response");
-      if (!key || !input) return (box.innerHTML = "❌ Missing input or key");
-      box.innerHTML = "🤖 Thinking...";
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + key,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-4",
-            messages: [
-              {
-                role: "system",
-                content: `You are Manager AI, a superintelligent assistant who understands and controls all modules of the Boss AI dashboard:
-- Script Writer: generates video scripts
-- Voiceover: creates voice narration
-- Upload Strategy: suggests posting plans
-- Trends AI: recommends trending content
-- Legal Review: checks for copyright issues
-- Final Output: shows results
-- History: logs previous work
-- Settings: saves user preferences
-Respond in natural language and understand the user's intent.`
-              },
-              { role: "user", content: input }
-            ]
-          })
-        });
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content || "❌ No response";
-        box.innerHTML = reply;
-      } catch (err) {
-        box.innerHTML = "❌ Error contacting Manager AI.";
+      const output = document.getElementById("manager-response");
+      if (!key || !input) return output.innerText = "Missing key or input.";
+      output.innerText = "Thinking...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are the Boss AI Manager. Always describe modules clearly, and use JavaScript only if needed using ```js code```." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || "No reply.";
+      output.innerText = reply;
+      const js = reply.match(/```js([\s\S]*?)```/);
+      if (js) try { eval(js[1]); } catch (e) { output.innerText += "\nJS Error: " + e.message; }
+    }
+
+    let canvas, nodes = [], nodeCount = 0;
+    function initAutomation() {
+      canvas = document.getElementById("automation-canvas");
+      canvas.innerHTML = '<svg class="connector"></svg>';
+      nodes = [];
+      nodeCount = 0;
+    }
+    function addNode(label) {
+      const div = document.createElement("div");
+      div.className = "node";
+      div.textContent = label;
+      div.dataset.id = ++nodeCount;
+      div.style.left = `${30 + nodeCount * 60}px`;
+      div.style.top = `${30 + nodeCount * 30}px`;
+      makeDraggable(div);
+      canvas.appendChild(div);
+      nodes.push(div);
+      drawConnections();
+    }
+    function makeDraggable(el) {
+      let offsetX = 0, offsetY = 0, dragging = false;
+      el.addEventListener("mousedown", e => {
+        dragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+      function onMouseMove(e) {
+        if (!dragging) return;
+        el.style.left = `${e.clientX - offsetX}px`;
+        el.style.top = `${e.clientY - offsetY}px`;
+        drawConnections();
       }
+      function onMouseUp() {
+        dragging = false;
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+      }
+    }
+    function drawConnections() {
+      const svg = canvas.querySelector("svg");
+      svg.innerHTML = '';
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const from = nodes[i].getBoundingClientRect();
+        const to = nodes[i + 1].getBoundingClientRect();
+        const x1 = from.left + from.width / 2 - canvas.getBoundingClientRect().left;
+        const y1 = from.top + from.height / 2 - canvas.getBoundingClientRect().top;
+        const x2 = to.left + to.width / 2 - canvas.getBoundingClientRect().left;
+        const y2 = to.top + to.height / 2 - canvas.getBoundingClientRect().top;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#00bfff");
+        line.setAttribute("stroke-width", 2);
+        svg.appendChild(line);
+      }
+    }
+    function clearNodes() {
+      initAutomation();
     }
 
     window.onload = () => {
