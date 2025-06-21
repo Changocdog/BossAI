@@ -161,7 +161,7 @@
     const content = {
       manager: `
         <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-command" placeholder="Example: Connect script writer to voiceover"></textarea><br>
+        <textarea id="manager-command" placeholder="Ex: Connect script to voiceover"></textarea><br>
         <button class="generate-btn" onclick="runManagerCommand()">Send</button>
         <div id="manager-response" class="glow"></div>
       `,
@@ -252,7 +252,7 @@
         body: JSON.stringify({
           model: "openai/gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You're a script writer for YouTube Shorts and TikToks." },
+            { role: "system", content: "You write viral YouTube Shorts scripts." },
             { role: "user", content: input }
           ]
         })
@@ -300,9 +300,9 @@
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "openai/gpt-4",
+            model: "openai/gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "You are Manager AI. Respond like ChatGPT but include a ```js code block if the user’s command needs to control the app. For example, to change modules, click buttons, or wire nodes in Automation AI." },
+              { role: "system", content: "You are Manager AI. Respond naturally, and when needed, include JavaScript in ```js blocks to control the app." },
               { role: "user", content: command }
             ]
           })
@@ -310,7 +310,7 @@
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content || "❌ No response";
         box.innerHTML = reply;
-        const match = reply.match(/```js\s*([\s\S]+?)```/);
+        const match = reply.match(/```js\\s*([\\s\\S]+?)```/);
         if (match) {
           try {
             eval(match[1]);
@@ -323,7 +323,7 @@
       }
     }
 
-    // Automation AI
+    // Automation AI Logic
     let canvas, nodes = [], nodeCount = 0;
     function initAutomation() {
       canvas = document.getElementById("automation-canvas");
