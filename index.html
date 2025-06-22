@@ -16,23 +16,21 @@
       height: 100vh;
       overflow: hidden;
     }
-    .glow {
-      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
-    }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+
     .menu-toggle {
-      position: fixed;
+      position: absolute;
       top: 10px;
       left: 10px;
       z-index: 9999;
       background: #000;
       color: #00bfff;
+      padding: 8px 12px;
       border: 1px solid #00bfff;
-      padding: 6px 12px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 4px;
       font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
     }
+
     .sidebar {
       width: 250px;
       background: #0e0e0e;
@@ -41,25 +39,35 @@
       flex-direction: column;
       gap: 8px;
       overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 1000;
     }
+
+    .sidebar.hidden {
+      transform: translateX(-260px);
+    }
+
     .sidebar button {
       background: none;
       border: none;
       color: #00bfff;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       padding: 8px;
       text-align: left;
     }
+
     .sidebar button.active {
       font-weight: bold;
       background: #111;
     }
+
     .content {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
     }
+
     textarea, input {
       width: 100%;
       background: #000;
@@ -67,9 +75,13 @@
       border: 1px solid #00bfff;
       padding: 10px;
       margin-top: 5px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 14px;
+      font-family: monospace;
     }
+
+    input[type="password"] {
+      -webkit-text-security: disc;
+    }
+
     .module { display: none; }
     .visible { display: block; }
     .manager-output {
@@ -79,26 +91,12 @@
       overflow-y: auto;
       white-space: pre-wrap;
       border: 1px solid #00bfff;
-      font-size: 14px;
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-        position: fixed;
-        top: 50px;
-        left: 0;
-        z-index: 999;
-        height: calc(100vh - 50px);
-      }
-      .sidebar.show {
-        display: flex;
-      }
     }
   </style>
 </head>
 <body>
-  <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
-  <div class="sidebar">
+  <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+  <div class="sidebar" id="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voice">🔊 Voiceover</button>
@@ -120,14 +118,14 @@
     </div>
     <div id="script" class="module">
       <h2 class="glow">✍️ Script Writer</h2>
-      <input id="script-api-key" placeholder="OpenRouter API Key" />
+      <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
       <textarea id="script-input" placeholder="Enter script topic..."></textarea>
       <button onclick="generateScript()">Generate Script</button>
       <div id="script-output" class="manager-output"></div>
     </div>
     <div id="voice" class="module">
       <h2 class="glow">🔊 Voiceover AI</h2>
-      <input id="voice-api-key" placeholder="ElevenLabs API Key" />
+      <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
       <textarea id="voice-text" placeholder="Paste script here..."></textarea>
       <button onclick="generateVoice()">Generate Voiceover</button>
       <audio id="voice-audio" controls style="margin-top:10px;"></audio>
@@ -144,21 +142,21 @@
 
   <script>
     const modules = {
-      manager: "Control center for all modules. Responds to commands and executes interface actions.",
-      script: "Generates YouTube scripts using OpenRouter GPT.",
-      voice: "Converts scripts into realistic voiceover using ElevenLabs.",
-      automation: "Build workflows and automate app logic (n8n-style).",
-      upload: "Suggests upload strategies, platforms, and times.",
-      trends: "Analyzes current topic trends and data.",
-      legal: "Performs legal and copyright reviews on content.",
-      output: "Final output generator for review and download.",
-      history: "Shows saved project outputs and past runs.",
-      sheets: "Logs all actions to a Google Sheet.",
-      settings: "Configure API keys, theme, and preferences."
+      manager: "Controls app and modules with AI commands.",
+      script: "Generates YouTube scripts using OpenRouter.",
+      voice: "Converts text to audio using ElevenLabs.",
+      automation: "Visual automation builder (like n8n).",
+      upload: "Plans optimal upload strategy.",
+      trends: "Analyzes trends for content ideas.",
+      legal: "Performs legal and copyright checks.",
+      output: "Final output preparation module.",
+      history: "Shows logs and past outputs.",
+      sheets: "Saves logs to Google Sheets.",
+      settings: "Manages preferences and keys."
     };
 
-    function toggleMenu() {
-      document.querySelector(".sidebar").classList.toggle("show");
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("hidden");
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -168,7 +166,6 @@
         const mod = button.getAttribute("data-module");
         document.getElementById(mod).classList.add("visible");
         button.classList.add("active");
-        document.querySelector(".sidebar").classList.remove("show");
       };
     });
 
@@ -177,13 +174,13 @@
       const out = document.getElementById("manager-output");
 
       if (input.includes("function") || input.includes("module") || input.includes("what can")) {
-        let msg = "🧠 Boss AI Modules:\n";
+        let msg = "🧠 Boss AI Modules:\n\n";
         for (let mod in modules) {
           msg += `• ${mod.toUpperCase()}: ${modules[mod]}\n`;
         }
         out.textContent = msg;
       } else {
-        out.textContent = "🤖 I'm here! Try asking what each module does or say 'list modules'.";
+        out.textContent = "🤖 I’m here to help. Try asking about what this app can do or name a module.";
       }
     }
 
