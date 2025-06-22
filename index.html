@@ -16,7 +16,23 @@
       height: 100vh;
       overflow: hidden;
     }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    .glow {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
+    }
+    .menu-toggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 9999;
+      background: #000;
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-family: 'Orbitron', sans-serif;
+    }
     .sidebar {
       width: 250px;
       background: #0e0e0e;
@@ -25,33 +41,12 @@
       flex-direction: column;
       gap: 8px;
       overflow-y: auto;
-      transition: transform 0.3s ease;
-    }
-    .sidebar.hidden {
-      transform: translateX(-260px);
-    }
-    .menu-btn {
-      display: none;
-      background: #000;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      font-size: 16px;
-      padding: 10px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-    }
-    @media (max-width: 768px) {
-      .menu-btn {
-        display: block;
-      }
     }
     .sidebar button {
       background: none;
       border: none;
       color: #00bfff;
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
       padding: 8px;
       text-align: left;
@@ -72,7 +67,8 @@
       border: 1px solid #00bfff;
       padding: 10px;
       margin-top: 5px;
-      font-family: monospace;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
     }
     .module { display: none; }
     .visible { display: block; }
@@ -83,12 +79,26 @@
       overflow-y: auto;
       white-space: pre-wrap;
       border: 1px solid #00bfff;
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+        position: fixed;
+        top: 50px;
+        left: 0;
+        z-index: 999;
+        height: calc(100vh - 50px);
+      }
+      .sidebar.show {
+        display: flex;
+      }
     }
   </style>
 </head>
 <body>
-  <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-  <div class="sidebar" id="sidebar">
+  <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+  <div class="sidebar">
     <button data-module="manager" class="active">🤖 Manager AI</button>
     <button data-module="script">✍️ Script Writer</button>
     <button data-module="voice">🔊 Voiceover</button>
@@ -147,8 +157,8 @@
       settings: "Configure API keys, theme, and preferences."
     };
 
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("hidden");
+    function toggleMenu() {
+      document.querySelector(".sidebar").classList.toggle("show");
     }
 
     document.querySelectorAll(".sidebar button").forEach(button => {
@@ -158,6 +168,7 @@
         const mod = button.getAttribute("data-module");
         document.getElementById(mod).classList.add("visible");
         button.classList.add("active");
+        document.querySelector(".sidebar").classList.remove("show");
       };
     });
 
