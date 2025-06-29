@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Boss AI Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
@@ -82,7 +82,6 @@
 
     .module { display: none; }
     .visible { display: block; }
-
     .manager-output {
       background: #000;
       padding: 10px;
@@ -108,15 +107,13 @@
     <button data-module="sheets">📄 Sheets Log</button>
     <button data-module="settings">⚙️ Settings</button>
   </div>
-
   <div class="content">
     <div id="manager" class="module visible">
       <h2 class="glow">🤖 Manager AI</h2>
-      <textarea id="manager-input" rows="2" placeholder="Ask Manager AI to make a change..."></textarea>
+      <textarea id="manager-input" rows="2" placeholder="Ask Manager AI..."></textarea>
       <button onclick="sendToManager()">Send</button>
       <div id="manager-output" class="manager-output"></div>
     </div>
-
     <div id="script" class="module">
       <h2 class="glow">✍️ Script Writer</h2>
       <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
@@ -124,7 +121,6 @@
       <button onclick="generateScript()">Generate Script</button>
       <div id="script-output" class="manager-output"></div>
     </div>
-
     <div id="voice" class="module">
       <h2 class="glow">🔊 Voiceover AI</h2>
       <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
@@ -132,7 +128,6 @@
       <button onclick="generateVoice()">Generate Voiceover</button>
       <audio id="voice-audio" controls style="margin-top:10px;"></audio>
     </div>
-
     <div id="automation" class="module"><h2 class="glow">⚙️ Automation AI</h2></div>
     <div id="upload" class="module"><h2 class="glow">📤 Upload Strategy</h2></div>
     <div id="trends" class="module"><h2 class="glow">📈 Trends AI</h2></div>
@@ -174,35 +169,22 @@
 
     function sendToManager() {
       const input = document.getElementById("manager-input").value.trim();
-      const output = document.getElementById("manager-output");
-      const currentHTML = document.documentElement.outerHTML;
+      const out = document.getElementById("manager-output");
+      out.textContent = "Thinking...";
 
-      fetch("https://manager-ai-backend-3.onrender.com/process", {
+      fetch("https://bossai-helper-server.onrender.com/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: input, html: currentHTML })
+        body: JSON.stringify({ prompt: input })
       })
       .then(res => res.json())
       .then(data => {
-        output.textContent = data.reply || "No response.";
-        if (data.updatedHtml) {
-          fetch("https://manager-ai-backend-3.onrender.com/commit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              filePath: "index.html",
-              content: data.updatedHtml,
-              message: `Manager AI update: ${input}`
-            })
-          }).then(() => {
-            output.textContent += "\n✅ Committed to GitHub.";
-          }).catch(() => {
-            output.textContent += "\n❌ Commit failed.";
-          });
+        out.textContent = data.reply || "🤖 No response.";
+        if (data.jsCommand) {
+          try { eval(data.jsCommand); } catch {}
         }
-      }).catch(err => {
-        output.textContent = "❌ Error: " + err;
-      });
+      })
+      .catch(err => out.textContent = "❌ Error: " + err.message);
     }
 
     function generateScript() {
