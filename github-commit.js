@@ -1,36 +1,33 @@
-// github-commit.js
-const fetch = require("node-fetch");
+// server.js
+const express = require("express");
+const { commitToGitHub } = require("./github-commit");
 
-async function commitToGitHub({ filePath, content, message }) {
-  const repo = "changocdog/BossAI";
-  const branch = "gh-pages";
-  const token = process.env.GITHUB_TOKEN;
+const app = express();
+app.use(express.json());
 
-  const url = `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`;
+// GitHub Commit Endpoint
+app.post("/commit", async (req, res) => {
+  const { filePath, content, message } = req.body;
 
-  const getRes = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  if (!filePath || !content || !message) {
+    return res.status(400).json({ error: "Missing filePath, content, or message" });
+  }
 
-  const getData = await getRes.json();
-  const sha = getData.sha;
+  try {
+    const result = await commitToGitHub({ filePath, content, message });
+    res.json({ success: true, url: result.commit?.html_url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-  const commitRes = await fetch(url, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message,
-      content: Buffer.from(content).toString("base64"),
-      sha,
-      branch
-    })
-  });
+// Root Test Endpoint
+app.get("/", (req, res) => {
+  res.send("✅ Boss AI Manager backend is running");
+});
 
-  const commitData = await commitRes.json();
-  return commitData;
-}
-
-module.exports = { commitToGitHub };
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
