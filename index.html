@@ -6,233 +6,170 @@
   <title>Boss AI Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: linear-gradient(to right, #000000, #0a0a2a);
       color: #00bfff;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, p, label {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
+    }
+    .container {
       display: flex;
       height: 100vh;
-      overflow: hidden;
     }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
-
-    .menu-toggle {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 9999;
-      background: #000;
-      color: #00bfff;
-      padding: 8px 12px;
-      border: 1px solid #00bfff;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-    }
-
     .sidebar {
-      width: 250px;
-      background: #0e0e0e;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-      z-index: 1000;
+      width: 200px;
+      background: #000;
+      border-right: 2px solid #00bfff;
+      padding: 20px;
     }
-
-    .sidebar.hidden { transform: translateX(-260px); }
-
     .sidebar button {
-      background: none;
-      border: none;
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid #00bfff;
       color: #00bfff;
-      font-size: 14px;
       cursor: pointer;
-      padding: 8px;
-      text-align: left;
     }
-
-    .sidebar button.active {
-      font-weight: bold;
-      background: #111;
-    }
-
-    .content {
-      flex: 1;
+    .main {
+      flex-grow: 1;
       padding: 20px;
       overflow-y: auto;
     }
-
-    textarea, input {
+    .hidden {
+      display: none;
+    }
+    input, textarea {
       width: 100%;
-      background: #000;
+      background: #111;
+      border: 1px solid #00bfff;
       color: #00bfff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button.primary {
+      background-color: #00bfff;
+      color: black;
+      font-weight: bold;
+    }
+    .output-box {
+      background: #111;
       border: 1px solid #00bfff;
       padding: 10px;
-      margin-top: 5px;
-      font-family: monospace;
-    }
-
-    input[type="password"] {
-      -webkit-text-security: disc;
-    }
-
-    .module { display: none; }
-    .visible { display: block; }
-    .manager-output {
-      background: #000;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
+      margin-top: 10px;
       white-space: pre-wrap;
-      border: 1px solid #00bfff;
     }
   </style>
 </head>
 <body>
-  <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
-  <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="script">✍️ Script Writer</button>
-    <button data-module="voice">🔊 Voiceover</button>
-    <button data-module="automation">⚙️ Automation AI</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="trends">📈 Trends AI</button>
-    <button data-module="legal">⚖️ Legal Review</button>
-    <button data-module="output">📦 Final Output</button>
-    <button data-module="history">🕓 History</button>
-    <button data-module="sheets">📄 Sheets Log</button>
-    <button data-module="settings">⚙️ Settings</button>
-  </div>
-  <div class="content">
-    <div id="manager" class="module visible">
-      <h2 class="glow">🤖 Manager AI</h2>
-      <textarea id="manager-input" rows="2" placeholder="Ask Manager AI..."></textarea>
-      <button onclick="sendToManager()">Send</button>
-      <div id="manager-output" class="manager-output"></div>
+  <div class="container">
+    <div class="sidebar">
+      <button onclick="showModule('manager')">Manager AI</button>
+      <button onclick="showModule('script')">Script Writer</button>
+      <button onclick="showModule('voiceover')">Voiceover</button>
     </div>
-    <div id="script" class="module">
-      <h2 class="glow">✍️ Script Writer</h2>
-      <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
-      <textarea id="script-input" placeholder="Enter script topic..."></textarea>
-      <button onclick="generateScript()">Generate Script</button>
-      <div id="script-output" class="manager-output"></div>
+    <div class="main">
+      <div id="manager" class="module">
+        <h2>Manager AI</h2>
+        <textarea id="managerInput" placeholder="Ask Manager AI..."></textarea>
+        <button class="primary" onclick="runManager()">Run</button>
+        <div class="output-box" id="managerOutput"></div>
+      </div>
+      <div id="script" class="module hidden">
+        <h2>Script Writer</h2>
+        <label>OpenRouter API Key:</label>
+        <input id="scriptApiKey" type="password" oninput="saveKey('scriptApiKey')" />
+        <textarea id="scriptInput" placeholder="Script topic..."></textarea>
+        <button class="primary" onclick="runScriptWriter()">Generate</button>
+        <div class="output-box" id="scriptOutput"></div>
+      </div>
+      <div id="voiceover" class="module hidden">
+        <h2>Voiceover AI</h2>
+        <label>ElevenLabs API Key:</label>
+        <input id="voiceApiKey" type="password" oninput="saveKey('voiceApiKey')" />
+        <textarea id="voiceInput" placeholder="Enter text to voice..."></textarea>
+        <button class="primary" onclick="runVoiceover()">Generate Voice</button>
+        <audio id="voiceAudio" controls></audio>
+      </div>
     </div>
-    <div id="voice" class="module">
-      <h2 class="glow">🔊 Voiceover AI</h2>
-      <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
-      <textarea id="voice-text" placeholder="Paste script here..."></textarea>
-      <button onclick="generateVoice()">Generate Voiceover</button>
-      <audio id="voice-audio" controls style="margin-top:10px;"></audio>
-    </div>
-    <div id="automation" class="module"><h2 class="glow">⚙️ Automation AI</h2></div>
-    <div id="upload" class="module"><h2 class="glow">📤 Upload Strategy</h2></div>
-    <div id="trends" class="module"><h2 class="glow">📈 Trends AI</h2></div>
-    <div id="legal" class="module"><h2 class="glow">⚖️ Legal Review</h2></div>
-    <div id="output" class="module"><h2 class="glow">📦 Final Output</h2></div>
-    <div id="history" class="module"><h2 class="glow">🕓 History</h2></div>
-    <div id="sheets" class="module"><h2 class="glow">📄 Sheets Log</h2></div>
-    <div id="settings" class="module"><h2 class="glow">⚙️ Settings</h2></div>
   </div>
 
   <script>
-    const modules = {
-      manager: "Controls app and modules with AI commands.",
-      script: "Generates YouTube scripts using OpenRouter.",
-      voice: "Converts text to audio using ElevenLabs.",
-      automation: "Visual automation builder (like n8n).",
-      upload: "Plans optimal upload strategy.",
-      trends: "Analyzes trends for content ideas.",
-      legal: "Performs legal and copyright checks.",
-      output: "Final output preparation module.",
-      history: "Shows logs and past outputs.",
-      sheets: "Saves logs to Google Sheets.",
-      settings: "Manages preferences and keys."
-    };
-
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("hidden");
+    // Show selected module
+    function showModule(id) {
+      document.querySelectorAll('.module').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
     }
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.onclick = () => {
-        document.querySelectorAll(".module").forEach(mod => mod.classList.remove("visible"));
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        const mod = button.getAttribute("data-module");
-        document.getElementById(mod).classList.add("visible");
-        button.classList.add("active");
-      };
-    });
-
-    function sendToManager() {
-      const input = document.getElementById("manager-input").value.trim();
-      const out = document.getElementById("manager-output");
-      out.textContent = "Thinking...";
-
-      fetch("https://bossai-helper-server.onrender.com/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: input })
-      })
-      .then(res => res.json())
-      .then(data => {
-        out.textContent = data.reply || "🤖 No response.";
-        if (data.jsCommand) {
-          try { eval(data.jsCommand); } catch {}
-        }
-      })
-      .catch(err => out.textContent = "❌ Error: " + err.message);
+    // Save and load API keys
+    function saveKey(id) {
+      localStorage.setItem(id, document.getElementById(id).value);
     }
 
-    function generateScript() {
-      const key = document.getElementById("script-api-key").value;
-      const topic = document.getElementById("script-input").value;
-      const out = document.getElementById("script-output");
-      localStorage.setItem("openrouter_key", key);
-      fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
+    function loadKeys() {
+      ['scriptApiKey', 'voiceApiKey'].forEach(id => {
+        const key = localStorage.getItem(id);
+        if (key) document.getElementById(id).value = key;
+      });
+    }
+
+    // Manager AI (local echo test)
+    function runManager() {
+      const input = document.getElementById('managerInput').value;
+      document.getElementById('managerOutput').innerText = `Manager received: ${input}`;
+    }
+
+    // Script Writer
+    async function runScriptWriter() {
+      const apiKey = document.getElementById('scriptApiKey').value;
+      const input = document.getElementById('scriptInput').value;
+      const output = document.getElementById('scriptOutput');
+      output.innerText = 'Generating...';
+
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
         headers: {
-          "Authorization": `Bearer ${key}`,
-          "Content-Type": "application/json"
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [{ role: "user", content: `Write a YouTube script about: ${topic}` }]
+          model: 'openai/gpt-3.5-turbo',
+          messages: [{ role: 'user', content: input }]
         })
-      })
-      .then(res => res.json())
-      .then(data => out.textContent = data.choices?.[0]?.message?.content || "No response.")
-      .catch(err => out.textContent = "❌ Error: " + err);
+      });
+      const data = await res.json();
+      output.innerText = data.choices?.[0]?.message?.content || 'No response';
     }
 
-    function generateVoice() {
-      const key = document.getElementById("voice-api-key").value;
-      const text = document.getElementById("voice-text").value;
-      localStorage.setItem("elevenlabs_key", key);
-      fetch("https://api.elevenlabs.io/v1/text-to-speech/default/audio", {
-        method: "POST",
+    // Voiceover
+    async function runVoiceover() {
+      const apiKey = document.getElementById('voiceApiKey').value;
+      const text = document.getElementById('voiceInput').value;
+      const audio = document.getElementById('voiceAudio');
+
+      const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL', {
+        method: 'POST',
         headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
+          'xi-api-key': apiKey,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ text })
-      })
-      .then(res => res.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        document.getElementById("voice-audio").src = url;
-      })
-      .catch(() => alert("❌ Error generating voice"));
+        body: JSON.stringify({
+          text,
+          voice_settings: { stability: 0.4, similarity_boost: 0.75 }
+        })
+      });
+
+      const blob = await res.blob();
+      audio.src = URL.createObjectURL(blob);
     }
 
-    window.onload = () => {
-      document.getElementById("script-api-key").value = localStorage.getItem("openrouter_key") || "";
-      document.getElementById("voice-api-key").value = localStorage.getItem("elevenlabs_key") || "";
-      document.querySelector('[data-module="manager"]').click();
-    };
+    // Initialize
+    loadKeys();
   </script>
 </body>
 </html>
