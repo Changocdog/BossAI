@@ -13,23 +13,27 @@
       background: linear-gradient(to right, #000000, #0a0a2a);
       color: #00bfff;
       display: flex;
+      flex-direction: column;
       height: 100vh;
-      overflow: hidden;
     }
-    .glow {
-      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
-    }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
     .menu-btn {
-      display: block;
       background: #000;
       color: #00bfff;
       border: 1px solid #00bfff;
       font-size: 16px;
       padding: 10px;
-      position: absolute;
+      position: fixed;
       top: 10px;
       left: 10px;
-      z-index: 9999;
+      z-index: 1001;
+      cursor: pointer;
+    }
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      margin-top: 50px;
     }
     .sidebar {
       width: 250px;
@@ -40,7 +44,6 @@
       gap: 8px;
       overflow-y: auto;
       transition: transform 0.3s ease;
-      z-index: 1000;
     }
     .sidebar.hidden {
       transform: translateX(-260px);
@@ -89,48 +92,50 @@
 </head>
 <body>
   <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-  <div class="sidebar" id="sidebar">
-    <button data-module="manager" class="active">🤖 Manager AI</button>
-    <button data-module="script">✍️ Script Writer</button>
-    <button data-module="voice">🔊 Voiceover</button>
-    <button data-module="automation">⚙️ Automation AI</button>
-    <button data-module="upload">📤 Upload Strategy</button>
-    <button data-module="trends">📈 Trends AI</button>
-    <button data-module="legal">⚖️ Legal Review</button>
-    <button data-module="output">📦 Final Output</button>
-    <button data-module="history">🕓 History</button>
-    <button data-module="sheets">📄 Sheets Log</button>
-    <button data-module="settings">⚙️ Settings</button>
-  </div>
-  <div class="content">
-    <div id="manager" class="module visible">
-      <h2 class="glow">🤖 Manager AI</h2>
-      <textarea id="manager-input" rows="2" placeholder="Ask Manager AI..."></textarea>
-      <button onclick="sendToManager()">Send</button>
-      <div id="manager-output" class="manager-output"></div>
+  <div class="main">
+    <div class="sidebar" id="sidebar">
+      <button data-module="manager" class="active">🤖 Manager AI</button>
+      <button data-module="script">✍️ Script Writer</button>
+      <button data-module="voice">🔊 Voiceover</button>
+      <button data-module="automation">⚙️ Automation AI</button>
+      <button data-module="upload">📤 Upload Strategy</button>
+      <button data-module="trends">📈 Trends AI</button>
+      <button data-module="legal">⚖️ Legal Review</button>
+      <button data-module="output">📦 Final Output</button>
+      <button data-module="history">🕓 History</button>
+      <button data-module="sheets">📄 Sheets Log</button>
+      <button data-module="settings">⚙️ Settings</button>
     </div>
-    <div id="script" class="module">
-      <h2 class="glow">✍️ Script Writer</h2>
-      <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
-      <textarea id="script-input" placeholder="Enter script topic..."></textarea>
-      <button onclick="generateScript()">Generate Script</button>
-      <div id="script-output" class="manager-output"></div>
+    <div class="content">
+      <div id="manager" class="module visible">
+        <h2 class="glow">🤖 Manager AI</h2>
+        <textarea id="manager-input" rows="2" placeholder="Ask Manager AI..."></textarea>
+        <button onclick="sendToManager()">Send</button>
+        <div id="manager-output" class="manager-output"></div>
+      </div>
+      <div id="script" class="module">
+        <h2 class="glow">✍️ Script Writer</h2>
+        <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
+        <textarea id="script-input" placeholder="Enter script topic..."></textarea>
+        <button onclick="generateScript()">Generate Script</button>
+        <div id="script-output" class="manager-output"></div>
+      </div>
+      <div id="voice" class="module">
+        <h2 class="glow">🔊 Voiceover AI</h2>
+        <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
+        <textarea id="voice-text" placeholder="Paste script here..."></textarea>
+        <button onclick="generateVoice()">Generate Voiceover</button>
+        <audio id="voice-audio" controls style="margin-top:10px;"></audio>
+      </div>
+      <div id="automation" class="module"><h2 class="glow">⚙️ Automation AI</h2></div>
+      <div id="upload" class="module"><h2 class="glow">📤 Upload Strategy</h2></div>
+      <div id="trends" class="module"><h2 class="glow">📈 Trends AI</h2></div>
+      <div id="legal" class="module"><h2 class="glow">⚖️ Legal Review</h2></div>
+      <div id="output" class="module"><h2 class="glow">📦 Final Output</h2></div>
+      <div id="history" class="module"><h2 class="glow">🕓 History</h2></div>
+      <div id="sheets" class="module"><h2 class="glow">📄 Sheets Log</h2></div>
+      <div id="settings" class="module"><h2 class="glow">⚙️ Settings</h2></div>
     </div>
-    <div id="voice" class="module">
-      <h2 class="glow">🔊 Voiceover AI</h2>
-      <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
-      <textarea id="voice-text" placeholder="Paste script here..."></textarea>
-      <button onclick="generateVoice()">Generate Voiceover</button>
-      <audio id="voice-audio" controls style="margin-top:10px;"></audio>
-    </div>
-    <div id="automation" class="module"><h2 class="glow">⚙️ Automation AI</h2></div>
-    <div id="upload" class="module"><h2 class="glow">📤 Upload Strategy</h2></div>
-    <div id="trends" class="module"><h2 class="glow">📈 Trends AI</h2></div>
-    <div id="legal" class="module"><h2 class="glow">⚖️ Legal Review</h2></div>
-    <div id="output" class="module"><h2 class="glow">📦 Final Output</h2></div>
-    <div id="history" class="module"><h2 class="glow">🕓 History</h2></div>
-    <div id="sheets" class="module"><h2 class="glow">📄 Sheets Log</h2></div>
-    <div id="settings" class="module"><h2 class="glow">⚙️ Settings</h2></div>
   </div>
 
   <script>
@@ -166,20 +171,14 @@
       const input = document.getElementById("manager-input").value.trim().toLowerCase();
       const out = document.getElementById("manager-output");
 
-      if (input.includes("list") || input.includes("modules")) {
+      if (input.includes("function") || input.includes("module") || input.includes("what can")) {
         let msg = "🧠 Boss AI Modules:\n";
         for (let mod in modules) {
           msg += `• ${mod.toUpperCase()}: ${modules[mod]}\n`;
         }
         out.textContent = msg;
-      } else if (input.includes("script")) {
-        document.querySelector('[data-module="script"]').click();
-        out.textContent = "📜 Switched to Script Writer module.";
-      } else if (input.includes("voice")) {
-        document.querySelector('[data-module="voice"]').click();
-        out.textContent = "🎙️ Switched to Voiceover AI module.";
       } else {
-        out.textContent = "🤖 Try saying: 'list modules', 'go to voice', or 'open script'.";
+        out.textContent = "🤖 I'm here! Try asking what each module does or say 'list modules'.";
       }
     }
 
