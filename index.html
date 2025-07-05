@@ -16,7 +16,21 @@
       height: 100vh;
       overflow: hidden;
     }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    .glow {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
+    }
+    .menu-btn {
+      display: block;
+      background: #000;
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      font-size: 16px;
+      padding: 10px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 9999;
+    }
     .sidebar {
       width: 250px;
       background: #0e0e0e;
@@ -26,26 +40,10 @@
       gap: 8px;
       overflow-y: auto;
       transition: transform 0.3s ease;
+      z-index: 1000;
     }
     .sidebar.hidden {
       transform: translateX(-260px);
-    }
-    .menu-btn {
-      display: none;
-      background: #000;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      font-size: 16px;
-      padding: 10px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-    }
-    @media (max-width: 768px) {
-      .menu-btn {
-        display: block;
-      }
     }
     .sidebar button {
       background: none;
@@ -73,6 +71,9 @@
       padding: 10px;
       margin-top: 5px;
       font-family: monospace;
+    }
+    input[type="password"] {
+      -webkit-text-security: disc;
     }
     .module { display: none; }
     .visible { display: block; }
@@ -110,14 +111,14 @@
     </div>
     <div id="script" class="module">
       <h2 class="glow">✍️ Script Writer</h2>
-      <input id="script-api-key" placeholder="OpenRouter API Key" />
+      <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
       <textarea id="script-input" placeholder="Enter script topic..."></textarea>
       <button onclick="generateScript()">Generate Script</button>
       <div id="script-output" class="manager-output"></div>
     </div>
     <div id="voice" class="module">
       <h2 class="glow">🔊 Voiceover AI</h2>
-      <input id="voice-api-key" placeholder="ElevenLabs API Key" />
+      <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
       <textarea id="voice-text" placeholder="Paste script here..."></textarea>
       <button onclick="generateVoice()">Generate Voiceover</button>
       <audio id="voice-audio" controls style="margin-top:10px;"></audio>
@@ -165,14 +166,20 @@
       const input = document.getElementById("manager-input").value.trim().toLowerCase();
       const out = document.getElementById("manager-output");
 
-      if (input.includes("function") || input.includes("module") || input.includes("what can")) {
+      if (input.includes("list") || input.includes("modules")) {
         let msg = "🧠 Boss AI Modules:\n";
         for (let mod in modules) {
           msg += `• ${mod.toUpperCase()}: ${modules[mod]}\n`;
         }
         out.textContent = msg;
+      } else if (input.includes("script")) {
+        document.querySelector('[data-module="script"]').click();
+        out.textContent = "📜 Switched to Script Writer module.";
+      } else if (input.includes("voice")) {
+        document.querySelector('[data-module="voice"]').click();
+        out.textContent = "🎙️ Switched to Voiceover AI module.";
       } else {
-        out.textContent = "🤖 I'm here! Try asking what each module does or say 'list modules'.";
+        out.textContent = "🤖 Try saying: 'list modules', 'go to voice', or 'open script'.";
       }
     }
 
