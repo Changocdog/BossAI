@@ -65,7 +65,7 @@
       position: fixed;
       top: 10px;
       left: 10px;
-      z-index: 9999;
+      z-index: 1000;
       background-color: #007bff;
       color: white;
       padding: 10px 16px;
@@ -108,18 +108,19 @@
 <body>
   <button id="toggle-btn">☰ Menu</button>
   <div class="sidebar" id="sidebar">
-    <button data-module="script" class="active">✍️ Script Writer</button>
+    <button data-module="manager" class="active">🤖 Manager AI</button>
+    <button data-module="script">✍️ Script Writer</button>
     <button data-module="voiceover">🎤 Voiceover</button>
   </div>
   <div class="main" id="main">
-    <h1 class="glow">Boss AI Dashboard</h1>
-    <p class="glow">Welcome. Select a module to get started.</p>
+    <h1 class="glow" id="dashboard-title">Boss AI Dashboard</h1>
+    <p class="glow" id="welcome-msg">Welcome. Select a module or give Manager AI a command.</p>
   </div>
 
   <script>
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    const main = document.getElementById("main");
+    const toggleBtn = document.getElementById("toggle-btn"),
+          sidebar = document.getElementById("sidebar"),
+          main = document.getElementById("main");
 
     toggleBtn.addEventListener("click", () => {
       sidebar.classList.toggle("hidden");
@@ -127,16 +128,22 @@
     });
 
     const content = {
+      manager: `
+        <h2 class="glow">🤖 Manager AI</h2>
+        <textarea id="manager-command" placeholder="e.g., Generate a voiceover or connect nodes..."></textarea><br>
+        <button class="generate-btn" onclick="runManagerCommand()">Send</button>
+        <div id="manager-response" class="glow-box"></div>
+      `,
       script: `
         <h2 class="glow">✍️ Script Writer</h2>
-        <textarea id="script-input" placeholder="Enter your video topic..."></textarea><br>
+        <textarea id="script-input" placeholder="Your video topic..."></textarea><br>
         <div id="script-key-box"></div>
         <button class="generate-btn" onclick="generateScript()">Generate Script</button>
         <p id="script-output" class="glow-box"></p>
       `,
       voiceover: `
         <h2 class="glow">🎤 Voiceover</h2>
-        <textarea id="voice-text" placeholder="Enter text for voiceover..."></textarea><br>
+        <textarea id="voice-text" placeholder="Enter your script here..."></textarea><br>
         <div id="voice-key-box"></div>
         <button class="generate-btn" onclick="generateVoice()">Generate Voice</button>
         <audio id="voice-player" controls style="margin-top: 10px;"></audio>
@@ -162,38 +169,58 @@
         : `<input id="script-key" type="password" placeholder="🔑 OpenRouter API Key"/><button class="generate-btn" onclick="saveScriptKey()">Save</button>`;
     }
 
+    function clearScriptKey() {
+      localStorage.removeItem("openrouter_key");
+      location.reload();
+    }
+
     function saveScriptKey() {
       const val = document.getElementById("script-key").value.trim();
       if (val.length > 10) {
         localStorage.setItem("openrouter_key", val);
-        loadScriptKey();
+        location.reload();
       }
-    }
-
-    function clearScriptKey() {
-      localStorage.removeItem("openrouter_key");
-      loadScriptKey();
     }
 
     function loadVoiceKey() {
       const key = localStorage.getItem("elevenlabs_key");
       const box = document.getElementById("voice-key-box");
       box.innerHTML = key
-        ? `<p class="glow">✅ Key saved. <button class="generate-btn" onclick="clearVoiceKey()">Change</button></p>`
-        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs API Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
+        ? `<p class="glow">✅ Key saved.</p>`
+        : `<input id="voice-key" type="password" placeholder="🔑 ElevenLabs Key"/><button class="generate-btn" onclick="saveVoiceKey()">Save</button>`;
     }
 
     function saveVoiceKey() {
       const val = document.getElementById("voice-key").value.trim();
       if (val.length > 10) {
         localStorage.setItem("elevenlabs_key", val);
-        loadVoiceKey();
+        location.reload();
       }
     }
 
-    function clearVoiceKey() {
-      localStorage.removeItem("elevenlabs_key");
-      loadVoiceKey();
+    async function runManagerCommand() {
+      const command = document.getElementById("manager-command").value.trim();
+      const box = document.getElementById("manager-response");
+      const key = localStorage.getItem("openrouter_key");
+      if (!key || !command) return (box.innerHTML = "❌ Missing input or key");
+      box.innerHTML = "🤖 Thinking...";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are Manager AI. Execute commands and respond clearly." },
+            { role: "user", content: command }
+          ]
+        })
+      });
+      const data = await res.json();
+      const reply = data?.choices?.[0]?.message?.content || "❌ No response.";
+      box.innerHTML = reply;
     }
 
     async function generateScript() {
@@ -201,7 +228,7 @@
       const input = document.getElementById("script-input").value.trim();
       const output = document.getElementById("script-output");
       if (!key || !input) return (output.innerText = "❌ Missing input or key");
-      output.innerText = "✍️ Generating script...";
+      output.innerText = "✍️ Writing script...";
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -219,9 +246,9 @@
 
     async function generateVoice() {
       const key = localStorage.getItem("elevenlabs_key");
-      const text = document.getElementById("voice-text").value.trim();
+      const text = document.getElementById("voice-text").value;
       const player = document.getElementById("voice-player");
-      if (!key || !text) return alert("❌ Missing input or key.");
+      if (!key || !text) return alert("Missing input or key");
       const res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL/audio", {
         method: "POST",
         headers: {
@@ -234,9 +261,8 @@
       player.src = URL.createObjectURL(blob);
     }
 
-    // Load Script Writer on page load
     window.onload = () => {
-      document.querySelector('[data-module="script"]').click();
+      document.querySelector('[data-module="manager"]').click();
     };
   </script>
 </body>
