@@ -1,159 +1,637 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Boss AI - Simple Automation Canvas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to right, #000000, #0a0a2a);
-      color: #00bfff;
-      overflow: hidden;
-    }
-    h1 {
-      text-align: center;
-      padding: 10px;
-      text-shadow: 0 0 8px #00bfff;
-    }
-    #nodePanel {
-      position: absolute;
-      top: 70px;
-      left: 10px;
-      width: 140px;
-      background: #111;
-      padding: 10px;
-      border: 2px solid #00bfff;
-      border-radius: 6px;
-      z-index: 100;
-    }
-    #canvas {
-      position: absolute;
-      top: 0;
-      left: 160px;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle, #111, #000);
-      overflow: hidden;
-    }
-    .node {
-      position: absolute;
-      width: 140px;
-      padding: 10px;
-      background: #0e0e0e;
-      border: 2px solid #00bfff;
-      color: #00bfff;
-      text-align: center;
-      border-radius: 6px;
-      text-shadow: 0 0 6px #00bfff;
-      cursor: move;
-    }
-    .connection {
-      position: absolute;
-      pointer-events: none;
-    }
-    button {
-      width: 100%;
-      margin-bottom: 8px;
-      background: #222;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      border-radius: 4px;
-      padding: 6px;
-      font-family: 'Orbitron', sans-serif;
-    }
-  </style>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Boss AI - Automation Canvas</title>
+   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+   <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+
+       body {
+           font-family: 'Orbitron', monospace;
+           background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+           color: #00ffff;
+           overflow: hidden;
+           height: 100vh;
+       }
+
+       .header {
+           background: rgba(0, 255, 255, 0.1);
+           border-bottom: 2px solid #00ffff;
+           padding: 15px 20px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+       }
+
+       .logo {
+           font-size: 24px;
+           font-weight: 900;
+           text-shadow: 0 0 10px #00ffff;
+       }
+
+       .controls {
+           display: flex;
+           gap: 10px;
+       }
+
+       .btn {
+           background: rgba(0, 255, 255, 0.2);
+           border: 2px solid #00ffff;
+           color: #00ffff;
+           padding: 8px 16px;
+           border-radius: 5px;
+           cursor: pointer;
+           font-family: 'Orbitron', monospace;
+           font-size: 12px;
+           transition: all 0.3s;
+           text-shadow: 0 0 5px #00ffff;
+       }
+
+       .btn:hover {
+           background: rgba(0, 255, 255, 0.4);
+           box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+           transform: translateY(-2px);
+       }
+
+       .sidebar {
+           position: fixed;
+           left: 0;
+           top: 70px;
+           width: 250px;
+           height: calc(100vh - 70px);
+           background: rgba(0, 0, 0, 0.8);
+           border-right: 2px solid #00ffff;
+           padding: 20px;
+           box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+       }
+
+       .sidebar h3 {
+           margin-bottom: 15px;
+           text-shadow: 0 0 10px #00ffff;
+       }
+
+       .node-template {
+           background: rgba(0, 255, 255, 0.1);
+           border: 2px solid #00ffff;
+           padding: 10px;
+           margin-bottom: 10px;
+           border-radius: 5px;
+           cursor: grab;
+           transition: all 0.3s;
+           text-align: center;
+           font-size: 14px;
+       }
+
+       .node-template:hover {
+           background: rgba(0, 255, 255, 0.2);
+           box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+       }
+
+       .canvas-container {
+           position: fixed;
+           left: 250px;
+           top: 70px;
+           width: calc(100vw - 250px);
+           height: calc(100vh - 70px);
+           overflow: hidden;
+       }
+
+       .canvas {
+           width: 100%;
+           height: 100%;
+           position: relative;
+           background: 
+               radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+               radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+               linear-gradient(45deg, #0a0a0a 25%, transparent 25%),
+               linear-gradient(-45deg, #0a0a0a 25%, transparent 25%);
+           background-size: 50px 50px, 50px 50px, 30px 30px, 30px 30px;
+           cursor: grab;
+       }
+
+       .node {
+           position: absolute;
+           min-width: 150px;
+           min-height: 80px;
+           background: rgba(0, 255, 255, 0.1);
+           border: 2px solid #00ffff;
+           border-radius: 10px;
+           padding: 15px;
+           cursor: move;
+           transition: all 0.3s;
+           box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+           backdrop-filter: blur(10px);
+       }
+
+       .node:hover {
+           box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+           transform: translateY(-2px);
+       }
+
+       .node.selected {
+           border-color: #ff00ff;
+           box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
+       }
+
+       .node-title {
+           font-weight: 700;
+           margin-bottom: 5px;
+           text-shadow: 0 0 5px #00ffff;
+           font-size: 14px;
+       }
+
+       .node-type {
+           font-size: 12px;
+           opacity: 0.7;
+           margin-bottom: 10px;
+       }
+
+       .node-config {
+           font-size: 11px;
+           opacity: 0.6;
+           word-wrap: break-word;
+       }
+
+       .connection-line {
+           position: absolute;
+           pointer-events: none;
+           z-index: 10;
+       }
+
+       .connection-line svg {
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           overflow: visible;
+       }
+
+       .connection-line path {
+           stroke: #00ffff;
+           stroke-width: 3;
+           fill: none;
+           filter: drop-shadow(0 0 5px #00ffff);
+       }
+
+       .modal {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background: rgba(0, 0, 0, 0.8);
+           display: none;
+           justify-content: center;
+           align-items: center;
+           z-index: 1000;
+       }
+
+       .modal-content {
+           background: rgba(0, 0, 0, 0.9);
+           border: 2px solid #00ffff;
+           border-radius: 10px;
+           padding: 30px;
+           width: 400px;
+           box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+       }
+
+       .modal h3 {
+           margin-bottom: 20px;
+           text-shadow: 0 0 10px #00ffff;
+       }
+
+       .form-group {
+           margin-bottom: 15px;
+       }
+
+       .form-group label {
+           display: block;
+           margin-bottom: 5px;
+           font-size: 14px;
+       }
+
+       .form-group input,
+       .form-group textarea {
+           width: 100%;
+           padding: 8px 12px;
+           background: rgba(0, 255, 255, 0.1);
+           border: 2px solid #00ffff;
+           border-radius: 5px;
+           color: #00ffff;
+           font-family: 'Orbitron', monospace;
+           font-size: 12px;
+       }
+
+       .form-group textarea {
+           resize: vertical;
+           min-height: 80px;
+       }
+
+       .modal-buttons {
+           display: flex;
+           gap: 10px;
+           justify-content: flex-end;
+           margin-top: 20px;
+       }
+
+       .connection-preview {
+           position: absolute;
+           pointer-events: none;
+           z-index: 100;
+       }
+
+       .connection-preview svg {
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           overflow: visible;
+       }
+
+       .connection-preview path {
+           stroke: #ff00ff;
+           stroke-width: 3;
+           fill: none;
+           stroke-dasharray: 5,5;
+           filter: drop-shadow(0 0 5px #ff00ff);
+       }
+   </style>
 </head>
 <body>
-  <h1>Boss AI Automation Canvas</h1>
+   <div class="header">
+       <div class="logo">BOSS AI - AUTOMATION CANVAS</div>
+       <div class="controls">
+           <button class="btn" onclick="exportWorkflow()">EXPORT</button>
+           <button class="btn" onclick="importWorkflow()">IMPORT</button>
+           <button class="btn" onclick="clearCanvas()">CLEAR</button>
+       </div>
+   </div>
 
-  <div id="nodePanel">
-    <button onclick="addNode('Script Writer')">Script Writer</button>
-    <button onclick="addNode('Voiceover')">Voiceover</button>
-    <button onclick="addNode('Logger')">Logger</button>
-  </div>
+   <div class="sidebar">
+       <h3>NODE TYPES</h3>
+       <div class="node-template" draggable="true" data-type="Script Writer">
+           📝 SCRIPT WRITER
+       </div>
+       <div class="node-template" draggable="true" data-type="Voiceover">
+           🎤 VOICEOVER
+       </div>
+       <div class="node-template" draggable="true" data-type="Logger">
+           📊 LOGGER
+       </div>
+   </div>
 
-  <div id="canvas" onmousedown="startConnection(event)" onmouseup="endConnection(event)"></div>
+   <div class="canvas-container">
+       <div class="canvas" id="canvas"></div>
+       <div class="connection-preview" id="connectionPreview"></div>
+   </div>
 
-  <script>
-    let nodeId = 0;
-    const canvas = document.getElementById('canvas');
-    let draggingNode = null;
-    let offsetX = 0, offsetY = 0;
-    let startNode = null;
+   <div class="modal" id="nodeModal">
+       <div class="modal-content">
+           <h3>NODE CONFIGURATION</h3>
+           <div class="form-group">
+               <label>Node Title:</label>
+               <input type="text" id="nodeTitle" placeholder="Enter node title">
+           </div>
+           <div class="form-group">
+               <label>Configuration:</label>
+               <textarea id="nodeConfig" placeholder="Enter configuration (e.g., prompt text, parameters)"></textarea>
+           </div>
+           <div class="modal-buttons">
+               <button class="btn" onclick="saveNodeConfig()">SAVE</button>
+               <button class="btn" onclick="closeModal()">CANCEL</button>
+           </div>
+       </div>
+   </div>
 
-    function addNode(type) {
-      const node = document.createElement('div');
-      node.className = 'node';
-      node.innerText = type;
-      node.dataset.id = nodeId++;
-      node.style.left = '200px';
-      node.style.top = '150px';
-      node.onmousedown = (e) => startDrag(e, node);
-      canvas.appendChild(node);
-    }
+   <script>
+       let nodeCounter = 0;
+       let nodes = [];
+       let connections = [];
+       let isDragging = false;
+       let dragOffset = { x: 0, y: 0 };
+       let selectedNode = null;
+       let isConnecting = false;
+       let connectionStart = null;
+       let currentEditingNode = null;
 
-    function startDrag(e, node) {
-      draggingNode = node;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-    }
+       // Initialize canvas
+       const canvas = document.getElementById('canvas');
+       const modal = document.getElementById('nodeModal');
+       const connectionPreview = document.getElementById('connectionPreview');
 
-    document.onmousemove = function(e) {
-      if (draggingNode) {
-        draggingNode.style.left = (e.pageX - offsetX) + 'px';
-        draggingNode.style.top = (e.pageY - offsetY) + 'px';
-        updateConnections();
-      }
-    };
+       // Node template drag and drop
+       document.querySelectorAll('.node-template').forEach(template => {
+           template.addEventListener('dragstart', (e) => {
+               e.dataTransfer.setData('text/plain', template.dataset.type);
+           });
+       });
 
-    document.onmouseup = function() {
-      draggingNode = null;
-    };
+       canvas.addEventListener('dragover', (e) => {
+           e.preventDefault();
+       });
 
-    function startConnection(e) {
-      if (e.target.className.includes('node')) {
-        startNode = e.target;
-      }
-    }
+       canvas.addEventListener('drop', (e) => {
+           e.preventDefault();
+           const nodeType = e.dataTransfer.getData('text/plain');
+           const rect = canvas.getBoundingClientRect();
+           const x = e.clientX - rect.left;
+           const y = e.clientY - rect.top;
+           createNode(nodeType, x, y);
+       });
 
-    function endConnection(e) {
-      if (startNode && e.target.className.includes('node') && startNode !== e.target) {
-        drawConnection(startNode, e.target);
-      }
-      startNode = null;
-    }
+       function createNode(type, x, y) {
+           const node = {
+               id: `node_${++nodeCounter}`,
+               type: type,
+               title: type,
+               x: x,
+               y: y,
+               config: ''
+           };
+           nodes.push(node);
+           renderNode(node);
+       }
 
-    function drawConnection(fromNode, toNode) {
-      const line = document.createElement('div');
-      line.className = 'connection';
-      line.dataset.from = fromNode.dataset.id;
-      line.dataset.to = toNode.dataset.id;
-      canvas.appendChild(line);
-      updateConnections();
-    }
+       function renderNode(node) {
+           const nodeEl = document.createElement('div');
+           nodeEl.className = 'node';
+           nodeEl.id = node.id;
+           nodeEl.style.left = node.x + 'px';
+           nodeEl.style.top = node.y + 'px';
+           
+           nodeEl.innerHTML = `
+               <div class="node-title">${node.title}</div>
+               <div class="node-type">${node.type}</div>
+               <div class="node-config">${node.config || 'No configuration'}</div>
+           `;
 
-    function updateConnections() {
-      document.querySelectorAll('.connection').forEach(line => {
-        const from = document.querySelector(`.node[data-id='${line.dataset.from}']`);
-        const to = document.querySelector(`.node[data-id='${line.dataset.to}']`);
-        const x1 = from.offsetLeft + from.offsetWidth / 2;
-        const y1 = from.offsetTop + from.offsetHeight / 2;
-        const x2 = to.offsetLeft + to.offsetWidth / 2;
-        const y2 = to.offsetTop + to.offsetHeight / 2;
-        const left = Math.min(x1, x2);
-        const top = Math.min(y1, y2);
-        line.style.left = left + 'px';
-        line.style.top = top + 'px';
-        line.style.width = Math.abs(x2 - x1) + 'px';
-        line.style.height = '2px';
-        line.style.background = '#00bfff';
-        line.style.transformOrigin = 'left center';
-        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-        line.style.transform = `rotate(${angle}deg)`;
-      });
-    }
-  </script>
+           // Mouse events for dragging
+           nodeEl.addEventListener('mousedown', (e) => {
+               if (e.ctrlKey || e.metaKey) {
+                   // Start connection
+                   startConnection(node);
+                   e.preventDefault();
+                   return;
+               }
+               
+               isDragging = true;
+               selectedNode = node;
+               nodeEl.classList.add('selected');
+               
+               const rect = nodeEl.getBoundingClientRect();
+               dragOffset.x = e.clientX - rect.left;
+               dragOffset.y = e.clientY - rect.top;
+               
+               e.preventDefault();
+           });
+
+           // Double click to edit
+           nodeEl.addEventListener('dblclick', (e) => {
+               e.preventDefault();
+               editNode(node);
+           });
+
+           canvas.appendChild(nodeEl);
+       }
+
+       function startConnection(node) {
+           isConnecting = true;
+           connectionStart = node;
+           document.body.style.cursor = 'crosshair';
+       }
+
+       function endConnection(targetNode) {
+           if (isConnecting && connectionStart && targetNode && connectionStart.id !== targetNode.id) {
+               const connection = {
+                   from: connectionStart.id,
+                   to: targetNode.id
+               };
+               connections.push(connection);
+               renderConnections();
+           }
+           isConnecting = false;
+           connectionStart = null;
+           document.body.style.cursor = 'default';
+           connectionPreview.innerHTML = '';
+       }
+
+       // Global mouse events
+       document.addEventListener('mousemove', (e) => {
+           if (isDragging && selectedNode) {
+               const rect = canvas.getBoundingClientRect();
+               const x = e.clientX - rect.left - dragOffset.x;
+               const y = e.clientY - rect.top - dragOffset.y;
+               
+               selectedNode.x = Math.max(0, x);
+               selectedNode.y = Math.max(0, y);
+               
+               const nodeEl = document.getElementById(selectedNode.id);
+               nodeEl.style.left = selectedNode.x + 'px';
+               nodeEl.style.top = selectedNode.y + 'px';
+               
+               renderConnections();
+           }
+           
+           if (isConnecting && connectionStart) {
+               const rect = canvas.getBoundingClientRect();
+               const x = e.clientX - rect.left;
+               const y = e.clientY - rect.top;
+               renderConnectionPreview(connectionStart, { x, y });
+           }
+       });
+
+       document.addEventListener('mouseup', (e) => {
+           if (isDragging) {
+               isDragging = false;
+               if (selectedNode) {
+                   document.getElementById(selectedNode.id).classList.remove('selected');
+                   selectedNode = null;
+               }
+           }
+           
+           if (isConnecting) {
+               const target = e.target.closest('.node');
+               if (target) {
+                   const targetNode = nodes.find(n => n.id === target.id);
+                   if (targetNode) {
+                       endConnection(targetNode);
+                   }
+               } else {
+                   endConnection(null);
+               }
+           }
+       });
+
+       function renderConnectionPreview(startNode, endPos) {
+           const startEl = document.getElementById(startNode.id);
+           const startRect = startEl.getBoundingClientRect();
+           const canvasRect = canvas.getBoundingClientRect();
+           
+           const startX = startRect.left - canvasRect.left + startRect.width / 2;
+           const startY = startRect.top - canvasRect.top + startRect.height / 2;
+           
+           const svg = `
+               <svg width="100%" height="100%">
+                   <path d="M ${startX} ${startY} Q ${(startX + endPos.x) / 2} ${startY} ${endPos.x} ${endPos.y}" />
+               </svg>
+           `;
+           
+           connectionPreview.innerHTML = svg;
+       }
+
+       function renderConnections() {
+           // Remove existing connection lines
+           document.querySelectorAll('.connection-line').forEach(line => line.remove());
+           
+           connections.forEach(connection => {
+               const fromNode = nodes.find(n => n.id === connection.from);
+               const toNode = nodes.find(n => n.id === connection.to);
+               
+               if (fromNode && toNode) {
+                   const fromEl = document.getElementById(fromNode.id);
+                   const toEl = document.getElementById(toNode.id);
+                   
+                   if (fromEl && toEl) {
+                       const fromRect = fromEl.getBoundingClientRect();
+                       const toRect = toEl.getBoundingClientRect();
+                       const canvasRect = canvas.getBoundingClientRect();
+                       
+                       const fromX = fromRect.left - canvasRect.left + fromRect.width / 2;
+                       const fromY = fromRect.top - canvasRect.top + fromRect.height / 2;
+                       const toX = toRect.left - canvasRect.left + toRect.width / 2;
+                       const toY = toRect.top - canvasRect.top + toRect.height / 2;
+                       
+                       const line = document.createElement('div');
+                       line.className = 'connection-line';
+                       line.innerHTML = `
+                           <svg width="100%" height="100%">
+                               <path d="M ${fromX} ${fromY} Q ${(fromX + toX) / 2} ${fromY} ${toX} ${toY}" />
+                           </svg>
+                       `;
+                       
+                       canvas.appendChild(line);
+                   }
+               }
+           });
+       }
+
+       function editNode(node) {
+           currentEditingNode = node;
+           document.getElementById('nodeTitle').value = node.title;
+           document.getElementById('nodeConfig').value = node.config;
+           modal.style.display = 'flex';
+       }
+
+       function saveNodeConfig() {
+           if (currentEditingNode) {
+               currentEditingNode.title = document.getElementById('nodeTitle').value;
+               currentEditingNode.config = document.getElementById('nodeConfig').value;
+               
+               const nodeEl = document.getElementById(currentEditingNode.id);
+               nodeEl.innerHTML = `
+                   <div class="node-title">${currentEditingNode.title}</div>
+                   <div class="node-type">${currentEditingNode.type}</div>
+                   <div class="node-config">${currentEditingNode.config || 'No configuration'}</div>
+               `;
+               
+               // Re-add event listeners
+               nodeEl.addEventListener('mousedown', (e) => {
+                   if (e.ctrlKey || e.metaKey) {
+                       startConnection(currentEditingNode);
+                       e.preventDefault();
+                       return;
+                   }
+                   
+                   isDragging = true;
+                   selectedNode = currentEditingNode;
+                   nodeEl.classList.add('selected');
+                   
+                   const rect = nodeEl.getBoundingClientRect();
+                   dragOffset.x = e.clientX - rect.left;
+                   dragOffset.y = e.clientY - rect.top;
+                   
+                   e.preventDefault();
+               });
+
+               nodeEl.addEventListener('dblclick', (e) => {
+                   e.preventDefault();
+                   editNode(currentEditingNode);
+               });
+           }
+           closeModal();
+       }
+
+       function closeModal() {
+           modal.style.display = 'none';
+           currentEditingNode = null;
+       }
+
+       function exportWorkflow() {
+           const workflow = {
+               nodes: nodes,
+               connections: connections
+           };
+           const json = JSON.stringify(workflow, null, 2);
+           
+           // Copy to clipboard
+           navigator.clipboard.writeText(json).then(() => {
+               alert('Workflow exported to clipboard!');
+           }).catch(() => {
+               // Fallback - show in prompt
+               prompt('Copy this workflow JSON:', json);
+           });
+       }
+
+       function importWorkflow() {
+           const json = prompt('Paste workflow JSON:');
+           if (json) {
+               try {
+                   const workflow = JSON.parse(json);
+                   nodes = workflow.nodes || [];
+                   connections = workflow.connections || [];
+                   
+                   // Clear canvas
+                   canvas.innerHTML = '';
+                   
+                   // Re-render nodes
+                   nodes.forEach(node => {
+                       renderNode(node);
+                   });
+                   
+                   // Re-render connections
+                   renderConnections();
+                   
+                   alert('Workflow imported successfully!');
+               } catch (e) {
+                   alert('Invalid JSON format!');
+               }
+           }
+       }
+
+       function clearCanvas() {
+           if (confirm('Are you sure you want to clear the canvas?')) {
+               nodes = [];
+               connections = [];
+               canvas.innerHTML = '';
+               nodeCounter = 0;
+           }
+       }
+
+       // Add instructions
+       console.log('Boss AI Canvas Controls:');
+       console.log('- Drag node types from sidebar to canvas');
+       console.log('- Double-click nodes to configure');
+       console.log('- Ctrl/Cmd + drag to create connections');
+       console.log('- Use Export/Import buttons to save workflows');
+   </script>
 </body>
 </html>
