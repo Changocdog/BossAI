@@ -1,233 +1,159 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boss AI Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <title>Boss AI - Simple Automation Canvas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: linear-gradient(to right, #000000, #0a0a2a);
       color: #00bfff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
-    .menu-btn {
-      background: #000;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      font-size: 16px;
-      padding: 10px;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1001;
-      cursor: pointer;
-    }
-    .main {
-      display: flex;
-      flex: 1;
       overflow: hidden;
-      margin-top: 50px;
     }
-    .sidebar {
-      width: 250px;
-      background: #0e0e0e;
+    h1 {
+      text-align: center;
       padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
+      text-shadow: 0 0 8px #00bfff;
     }
-    .sidebar.hidden {
-      transform: translateX(-260px);
-    }
-    .sidebar button {
-      background: none;
-      border: none;
-      color: #00bfff;
-      font-size: 14px;
-      cursor: pointer;
-      padding: 8px;
-      text-align: left;
-    }
-    .sidebar button.active {
-      font-weight: bold;
+    #nodePanel {
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      width: 140px;
       background: #111;
+      padding: 10px;
+      border: 2px solid #00bfff;
+      border-radius: 6px;
+      z-index: 100;
     }
-    .content {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 160px;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle, #111, #000);
+      overflow: hidden;
     }
-    textarea, input {
+    .node {
+      position: absolute;
+      width: 140px;
+      padding: 10px;
+      background: #0e0e0e;
+      border: 2px solid #00bfff;
+      color: #00bfff;
+      text-align: center;
+      border-radius: 6px;
+      text-shadow: 0 0 6px #00bfff;
+      cursor: move;
+    }
+    .connection {
+      position: absolute;
+      pointer-events: none;
+    }
+    button {
       width: 100%;
-      background: #000;
+      margin-bottom: 8px;
+      background: #222;
       color: #00bfff;
       border: 1px solid #00bfff;
-      padding: 10px;
-      margin-top: 5px;
-      font-family: monospace;
-    }
-    input[type="password"] {
-      -webkit-text-security: disc;
-    }
-    .module { display: none; }
-    .visible { display: block; }
-    .manager-output {
-      background: #000;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      border: 1px solid #00bfff;
+      border-radius: 4px;
+      padding: 6px;
+      font-family: 'Orbitron', sans-serif;
     }
   </style>
 </head>
 <body>
-  <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
-  <div class="main">
-    <div class="sidebar" id="sidebar">
-      <button data-module="manager" class="active">🤖 Manager AI</button>
-      <button data-module="script">✍️ Script Writer</button>
-      <button data-module="voice">🔊 Voiceover</button>
-      <button data-module="automation">⚙️ Automation AI</button>
-      <button data-module="upload">📤 Upload Strategy</button>
-      <button data-module="trends">📈 Trends AI</button>
-      <button data-module="legal">⚖️ Legal Review</button>
-      <button data-module="output">📦 Final Output</button>
-      <button data-module="history">🕓 History</button>
-      <button data-module="sheets">📄 Sheets Log</button>
-      <button data-module="settings">⚙️ Settings</button>
-    </div>
-    <div class="content">
-      <div id="manager" class="module visible">
-        <h2 class="glow">🤖 Manager AI</h2>
-        <textarea id="manager-input" rows="2" placeholder="Ask Manager AI..."></textarea>
-        <button onclick="sendToManager()">Send</button>
-        <div id="manager-output" class="manager-output"></div>
-      </div>
-      <div id="script" class="module">
-        <h2 class="glow">✍️ Script Writer</h2>
-        <input type="password" id="script-api-key" placeholder="OpenRouter API Key" />
-        <textarea id="script-input" placeholder="Enter script topic..."></textarea>
-        <button onclick="generateScript()">Generate Script</button>
-        <div id="script-output" class="manager-output"></div>
-      </div>
-      <div id="voice" class="module">
-        <h2 class="glow">🔊 Voiceover AI</h2>
-        <input type="password" id="voice-api-key" placeholder="ElevenLabs API Key" />
-        <textarea id="voice-text" placeholder="Paste script here..."></textarea>
-        <button onclick="generateVoice()">Generate Voiceover</button>
-        <audio id="voice-audio" controls style="margin-top:10px;"></audio>
-      </div>
-      <div id="automation" class="module"><h2 class="glow">⚙️ Automation AI</h2></div>
-      <div id="upload" class="module"><h2 class="glow">📤 Upload Strategy</h2></div>
-      <div id="trends" class="module"><h2 class="glow">📈 Trends AI</h2></div>
-      <div id="legal" class="module"><h2 class="glow">⚖️ Legal Review</h2></div>
-      <div id="output" class="module"><h2 class="glow">📦 Final Output</h2></div>
-      <div id="history" class="module"><h2 class="glow">🕓 History</h2></div>
-      <div id="sheets" class="module"><h2 class="glow">📄 Sheets Log</h2></div>
-      <div id="settings" class="module"><h2 class="glow">⚙️ Settings</h2></div>
-    </div>
+  <h1>Boss AI Automation Canvas</h1>
+
+  <div id="nodePanel">
+    <button onclick="addNode('Script Writer')">Script Writer</button>
+    <button onclick="addNode('Voiceover')">Voiceover</button>
+    <button onclick="addNode('Logger')">Logger</button>
   </div>
 
-  <script>
-    const modules = {
-      manager: "Control center for all modules. Responds to commands and executes interface actions.",
-      script: "Generates YouTube scripts using OpenRouter GPT.",
-      voice: "Converts scripts into realistic voiceover using ElevenLabs.",
-      automation: "Build workflows and automate app logic (n8n-style).",
-      upload: "Suggests upload strategies, platforms, and times.",
-      trends: "Analyzes current topic trends and data.",
-      legal: "Performs legal and copyright reviews on content.",
-      output: "Final output generator for review and download.",
-      history: "Shows saved project outputs and past runs.",
-      sheets: "Logs all actions to a Google Sheet.",
-      settings: "Configure API keys, theme, and preferences."
-    };
+  <div id="canvas" onmousedown="startConnection(event)" onmouseup="endConnection(event)"></div>
 
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("hidden");
+  <script>
+    let nodeId = 0;
+    const canvas = document.getElementById('canvas');
+    let draggingNode = null;
+    let offsetX = 0, offsetY = 0;
+    let startNode = null;
+
+    function addNode(type) {
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.innerText = type;
+      node.dataset.id = nodeId++;
+      node.style.left = '200px';
+      node.style.top = '150px';
+      node.onmousedown = (e) => startDrag(e, node);
+      canvas.appendChild(node);
     }
 
-    document.querySelectorAll(".sidebar button").forEach(button => {
-      button.onclick = () => {
-        document.querySelectorAll(".module").forEach(mod => mod.classList.remove("visible"));
-        document.querySelectorAll(".sidebar button").forEach(btn => btn.classList.remove("active"));
-        const mod = button.getAttribute("data-module");
-        document.getElementById(mod).classList.add("visible");
-        button.classList.add("active");
-      };
-    });
+    function startDrag(e, node) {
+      draggingNode = node;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+    }
 
-    function sendToManager() {
-      const input = document.getElementById("manager-input").value.trim().toLowerCase();
-      const out = document.getElementById("manager-output");
+    document.onmousemove = function(e) {
+      if (draggingNode) {
+        draggingNode.style.left = (e.pageX - offsetX) + 'px';
+        draggingNode.style.top = (e.pageY - offsetY) + 'px';
+        updateConnections();
+      }
+    };
 
-      if (input.includes("function") || input.includes("module") || input.includes("what can")) {
-        let msg = "🧠 Boss AI Modules:\n";
-        for (let mod in modules) {
-          msg += `• ${mod.toUpperCase()}: ${modules[mod]}\n`;
-        }
-        out.textContent = msg;
-      } else {
-        out.textContent = "🤖 I'm here! Try asking what each module does or say 'list modules'.";
+    document.onmouseup = function() {
+      draggingNode = null;
+    };
+
+    function startConnection(e) {
+      if (e.target.className.includes('node')) {
+        startNode = e.target;
       }
     }
 
-    function generateScript() {
-      const key = document.getElementById("script-api-key").value;
-      const topic = document.getElementById("script-input").value;
-      const out = document.getElementById("script-output");
-      localStorage.setItem("openrouter_key", key);
-      fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${key}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [{ role: "user", content: `Write a YouTube script about: ${topic}` }]
-        })
-      })
-      .then(res => res.json())
-      .then(data => out.textContent = data.choices?.[0]?.message?.content || "No response.")
-      .catch(err => out.textContent = "❌ Error: " + err);
+    function endConnection(e) {
+      if (startNode && e.target.className.includes('node') && startNode !== e.target) {
+        drawConnection(startNode, e.target);
+      }
+      startNode = null;
     }
 
-    function generateVoice() {
-      const key = document.getElementById("voice-api-key").value;
-      const text = document.getElementById("voice-text").value;
-      localStorage.setItem("elevenlabs_key", key);
-      fetch("https://api.elevenlabs.io/v1/text-to-speech/default/audio", {
-        method: "POST",
-        headers: {
-          "xi-api-key": key,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text })
-      })
-      .then(res => res.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        document.getElementById("voice-audio").src = url;
-      })
-      .catch(() => alert("❌ Error generating voice"));
+    function drawConnection(fromNode, toNode) {
+      const line = document.createElement('div');
+      line.className = 'connection';
+      line.dataset.from = fromNode.dataset.id;
+      line.dataset.to = toNode.dataset.id;
+      canvas.appendChild(line);
+      updateConnections();
     }
 
-    window.onload = () => {
-      document.getElementById("script-api-key").value = localStorage.getItem("openrouter_key") || "";
-      document.getElementById("voice-api-key").value = localStorage.getItem("elevenlabs_key") || "";
-      document.querySelector('[data-module="manager"]').click();
-    };
+    function updateConnections() {
+      document.querySelectorAll('.connection').forEach(line => {
+        const from = document.querySelector(`.node[data-id='${line.dataset.from}']`);
+        const to = document.querySelector(`.node[data-id='${line.dataset.to}']`);
+        const x1 = from.offsetLeft + from.offsetWidth / 2;
+        const y1 = from.offsetTop + from.offsetHeight / 2;
+        const x2 = to.offsetLeft + to.offsetWidth / 2;
+        const y2 = to.offsetTop + to.offsetHeight / 2;
+        const left = Math.min(x1, x2);
+        const top = Math.min(y1, y2);
+        line.style.left = left + 'px';
+        line.style.top = top + 'px';
+        line.style.width = Math.abs(x2 - x1) + 'px';
+        line.style.height = '2px';
+        line.style.background = '#00bfff';
+        line.style.transformOrigin = 'left center';
+        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        line.style.transform = `rotate(${angle}deg)`;
+      });
+    }
   </script>
 </body>
 </html>
