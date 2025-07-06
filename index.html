@@ -1,637 +1,998 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Boss AI - Automation Canvas</title>
-   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-   <style>
-       * {
-           margin: 0;
-           padding: 0;
-           box-sizing: border-box;
-       }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Automation Canvas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-       body {
-           font-family: 'Orbitron', monospace;
-           background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-           color: #00ffff;
-           overflow: hidden;
-           height: 100vh;
-       }
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-       .header {
-           background: rgba(0, 255, 255, 0.1);
-           border-bottom: 2px solid #00ffff;
-           padding: 15px 20px;
-           display: flex;
-           justify-content: space-between;
-           align-items: center;
-           box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-       }
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+        }
 
-       .logo {
-           font-size: 24px;
-           font-weight: 900;
-           text-shadow: 0 0 10px #00ffff;
-       }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #0099ff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
 
-       .controls {
-           display: flex;
-           gap: 10px;
-       }
+        .header h1 {
+            font-weight: 900;
+            font-size: 24px;
+            color: #0099ff;
+            text-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
+        }
 
-       .btn {
-           background: rgba(0, 255, 255, 0.2);
-           border: 2px solid #00ffff;
-           color: #00ffff;
-           padding: 8px 16px;
-           border-radius: 5px;
-           cursor: pointer;
-           font-family: 'Orbitron', monospace;
-           font-size: 12px;
-           transition: all 0.3s;
-           text-shadow: 0 0 5px #00ffff;
-       }
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
 
-       .btn:hover {
-           background: rgba(0, 255, 255, 0.4);
-           box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-           transform: translateY(-2px);
-       }
+        .btn {
+            padding: 8px 16px;
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid #0099ff;
+            color: #0099ff;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
 
-       .sidebar {
-           position: fixed;
-           left: 0;
-           top: 70px;
-           width: 250px;
-           height: calc(100vh - 70px);
-           background: rgba(0, 0, 0, 0.8);
-           border-right: 2px solid #00ffff;
-           padding: 20px;
-           box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-       }
+        .btn:hover {
+            background: rgba(0, 153, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 153, 255, 0.4);
+        }
 
-       .sidebar h3 {
-           margin-bottom: 15px;
-           text-shadow: 0 0 10px #00ffff;
-       }
+        .btn.primary {
+            background: #0099ff;
+            color: #000;
+        }
 
-       .node-template {
-           background: rgba(0, 255, 255, 0.1);
-           border: 2px solid #00ffff;
-           padding: 10px;
-           margin-bottom: 10px;
-           border-radius: 5px;
-           cursor: grab;
-           transition: all 0.3s;
-           text-align: center;
-           font-size: 14px;
-       }
+        .btn.primary:hover {
+            background: #0077cc;
+            box-shadow: 0 0 20px rgba(0, 153, 255, 0.6);
+        }
 
-       .node-template:hover {
-           background: rgba(0, 255, 255, 0.2);
-           box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-       }
+        .btn.danger {
+            border-color: #ff4444;
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
 
-       .canvas-container {
-           position: fixed;
-           left: 250px;
-           top: 70px;
-           width: calc(100vw - 250px);
-           height: calc(100vh - 70px);
-           overflow: hidden;
-       }
+        .btn.danger:hover {
+            background: rgba(255, 68, 68, 0.2);
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+        }
 
-       .canvas {
-           width: 100%;
-           height: 100%;
-           position: relative;
-           background: 
-               radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-               radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
-               linear-gradient(45deg, #0a0a0a 25%, transparent 25%),
-               linear-gradient(-45deg, #0a0a0a 25%, transparent 25%);
-           background-size: 50px 50px, 50px 50px, 30px 30px, 30px 30px;
-           cursor: grab;
-       }
+        .sidebar {
+            width: 250px;
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 1px solid #0099ff;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+        }
 
-       .node {
-           position: absolute;
-           min-width: 150px;
-           min-height: 80px;
-           background: rgba(0, 255, 255, 0.1);
-           border: 2px solid #00ffff;
-           border-radius: 10px;
-           padding: 15px;
-           cursor: move;
-           transition: all 0.3s;
-           box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-           backdrop-filter: blur(10px);
-       }
+        .sidebar h2 {
+            color: #0099ff;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px rgba(0, 153, 255, 0.3);
+        }
 
-       .node:hover {
-           box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
-           transform: translateY(-2px);
-       }
+        .node-type {
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid #0099ff;
+            padding: 12px;
+            margin: 10px 0;
+            cursor: grab;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
 
-       .node.selected {
-           border-color: #ff00ff;
-           box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
-       }
+        .node-type:hover {
+            background: rgba(0, 153, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
+        }
 
-       .node-title {
-           font-weight: 700;
-           margin-bottom: 5px;
-           text-shadow: 0 0 5px #00ffff;
-           font-size: 14px;
-       }
+        .node-type:active {
+            cursor: grabbing;
+        }
 
-       .node-type {
-           font-size: 12px;
-           opacity: 0.7;
-           margin-bottom: 10px;
-       }
+        .node-type h3 {
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
 
-       .node-config {
-           font-size: 11px;
-           opacity: 0.6;
-           word-wrap: break-word;
-       }
+        .node-type p {
+            font-size: 11px;
+            color: #aaa;
+            line-height: 1.4;
+        }
 
-       .connection-line {
-           position: absolute;
-           pointer-events: none;
-           z-index: 10;
-       }
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+        }
 
-       .connection-line svg {
-           position: absolute;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 100%;
-           overflow: visible;
-       }
+        .canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 153, 255, 0.05) 0%, transparent 50%);
+            cursor: crosshair;
+        }
 
-       .connection-line path {
-           stroke: #00ffff;
-           stroke-width: 3;
-           fill: none;
-           filter: drop-shadow(0 0 5px #00ffff);
-       }
+        .canvas-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-       .modal {
-           position: fixed;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 100%;
-           background: rgba(0, 0, 0, 0.8);
-           display: none;
-           justify-content: center;
-           align-items: center;
-           z-index: 1000;
-       }
+        .node {
+            position: absolute;
+            min-width: 180px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0099ff;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: move;
+            z-index: 10;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 153, 255, 0.1);
+        }
 
-       .modal-content {
-           background: rgba(0, 0, 0, 0.9);
-           border: 2px solid #00ffff;
-           border-radius: 10px;
-           padding: 30px;
-           width: 400px;
-           box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-       }
+        .node:hover {
+            box-shadow: 0 6px 30px rgba(0, 153, 255, 0.2);
+            border-color: #00bbff;
+        }
 
-       .modal h3 {
-           margin-bottom: 20px;
-           text-shadow: 0 0 10px #00ffff;
-       }
+        .node.executing {
+            border-color: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
 
-       .form-group {
-           margin-bottom: 15px;
-       }
+        .node.executed {
+            border-color: #888;
+            opacity: 0.8;
+        }
 
-       .form-group label {
-           display: block;
-           margin-bottom: 5px;
-           font-size: 14px;
-       }
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-       .form-group input,
-       .form-group textarea {
-           width: 100%;
-           padding: 8px 12px;
-           background: rgba(0, 255, 255, 0.1);
-           border: 2px solid #00ffff;
-           border-radius: 5px;
-           color: #00ffff;
-           font-family: 'Orbitron', monospace;
-           font-size: 12px;
-       }
+        .node-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0099ff;
+            text-shadow: 0 0 5px rgba(0, 153, 255, 0.3);
+        }
 
-       .form-group textarea {
-           resize: vertical;
-           min-height: 80px;
-       }
+        .node-type-label {
+            font-size: 10px;
+            color: #888;
+            background: rgba(0, 153, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #0099ff;
+        }
 
-       .modal-buttons {
-           display: flex;
-           gap: 10px;
-           justify-content: flex-end;
-           margin-top: 20px;
-       }
+        .node-content {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
 
-       .connection-preview {
-           position: absolute;
-           pointer-events: none;
-           z-index: 100;
-       }
+        .node-ports {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 20px;
+        }
 
-       .connection-preview svg {
-           position: absolute;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 100%;
-           overflow: visible;
-       }
+        .port {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #0099ff;
+            background: rgba(0, 153, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-       .connection-preview path {
-           stroke: #ff00ff;
-           stroke-width: 3;
-           fill: none;
-           stroke-dasharray: 5,5;
-           filter: drop-shadow(0 0 5px #ff00ff);
-       }
-   </style>
+        .port.input {
+            margin-left: -20px;
+        }
+
+        .port.output {
+            margin-right: -20px;
+            background: rgba(0, 153, 255, 0.3);
+        }
+
+        .port:hover {
+            background: #0099ff;
+            box-shadow: 0 0 10px rgba(0, 153, 255, 0.6);
+        }
+
+        .connection {
+            stroke: #0099ff;
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 5px rgba(0, 153, 255, 0.3));
+        }
+
+        .connection.active {
+            stroke: #00ff00;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #000;
+            border: 1px solid #0099ff;
+            border-radius: 8px;
+            padding: 30px;
+            min-width: 400px;
+            max-width: 600px;
+            box-shadow: 0 10px 50px rgba(0, 153, 255, 0.3);
+        }
+
+        .modal h2 {
+            color: #0099ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #0099ff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid #0099ff;
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00bbff;
+            box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .execution-log {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 200px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #0099ff;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .execution-log.active {
+            display: block;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            background: rgba(0, 153, 255, 0.1);
+            color: #0099ff;
+        }
+
+        .log-entry.success {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+        }
+
+        .log-entry.error {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0099ff;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #0099ff;
+            display: none;
+        }
+
+        .status-indicator.active {
+            display: block;
+        }
+
+        .status-indicator.executing {
+            border-color: #00ff00;
+            color: #00ff00;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .drag-preview {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-   <div class="header">
-       <div class="logo">BOSS AI - AUTOMATION CANVAS</div>
-       <div class="controls">
-           <button class="btn" onclick="exportWorkflow()">EXPORT</button>
-           <button class="btn" onclick="importWorkflow()">IMPORT</button>
-           <button class="btn" onclick="clearCanvas()">CLEAR</button>
-       </div>
-   </div>
+    <div class="app-container">
+        <div class="header">
+            <h1>Visual Automation Canvas</h1>
+            <div class="header-controls">
+                <button class="btn primary" onclick="runWorkflow()">▶ RUN</button>
+                <button class="btn" onclick="exportWorkflow()">📤 EXPORT</button>
+                <button class="btn" onclick="importWorkflow()">📥 IMPORT</button>
+                <button class="btn danger" onclick="clearCanvas()">🗑 CLEAR</button>
+            </div>
+        </div>
 
-   <div class="sidebar">
-       <h3>NODE TYPES</h3>
-       <div class="node-template" draggable="true" data-type="Script Writer">
-           📝 SCRIPT WRITER
-       </div>
-       <div class="node-template" draggable="true" data-type="Voiceover">
-           🎤 VOICEOVER
-       </div>
-       <div class="node-template" draggable="true" data-type="Logger">
-           📊 LOGGER
-       </div>
-   </div>
+        <div class="sidebar">
+            <h2>Node Types</h2>
+            <div class="node-type" draggable="true" data-type="script">
+                <h3>Script Writer</h3>
+                <p>Generate scripts and content using AI prompts</p>
+            </div>
+            <div class="node-type" draggable="true" data-type="voiceover">
+                <h3>Voiceover</h3>
+                <p>Convert text to speech with voice settings</p>
+            </div>
+            <div class="node-type" draggable="true" data-type="logger">
+                <h3>Logger</h3>
+                <p>Log messages and data for debugging</p>
+            </div>
+            <div class="node-type" draggable="true" data-type="http">
+                <h3>HTTP Request</h3>
+                <p>Make API calls and web requests</p>
+            </div>
+            <div class="node-type" draggable="true" data-type="delay">
+                <h3>Delay</h3>
+                <p>Add time delays between operations</p>
+            </div>
+            <div class="node-type" draggable="true" data-type="conditional">
+                <h3>Conditional</h3>
+                <p>Branch workflow based on conditions</p>
+            </div>
+        </div>
 
-   <div class="canvas-container">
-       <div class="canvas" id="canvas"></div>
-       <div class="connection-preview" id="connectionPreview"></div>
-   </div>
+        <div class="canvas-container">
+            <div class="canvas" id="canvas">
+                <svg class="canvas-svg" id="canvas-svg"></svg>
+            </div>
+        </div>
 
-   <div class="modal" id="nodeModal">
-       <div class="modal-content">
-           <h3>NODE CONFIGURATION</h3>
-           <div class="form-group">
-               <label>Node Title:</label>
-               <input type="text" id="nodeTitle" placeholder="Enter node title">
-           </div>
-           <div class="form-group">
-               <label>Configuration:</label>
-               <textarea id="nodeConfig" placeholder="Enter configuration (e.g., prompt text, parameters)"></textarea>
-           </div>
-           <div class="modal-buttons">
-               <button class="btn" onclick="saveNodeConfig()">SAVE</button>
-               <button class="btn" onclick="closeModal()">CANCEL</button>
-           </div>
-       </div>
-   </div>
+        <div class="status-indicator" id="statusIndicator">Ready</div>
+        
+        <div class="execution-log" id="executionLog">
+            <h3 style="color: #0099ff; margin-bottom: 10px;">Execution Log</h3>
+            <div id="logContent"></div>
+        </div>
+    </div>
 
-   <script>
-       let nodeCounter = 0;
-       let nodes = [];
-       let connections = [];
-       let isDragging = false;
-       let dragOffset = { x: 0, y: 0 };
-       let selectedNode = null;
-       let isConnecting = false;
-       let connectionStart = null;
-       let currentEditingNode = null;
+    <!-- Modal for editing nodes -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>Edit Node</h2>
+            <div class="form-group">
+                <label for="nodeTitle">Node Title:</label>
+                <input type="text" id="nodeTitle" placeholder="Enter node title">
+            </div>
+            <div class="form-group">
+                <label for="nodeConfig">Configuration:</label>
+                <textarea id="nodeConfig" placeholder="Enter configuration details..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeModal()">Cancel</button>
+                <button class="btn primary" onclick="saveNode()">Save</button>
+            </div>
+        </div>
+    </div>
 
-       // Initialize canvas
-       const canvas = document.getElementById('canvas');
-       const modal = document.getElementById('nodeModal');
-       const connectionPreview = document.getElementById('connectionPreview');
+    <script>
+        // Global variables
+        let nodes = [];
+        let connections = [];
+        let nodeIdCounter = 0;
+        let isDragging = false;
+        let draggedNode = null;
+        let isConnecting = false;
+        let connectionStart = null;
+        let currentEditingNode = null;
+        let executionState = 'idle';
 
-       // Node template drag and drop
-       document.querySelectorAll('.node-template').forEach(template => {
-           template.addEventListener('dragstart', (e) => {
-               e.dataTransfer.setData('text/plain', template.dataset.type);
-           });
-       });
+        // Node type definitions
+        const nodeTypes = {
+            script: {
+                title: 'Script Writer',
+                defaultConfig: 'Write a creative script about...',
+                execute: async function(config, input) {
+                    log('info', `Executing Script Writer: ${config.substring(0, 50)}...`);
+                    await delay(1000);
+                    return `Generated script: ${config}`;
+                }
+            },
+            voiceover: {
+                title: 'Voiceover',
+                defaultConfig: 'Voice: Natural, Speed: 1.0x',
+                execute: async function(config, input) {
+                    log('info', `Executing Voiceover: ${config}`);
+                    await delay(1500);
+                    return `Audio generated with settings: ${config}`;
+                }
+            },
+            logger: {
+                title: 'Logger',
+                defaultConfig: 'Log level: INFO',
+                execute: async function(config, input) {
+                    log('info', `Logger: ${input || 'No input data'}`);
+                    await delay(300);
+                    return input;
+                }
+            },
+            http: {
+                title: 'HTTP Request',
+                defaultConfig: 'GET https://api.example.com/data',
+                execute: async function(config, input) {
+                    log('info', `Making HTTP request: ${config}`);
+                    await delay(2000);
+                    return `HTTP response: ${config}`;
+                }
+            },
+            delay: {
+                title: 'Delay',
+                defaultConfig: '2000ms',
+                execute: async function(config, input) {
+                    const ms = parseInt(config) || 2000;
+                    log('info', `Waiting ${ms}ms...`);
+                    await delay(ms);
+                    return input;
+                }
+            },
+            conditional: {
+                title: 'Conditional',
+                defaultConfig: 'if (input.length > 0) return true',
+                execute: async function(config, input) {
+                    log('info', `Evaluating condition: ${config}`);
+                    await delay(500);
+                    return input;
+                }
+            }
+        };
 
-       canvas.addEventListener('dragover', (e) => {
-           e.preventDefault();
-       });
+        // Initialize canvas
+        function initCanvas() {
+            const canvas = document.getElementById('canvas');
+            const svg = document.getElementById('canvas-svg');
 
-       canvas.addEventListener('drop', (e) => {
-           e.preventDefault();
-           const nodeType = e.dataTransfer.getData('text/plain');
-           const rect = canvas.getBoundingClientRect();
-           const x = e.clientX - rect.left;
-           const y = e.clientY - rect.top;
-           createNode(nodeType, x, y);
-       });
+            // Handle drag and drop from sidebar
+            document.addEventListener('dragstart', handleDragStart);
+            document.addEventListener('dragover', handleDragOver);
+            document.addEventListener('drop', handleDrop);
 
-       function createNode(type, x, y) {
-           const node = {
-               id: `node_${++nodeCounter}`,
-               type: type,
-               title: type,
-               x: x,
-               y: y,
-               config: ''
-           };
-           nodes.push(node);
-           renderNode(node);
-       }
+            // Handle node interactions
+            canvas.addEventListener('mousedown', handleCanvasMouseDown);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+            canvas.addEventListener('mouseup', handleCanvasMouseUp);
+            canvas.addEventListener('dblclick', handleCanvasDoubleClick);
 
-       function renderNode(node) {
-           const nodeEl = document.createElement('div');
-           nodeEl.className = 'node';
-           nodeEl.id = node.id;
-           nodeEl.style.left = node.x + 'px';
-           nodeEl.style.top = node.y + 'px';
-           
-           nodeEl.innerHTML = `
-               <div class="node-title">${node.title}</div>
-               <div class="node-type">${node.type}</div>
-               <div class="node-config">${node.config || 'No configuration'}</div>
-           `;
+            // Handle connection drawing
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
 
-           // Mouse events for dragging
-           nodeEl.addEventListener('mousedown', (e) => {
-               if (e.ctrlKey || e.metaKey) {
-                   // Start connection
-                   startConnection(node);
-                   e.preventDefault();
-                   return;
-               }
-               
-               isDragging = true;
-               selectedNode = node;
-               nodeEl.classList.add('selected');
-               
-               const rect = nodeEl.getBoundingClientRect();
-               dragOffset.x = e.clientX - rect.left;
-               dragOffset.y = e.clientY - rect.top;
-               
-               e.preventDefault();
-           });
+            updateCanvas();
+        }
 
-           // Double click to edit
-           nodeEl.addEventListener('dblclick', (e) => {
-               e.preventDefault();
-               editNode(node);
-           });
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            if (e.target.classList.contains('node-type')) {
+                e.dataTransfer.setData('nodeType', e.target.dataset.type);
+            }
+        }
 
-           canvas.appendChild(nodeEl);
-       }
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
 
-       function startConnection(node) {
-           isConnecting = true;
-           connectionStart = node;
-           document.body.style.cursor = 'crosshair';
-       }
+        function handleDrop(e) {
+            e.preventDefault();
+            const nodeType = e.dataTransfer.getData('nodeType');
+            if (nodeType) {
+                const rect = document.getElementById('canvas').getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                createNode(nodeType, x, y);
+            }
+        }
 
-       function endConnection(targetNode) {
-           if (isConnecting && connectionStart && targetNode && connectionStart.id !== targetNode.id) {
-               const connection = {
-                   from: connectionStart.id,
-                   to: targetNode.id
-               };
-               connections.push(connection);
-               renderConnections();
-           }
-           isConnecting = false;
-           connectionStart = null;
-           document.body.style.cursor = 'default';
-           connectionPreview.innerHTML = '';
-       }
+        // Create new node
+        function createNode(type, x, y) {
+            const nodeType = nodeTypes[type];
+            const node = {
+                id: `node_${nodeIdCounter++}`,
+                type: type,
+                title: nodeType.title,
+                config: nodeType.defaultConfig,
+                x: x,
+                y: y,
+                executed: false
+            };
+            nodes.push(node);
+            updateCanvas();
+            return node;
+        }
 
-       // Global mouse events
-       document.addEventListener('mousemove', (e) => {
-           if (isDragging && selectedNode) {
-               const rect = canvas.getBoundingClientRect();
-               const x = e.clientX - rect.left - dragOffset.x;
-               const y = e.clientY - rect.top - dragOffset.y;
-               
-               selectedNode.x = Math.max(0, x);
-               selectedNode.y = Math.max(0, y);
-               
-               const nodeEl = document.getElementById(selectedNode.id);
-               nodeEl.style.left = selectedNode.x + 'px';
-               nodeEl.style.top = selectedNode.y + 'px';
-               
-               renderConnections();
-           }
-           
-           if (isConnecting && connectionStart) {
-               const rect = canvas.getBoundingClientRect();
-               const x = e.clientX - rect.left;
-               const y = e.clientY - rect.top;
-               renderConnectionPreview(connectionStart, { x, y });
-           }
-       });
+        // Canvas interaction handlers
+        function handleCanvasMouseDown(e) {
+            const node = getNodeAtPosition(e.clientX, e.clientY);
+            if (node) {
+                if (isConnecting) {
+                    if (connectionStart && connectionStart.id !== node.id) {
+                        createConnection(connectionStart.id, node.id);
+                        isConnecting = false;
+                        connectionStart = null;
+                        updateCanvas();
+                    }
+                } else {
+                    isDragging = true;
+                    draggedNode = node;
+                    const rect = document.getElementById('canvas').getBoundingClientRect();
+                    draggedNode.offsetX = e.clientX - rect.left - node.x;
+                    draggedNode.offsetY = e.clientY - rect.top - node.y;
+                }
+            }
+        }
 
-       document.addEventListener('mouseup', (e) => {
-           if (isDragging) {
-               isDragging = false;
-               if (selectedNode) {
-                   document.getElementById(selectedNode.id).classList.remove('selected');
-                   selectedNode = null;
-               }
-           }
-           
-           if (isConnecting) {
-               const target = e.target.closest('.node');
-               if (target) {
-                   const targetNode = nodes.find(n => n.id === target.id);
-                   if (targetNode) {
-                       endConnection(targetNode);
-                   }
-               } else {
-                   endConnection(null);
-               }
-           }
-       });
+        function handleCanvasMouseMove(e) {
+            if (isDragging && draggedNode) {
+                const rect = document.getElementById('canvas').getBoundingClientRect();
+                draggedNode.x = e.clientX - rect.left - draggedNode.offsetX;
+                draggedNode.y = e.clientY - rect.top - draggedNode.offsetY;
+                updateCanvas();
+            }
+        }
 
-       function renderConnectionPreview(startNode, endPos) {
-           const startEl = document.getElementById(startNode.id);
-           const startRect = startEl.getBoundingClientRect();
-           const canvasRect = canvas.getBoundingClientRect();
-           
-           const startX = startRect.left - canvasRect.left + startRect.width / 2;
-           const startY = startRect.top - canvasRect.top + startRect.height / 2;
-           
-           const svg = `
-               <svg width="100%" height="100%">
-                   <path d="M ${startX} ${startY} Q ${(startX + endPos.x) / 2} ${startY} ${endPos.x} ${endPos.y}" />
-               </svg>
-           `;
-           
-           connectionPreview.innerHTML = svg;
-       }
+        function handleCanvasMouseUp(e) {
+            isDragging = false;
+            draggedNode = null;
+        }
 
-       function renderConnections() {
-           // Remove existing connection lines
-           document.querySelectorAll('.connection-line').forEach(line => line.remove());
-           
-           connections.forEach(connection => {
-               const fromNode = nodes.find(n => n.id === connection.from);
-               const toNode = nodes.find(n => n.id === connection.to);
-               
-               if (fromNode && toNode) {
-                   const fromEl = document.getElementById(fromNode.id);
-                   const toEl = document.getElementById(toNode.id);
-                   
-                   if (fromEl && toEl) {
-                       const fromRect = fromEl.getBoundingClientRect();
-                       const toRect = toEl.getBoundingClientRect();
-                       const canvasRect = canvas.getBoundingClientRect();
-                       
-                       const fromX = fromRect.left - canvasRect.left + fromRect.width / 2;
-                       const fromY = fromRect.top - canvasRect.top + fromRect.height / 2;
-                       const toX = toRect.left - canvasRect.left + toRect.width / 2;
-                       const toY = toRect.top - canvasRect.top + toRect.height / 2;
-                       
-                       const line = document.createElement('div');
-                       line.className = 'connection-line';
-                       line.innerHTML = `
-                           <svg width="100%" height="100%">
-                               <path d="M ${fromX} ${fromY} Q ${(fromX + toX) / 2} ${fromY} ${toX} ${toY}" />
-                           </svg>
-                       `;
-                       
-                       canvas.appendChild(line);
-                   }
-               }
-           });
-       }
+        function handleCanvasDoubleClick(e) {
+            const node = getNodeAtPosition(e.clientX, e.clientY);
+            if (node) {
+                openEditModal(node);
+            }
+        }
 
-       function editNode(node) {
-           currentEditingNode = node;
-           document.getElementById('nodeTitle').value = node.title;
-           document.getElementById('nodeConfig').value = node.config;
-           modal.style.display = 'flex';
-       }
+        // Connection handling
+        function handleKeyDown(e) {
+            if (e.ctrlKey && !isConnecting) {
+                const node = getNodeAtPosition(e.clientX, e.clientY);
+                if (node) {
+                    isConnecting = true;
+                    connectionStart = node;
+                    document.getElementById('canvas').style.cursor = 'crosshair';
+                }
+            }
+        }
 
-       function saveNodeConfig() {
-           if (currentEditingNode) {
-               currentEditingNode.title = document.getElementById('nodeTitle').value;
-               currentEditingNode.config = document.getElementById('nodeConfig').value;
-               
-               const nodeEl = document.getElementById(currentEditingNode.id);
-               nodeEl.innerHTML = `
-                   <div class="node-title">${currentEditingNode.title}</div>
-                   <div class="node-type">${currentEditingNode.type}</div>
-                   <div class="node-config">${currentEditingNode.config || 'No configuration'}</div>
-               `;
-               
-               // Re-add event listeners
-               nodeEl.addEventListener('mousedown', (e) => {
-                   if (e.ctrlKey || e.metaKey) {
-                       startConnection(currentEditingNode);
-                       e.preventDefault();
-                       return;
-                   }
-                   
-                   isDragging = true;
-                   selectedNode = currentEditingNode;
-                   nodeEl.classList.add('selected');
-                   
-                   const rect = nodeEl.getBoundingClientRect();
-                   dragOffset.x = e.clientX - rect.left;
-                   dragOffset.y = e.clientY - rect.top;
-                   
-                   e.preventDefault();
-               });
+        function handleKeyUp(e) {
+            if (!e.ctrlKey && isConnecting) {
+                isConnecting = false;
+                connectionStart = null;
+                document.getElementById('canvas').style.cursor = 'default';
+            }
+        }
 
-               nodeEl.addEventListener('dblclick', (e) => {
-                   e.preventDefault();
-                   editNode(currentEditingNode);
-               });
-           }
-           closeModal();
-       }
+        // Utility functions
+        function getNodeAtPosition(clientX, clientY) {
+            const rect = document.getElementById('canvas').getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            return nodes.find(node => 
+                x >= node.x && x <= node.x + 180 &&
+                y >= node.y && y <= node.y + 120
+            );
+        }
 
-       function closeModal() {
-           modal.style.display = 'none';
-           currentEditingNode = null;
-       }
+        function createConnection(fromId, toId) {
+            if (!connections.find(conn => conn.from === fromId && conn.to === toId)) {
+                connections.push({ from: fromId, to: toId });
+            }
+        }
 
-       function exportWorkflow() {
-           const workflow = {
-               nodes: nodes,
-               connections: connections
-           };
-           const json = JSON.stringify(workflow, null, 2);
-           
-           // Copy to clipboard
-           navigator.clipboard.writeText(json).then(() => {
-               alert('Workflow exported to clipboard!');
-           }).catch(() => {
-               // Fallback - show in prompt
-               prompt('Copy this workflow JSON:', json);
-           });
-       }
+        // Modal functions
+        function openEditModal(node) {
+            currentEditingNode = node;
+            document.getElementById('nodeTitle').value = node.title;
+            document.getElementById('nodeConfig').value = node.config;
+            document.getElementById('editModal').style.display = 'flex';
+        }
 
-       function importWorkflow() {
-           const json = prompt('Paste workflow JSON:');
-           if (json) {
-               try {
-                   const workflow = JSON.parse(json);
-                   nodes = workflow.nodes || [];
-                   connections = workflow.connections || [];
-                   
-                   // Clear canvas
-                   canvas.innerHTML = '';
-                   
-                   // Re-render nodes
-                   nodes.forEach(node => {
-                       renderNode(node);
-                   });
-                   
-                   // Re-render connections
-                   renderConnections();
-                   
-                   alert('Workflow imported successfully!');
-               } catch (e) {
-                   alert('Invalid JSON format!');
-               }
-           }
-       }
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingNode = null;
+        }
 
-       function clearCanvas() {
-           if (confirm('Are you sure you want to clear the canvas?')) {
-               nodes = [];
-               connections = [];
-               canvas.innerHTML = '';
-               nodeCounter = 0;
-           }
-       }
+        function saveNode() {
+            if (currentEditingNode) {
+                currentEditingNode.title = document.getElementById('nodeTitle').value;
+                currentEditingNode.config = document.getElementById('nodeConfig').value;
+                updateCanvas();
+                closeModal();
+            }
+        }
 
-       // Add instructions
-       console.log('Boss AI Canvas Controls:');
-       console.log('- Drag node types from sidebar to canvas');
-       console.log('- Double-click nodes to configure');
-       console.log('- Ctrl/Cmd + drag to create connections');
-       console.log('- Use Export/Import buttons to save workflows');
-   </script>
+        // Canvas rendering
+        function updateCanvas() {
+            const canvas = document.getElementById('canvas');
+            const svg = document.getElementById('canvas-svg');
+            
+            // Clear existing nodes
+            const existingNodes = canvas.querySelectorAll('.node');
+            existingNodes.forEach(node => node.remove());
+            
+            // Render nodes
+            nodes.forEach(node => {
+                const nodeElement = document.createElement('div');
+                nodeElement.className = `node ${node.executed ? 'executed' : ''}`;
+                nodeElement.style.left = node.x + 'px';
+                nodeElement.style.top = node.y + 'px';
+                nodeElement.innerHTML = `
+                    <div class="node-header">
+                        <div class="node-title">${node.title}</div>
+                        <div class="node-type-label">${node.type}</div>
+                    </div>
+                    <div class="node-content">${node.config}</div>
+                    <div class="node-ports">
+                        <div class="port input"></div>
+                        <div class="port output"></div>
+                    </div>
+                `;
+                canvas.appendChild(nodeElement);
+            });
+            
+            // Render connections
+            svg.innerHTML = '';
+            connections.forEach(conn => {
+                const fromNode = nodes.find(n => n.id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to);
+                if (fromNode && toNode) {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const fromX = fromNode.x + 180;
+                    const fromY = fromNode.y + 60;
+                    const toX = toNode.x;
+                    const toY = toNode.y + 60;
+                    
+                    const midX = (fromX + toX) / 2;
+                    const d = `M ${fromX} ${fromY} C ${midX} ${fromY}, ${midX} ${toY}, ${toX} ${toY}`;
+                    
+                    path.setAttribute('d', d);
+                    path.setAttribute('class', 'connection');
+                    svg.appendChild(path);
+                }
+            });
+        }
+
+        // Workflow execution
+        async function runWorkflow() {
+            if (executionState === 'executing') return;
+            
+            executionState = 'executing';
+            updateStatus('Executing workflow...', 'executing');
+            showExecutionLog();
+            
+            // Reset execution state
+            nodes.forEach(node => {
+                node.executed = false;
+                node.result = null;
+            });
+            
+            clearLog();
+            log('info', 'Starting workflow execution...');
+            
+            try {
+                // Find starting nodes (nodes with no incoming connections)
+                const startNodes = nodes.filter(node => 
+                    !connections.some(conn => conn.to === node.id)
+                );
+                
+                if (startNodes.length === 0) {
+                    log('error', 'No starting nodes found. Add nodes without input connections.');
+                    return;
+                }
+                
+                // Execute nodes in topological order
+                const executedNodes = new Set();
+                const executing = [];
+                
+                for (const startNode of startNodes) {
+                    executing.push(executeNodeChain(startNode, executedNodes));
+                }
+                
+                await Promise.all(executing);
+                
+                log('success', 'Workflow execution completed successfully!');
+                
+            } catch (error) {
+                log('error', `Workflow execution failed: ${error.message}`);
+            } finally {
+                executionState = 'idle';
+                updateStatus('Ready', 'idle');
+                updateCanvas();
+            }
+        }
+
+        async function executeNodeChain(node, executedNodes) {
+            if (executedNodes.has(node.id)) return node.result;
+            
+            // Wait for all input nodes to complete
+            const inputConnections = connections.filter(conn => conn.to === node.id);
+            const inputResults = [];
+            
+            for (const conn of inputConnections) {
+                const inputNode = nodes.find(n => n.id === conn.from);
+                if (inputNode) {
+                    const result = await executeNodeChain(inputNode, executedNodes);
+                    inputResults.push(result);
+                }
+            }
+            
+            // Execute current node
+            const nodeElement = document.querySelector(`.node:nth-child(${nodes.indexOf(node) + 1})`);
+            if (nodeElement) {
+                nodeElement.classList.add('executing');
+            }
+            
+            const nodeType = nodeTypes[node.type];
+            const inputData = inputResults.length > 0 ? inputResults.join('\n') : null;
+            
+            try {
+                node.result = await nodeType.execute(node.config, inputData);
+                node.executed = true;
+                executedNodes.add(node.id);
+                
+                if (nodeElement) {
+                    nodeElement.classList.remove('executing');
+                    nodeElement.classList.add('executed');
+                }
+                
+                log('success', `${node.title} completed: ${node.result.substring(0, 100)}...`);
+                
+            } catch (error) {
+                log('error', `${node.title} failed: ${error.message}`);
+                throw error;
+            }
+            
+            return node.result;
+        }
+
+        // Export/Import functions
+        function exportWorkflow() {
+            const workflow = {
+                nodes: nodes,
+                connections: connections
+            };
+            const jsonStr = JSON.stringify(workflow, null, 2);
+            
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                log('success', 'Workflow exported to clipboard!');
+                showExecutionLog();
+            }).catch(() => {
+                // Fallback for browsers that don't support clipboard API
+                const textarea = document.createElement('textarea');
+                textarea.value = jsonStr;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                log('success', 'Workflow exported to clipboard!');
+                showExecutionLog();
+            });
+        }
+
+        function importWorkflow() {
+            const jsonStr = prompt('Paste your workflow JSON:');
+            if (!jsonStr) return;
+            
+            try {
+                const workflow = JSON.parse(jsonStr);
+                nodes = workflow.nodes || [];
+                connections = workflow.connections || [];
+                
+                // Update counter to avoid ID conflicts
+                nodeIdCounter = Math.max(...nodes.map(n => parseInt(n.id.split('_')[1]) || 0), 0) + 1;
+                
+                updateCanvas();
+                log('success', 'Workflow imported successfully!');
+                showExecutionLog();
+                
+            } catch (error) {
+                log('error', 'Failed to import workflow: Invalid JSON');
+                showExecutionLog();
+            }
+        }
+
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear the canvas?')) {
+                nodes = [];
+                connections = [];
+                nodeIdCounter = 0;
+                updateCanvas();
+                clearLog();
+                log('info', 'Canvas cleared');
+                showExecutionLog();
+            }
+        }
+
+        // Logging functions
+        function log(type, message) {
+            const logContent = document.getElementById('logContent');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContent.appendChild(entry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContent').innerHTML = '';
+        }
+
+        function showExecutionLog() {
+            document.getElementById('executionLog').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('executionLog').classList.remove('active');
+            }, 5000);
+        }
+
+        // Status functions
+        function updateStatus(message, state) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.textContent = message;
+            indicator.className = `status-indicator active ${state}`;
+            
+            if (state === 'idle') {
+                setTimeout(() => {
+                    indicator.classList.remove('active');
+                }, 2000);
+            }
+        }
+
+        // Utility function for delays
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('editModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                runWorkflow();
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                exportWorkflow();
+            }
+        });
+
+        // Initialize the application
+        window.addEventListener('load', () => {
+            initCanvas();
+            log('info', 'Visual Automation Canvas initialized');
+            updateStatus('Ready', 'idle');
+        });
+    </script>
 </body>
 </html>
