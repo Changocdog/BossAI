@@ -14,261 +14,206 @@
 
         body {
             font-family: 'Orbitron', monospace;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            color: #00d4ff;
+            background: #000;
+            color: #00ffff;
             overflow: hidden;
+            user-select: none;
+        }
+
+        .container {
+            display: flex;
             height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(90deg, #000000 0%, #1a1a2e 50%, #000000 100%);
-            padding: 15px 30px;
-            border-bottom: 2px solid #00d4ff;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 900;
-            color: #00d4ff;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            letter-spacing: 2px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #001122, #003366);
-            border: 1px solid #00d4ff;
-            color: #00d4ff;
-            padding: 10px 20px;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
-            border-radius: 5px;
-        }
-
-        .btn:hover {
-            background: linear-gradient(45deg, #003366, #0055aa);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .main-container {
-            display: flex;
-            height: calc(100vh - 80px);
+            background: linear-gradient(135deg, #000000 0%, #111111 50%, #000000 100%);
         }
 
         .sidebar {
-            width: 300px;
-            background: linear-gradient(180deg, #000000 0%, #1a1a2e 100%);
-            border-right: 2px solid #00d4ff;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 2px solid #00ffff;
             padding: 20px;
-            overflow-y: auto;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
 
-        .sidebar h3 {
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-size: 18px;
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffff;
             text-align: center;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            letter-spacing: 2px;
         }
 
         .node-palette {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .node-template {
-            background: linear-gradient(45deg, #001122, #002244);
-            border: 2px solid #00d4ff;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: move;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .node-template:hover {
-            background: linear-gradient(45deg, #002244, #004488);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .node-template::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #00d4ff, #0088cc, #00d4ff);
-            border-radius: 10px;
-            z-index: -1;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            0% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .node-template h4 {
-            color: #00d4ff;
+        .palette-title {
             font-size: 14px;
-            margin-bottom: 8px;
-            text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .node-template p {
-            color: #ffffff;
-            font-size: 11px;
-            opacity: 0.8;
+        .palette-node {
+            background: linear-gradient(135deg, #001122 0%, #003366 100%);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        .palette-node:hover {
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .palette-node:active {
+            cursor: grabbing;
+        }
+
+        .node-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+
+        .node-desc {
+            font-size: 10px;
+            color: #888;
+            line-height: 1.4;
         }
 
         .canvas-container {
             flex: 1;
             position: relative;
+            background: radial-gradient(circle at 50% 50%, #001122 0%, #000000 100%);
             overflow: hidden;
         }
 
         .canvas {
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 136, 204, 0.1) 0%, transparent 50%),
-                linear-gradient(45deg, #0a0a0a 0%, #1a1a2e 100%);
-            background-size: 100px 100px, 100px 100px, 100% 100%;
             position: relative;
-            cursor: grab;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            background-size: 200px 200px;
+            cursor: move;
         }
 
-        .canvas:active {
-            cursor: grabbing;
-        }
-
-        .grid-overlay {
+        .grid {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
             pointer-events: none;
         }
 
         .workflow-node {
             position: absolute;
             width: 200px;
-            min-height: 100px;
-            background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%);
-            border: 2px solid #00d4ff;
-            border-radius: 15px;
+            min-height: 80px;
+            background: linear-gradient(135deg, #001122 0%, #003366 100%);
+            border: 2px solid #00ffff;
+            border-radius: 12px;
             padding: 15px;
             cursor: move;
             transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            z-index: 10;
         }
 
         .workflow-node:hover {
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
-            transform: scale(1.02);
+            border-color: #ffffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+            transform: translateY(-3px);
         }
 
         .workflow-node.selected {
-            border-color: #ffffff;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+            border-color: #ff00ff;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
+        }
+
+        .workflow-node.dragging {
+            z-index: 1000;
+            cursor: grabbing;
         }
 
         .node-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: between;
             align-items: center;
             margin-bottom: 10px;
         }
 
         .node-title {
-            color: #00d4ff;
             font-size: 14px;
             font-weight: 700;
-            text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         .node-delete {
-            background: linear-gradient(45deg, #cc0000, #ff0000);
-            border: 1px solid #ff0000;
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
+            background: none;
+            border: none;
+            color: #ff0066;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            padding: 0;
+            margin-left: auto;
+            transition: color 0.3s ease;
         }
 
         .node-delete:hover {
-            background: linear-gradient(45deg, #ff0000, #ff4444);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            color: #ff3388;
+            text-shadow: 0 0 10px rgba(255, 0, 102, 0.5);
         }
 
         .node-content {
-            color: #ffffff;
-            font-size: 12px;
+            font-size: 11px;
+            color: #aaa;
             line-height: 1.4;
         }
 
-        .connection-points {
-            position: absolute;
-        }
-
         .connection-point {
+            position: absolute;
             width: 12px;
             height: 12px;
-            background: #00d4ff;
+            background: #00ffff;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            position: absolute;
             cursor: crosshair;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         .connection-point:hover {
             background: #ffffff;
-            transform: scale(1.5);
+            transform: scale(1.2);
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
 
-        .connection-point.input {
-            left: -6px;
+        .input-point {
+            left: -8px;
             top: 50%;
             transform: translateY(-50%);
         }
 
-        .connection-point.output {
-            right: -6px;
+        .output-point {
+            right: -8px;
             top: 50%;
             transform: translateY(-50%);
         }
@@ -276,261 +221,221 @@
         .connection-line {
             position: absolute;
             pointer-events: none;
-            z-index: 50;
+            z-index: 1;
         }
 
-        .connection-line path {
-            stroke: #00d4ff;
-            stroke-width: 3;
+        .connection-path {
             fill: none;
-            filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.6));
-            animation: pulse 2s ease-in-out infinite;
+            stroke: #00ffff;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
         }
 
-        @keyframes pulse {
-            0%, 100% { stroke-opacity: 0.7; }
-            50% { stroke-opacity: 1; }
+        .temp-connection {
+            stroke: #ff00ff;
+            stroke-dasharray: 5,5;
+            animation: dash 1s linear infinite;
         }
 
-        .status-indicator {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #00ff00;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
-            animation: statusPulse 1.5s ease-in-out infinite;
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -10;
+            }
         }
 
-        @keyframes statusPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .properties-panel {
-            position: absolute;
-            top: 100px;
-            right: 20px;
-            width: 300px;
-            background: linear-gradient(180deg, #000000 0%, #1a1a2e 100%);
-            border: 2px solid #00d4ff;
-            border-radius: 10px;
-            padding: 20px;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
-        }
-
-        .properties-panel h3 {
-            color: #00d4ff;
-            margin-bottom: 15px;
-            text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
-        }
-
-        .property-group {
-            margin-bottom: 15px;
-        }
-
-        .property-label {
-            color: #ffffff;
-            font-size: 12px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .property-input {
-            width: 100%;
-            background: #001122;
-            border: 1px solid #00d4ff;
-            color: #00d4ff;
-            padding: 8px;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-            border-radius: 5px;
-        }
-
-        .property-input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-        }
-
-        .floating-toolbar {
+        .toolbar {
             position: absolute;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 20px;
             display: flex;
             gap: 10px;
-            background: linear-gradient(90deg, #000000 0%, #1a1a2e 100%);
-            padding: 10px 20px;
-            border: 1px solid #00d4ff;
-            border-radius: 25px;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-            z-index: 1000;
+            z-index: 100;
         }
 
         .toolbar-btn {
-            background: transparent;
-            border: 1px solid #00d4ff;
-            color: #00d4ff;
-            padding: 8px 15px;
+            background: linear-gradient(135deg, #001122 0%, #003366 100%);
+            border: 1px solid #00ffff;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: #00ffff;
             font-family: 'Orbitron', monospace;
             font-size: 12px;
-            border-radius: 15px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
         }
 
         .toolbar-btn:hover {
-            background: rgba(0, 212, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
         }
 
-        .execution-indicator {
+        .status-bar {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #00d4ff, #ffffff, #00d4ff);
-            opacity: 0;
-            border-radius: 15px 15px 0 0;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #00ffff;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 12px;
+            color: #00ffff;
+            z-index: 100;
         }
 
-        .workflow-node.executing .execution-indicator {
-            opacity: 1;
-            animation: execution 1s ease-in-out infinite;
+        .status-item {
+            margin-right: 30px;
         }
 
-        @keyframes execution {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .connection-mode {
+            cursor: crosshair;
         }
 
-        .minimap {
+        .node-types {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .connecting .connection-point {
+            animation: pulse 1s infinite;
+        }
+
+        .zoom-controls {
             position: absolute;
-            bottom: 20px;
+            bottom: 60px;
             right: 20px;
-            width: 200px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00d4ff;
-            border-radius: 10px;
-            z-index: 1000;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .minimap-content {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #0a0a0a 0%, #1a1a2e 100%);
-            position: relative;
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #001122 0%, #003366 100%);
+            border: 1px solid #00ffff;
+            border-radius: 50%;
+            color: #00ffff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
-        .minimap-node {
-            position: absolute;
-            width: 8px;
-            height: 6px;
-            background: #00d4ff;
-            border-radius: 2px;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 250px;
-            }
-            
-            .properties-panel {
-                width: 250px;
-            }
+        .zoom-btn:hover {
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">BOSS AI</div>
-        <div class="controls">
-            <button class="btn" onclick="executeWorkflow()">EXECUTE</button>
-            <button class="btn" onclick="saveWorkflow()">SAVE</button>
-            <button class="btn" onclick="loadWorkflow()">LOAD</button>
-            <button class="btn" onclick="clearCanvas()">CLEAR</button>
-        </div>
-    </div>
-
-    <div class="main-container">
+    <div class="container">
         <div class="sidebar">
-            <h3>NODE LIBRARY</h3>
+            <div class="logo">BOSS AI</div>
+            
             <div class="node-palette">
-                <div class="node-template" draggable="true" data-node-type="script-writer">
-                    <h4>Script Writer</h4>
-                    <p>Generate and process scripts with AI-powered writing capabilities</p>
+                <div class="palette-title">Data Sources</div>
+                <div class="palette-node" data-type="api">
+                    <div class="node-title">API Request</div>
+                    <div class="node-desc">Fetch data from external APIs</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="voiceover">
-                    <h4>Voiceover</h4>
-                    <p>Convert text to speech with multiple voice options and settings</p>
+                <div class="palette-node" data-type="database">
+                    <div class="node-title">Database</div>
+                    <div class="node-desc">Query databases and data stores</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="logger">
-                    <h4>Logger</h4>
-                    <p>Log and monitor workflow execution with detailed tracking</p>
+                <div class="palette-node" data-type="webhook">
+                    <div class="node-title">Webhook</div>
+                    <div class="node-desc">Receive HTTP requests</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="data-processor">
-                    <h4>Data Processor</h4>
-                    <p>Transform and manipulate data between workflow nodes</p>
+            </div>
+
+            <div class="node-palette">
+                <div class="palette-title">AI Processing</div>
+                <div class="palette-node" data-type="llm">
+                    <div class="node-title">LLM Process</div>
+                    <div class="node-desc">Large Language Model processing</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="api-connector">
-                    <h4>API Connector</h4>
-                    <p>Connect to external APIs and services for data exchange</p>
+                <div class="palette-node" data-type="vision">
+                    <div class="node-title">Vision AI</div>
+                    <div class="node-desc">Image and video analysis</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="trigger">
-                    <h4>Trigger</h4>
-                    <p>Start workflows based on events, schedules, or conditions</p>
+                <div class="palette-node" data-type="embedding">
+                    <div class="node-title">Embeddings</div>
+                    <div class="node-desc">Vector embeddings generation</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="condition">
-                    <h4>Condition</h4>
-                    <p>Create conditional logic and branching in workflows</p>
+            </div>
+
+            <div class="node-palette">
+                <div class="palette-title">Data Processing</div>
+                <div class="palette-node" data-type="filter">
+                    <div class="node-title">Filter</div>
+                    <div class="node-desc">Filter and transform data</div>
                 </div>
-                <div class="node-template" draggable="true" data-node-type="output">
-                    <h4>Output</h4>
-                    <p>Send results to files, databases, or external systems</p>
+                <div class="palette-node" data-type="merge">
+                    <div class="node-title">Merge</div>
+                    <div class="node-desc">Combine multiple data streams</div>
+                </div>
+                <div class="palette-node" data-type="split">
+                    <div class="node-title">Split</div>
+                    <div class="node-desc">Split data into branches</div>
+                </div>
+            </div>
+
+            <div class="node-palette">
+                <div class="palette-title">Outputs</div>
+                <div class="palette-node" data-type="email">
+                    <div class="node-title">Email</div>
+                    <div class="node-desc">Send email notifications</div>
+                </div>
+                <div class="palette-node" data-type="slack">
+                    <div class="node-title">Slack</div>
+                    <div class="node-desc">Send messages to Slack</div>
+                </div>
+                <div class="palette-node" data-type="file">
+                    <div class="node-title">File Output</div>
+                    <div class="node-desc">Save data to files</div>
                 </div>
             </div>
         </div>
 
         <div class="canvas-container">
-            <div class="floating-toolbar">
-                <button class="toolbar-btn" onclick="zoomIn()">ZOOM+</button>
-                <button class="toolbar-btn" onclick="zoomOut()">ZOOM-</button>
-                <button class="toolbar-btn" onclick="resetZoom()">RESET</button>
-                <button class="toolbar-btn" onclick="toggleGrid()">GRID</button>
-                <button class="toolbar-btn" onclick="autoLayout()">AUTO</button>
+            <div class="grid"></div>
+            <div class="canvas" id="canvas">
+                <svg class="connection-line" id="connectionSvg"></svg>
             </div>
             
-            <div class="canvas" id="canvas">
-                <div class="grid-overlay" id="gridOverlay"></div>
-                <svg class="connection-line" id="connectionSvg" width="100%" height="100%"></svg>
+            <div class="toolbar">
+                <button class="toolbar-btn" id="runWorkflow">▶ RUN</button>
+                <button class="toolbar-btn" id="stopWorkflow">⏹ STOP</button>
+                <button class="toolbar-btn" id="saveWorkflow">💾 SAVE</button>
+                <button class="toolbar-btn" id="loadWorkflow">📁 LOAD</button>
+                <button class="toolbar-btn" id="clearCanvas">🗑 CLEAR</button>
             </div>
 
-            <div class="properties-panel" id="propertiesPanel">
-                <h3>NODE PROPERTIES</h3>
-                <div class="property-group">
-                    <label class="property-label">Name:</label>
-                    <input type="text" class="property-input" id="nodeName" placeholder="Enter node name">
-                </div>
-                <div class="property-group">
-                    <label class="property-label">Description:</label>
-                    <textarea class="property-input" id="nodeDescription" placeholder="Enter description"></textarea>
-                </div>
-                <div class="property-group">
-                    <label class="property-label">Parameters:</label>
-                    <textarea class="property-input" id="nodeParameters" placeholder="Enter parameters (JSON)"></textarea>
-                </div>
-                <button class="btn" onclick="applyNodeProperties()">APPLY</button>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomIn">+</button>
+                <button class="zoom-btn" id="zoomOut">-</button>
+                <button class="zoom-btn" id="resetZoom">⌂</button>
             </div>
 
-            <div class="minimap">
-                <div class="minimap-content" id="minimapContent"></div>
+            <div class="status-bar">
+                <div class="status-item">Nodes: <span id="nodeCount">0</span></div>
+                <div class="status-item">Connections: <span id="connectionCount">0</span></div>
+                <div class="status-item">Status: <span id="workflowStatus">Ready</span></div>
+                <div class="status-item">Zoom: <span id="zoomLevel">100%</span></div>
             </div>
         </div>
     </div>
@@ -538,113 +443,96 @@
     <script>
         class WorkflowSystem {
             constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.connectionSvg = document.getElementById('connectionSvg');
                 this.nodes = new Map();
-                this.connections = new Map();
-                this.selectedNode = null;
-                this.draggedNode = null;
+                this.connections = [];
+                this.nodeCounter = 0;
+                this.isDragging = false;
                 this.isConnecting = false;
                 this.connectionStart = null;
-                this.canvas = document.getElementById('canvas');
-                this.svg = document.getElementById('connectionSvg');
-                this.nodeIdCounter = 0;
+                this.tempConnection = null;
+                this.selectedNode = null;
+                this.canvasOffset = { x: 0, y: 0 };
                 this.zoom = 1;
-                this.panX = 0;
-                this.panY = 0;
-                this.isPanning = false;
-                this.lastPanX = 0;
-                this.lastPanY = 0;
+                this.mousePos = { x: 0, y: 0 };
                 
                 this.initializeEventListeners();
-                this.updateMinimap();
+                this.updateStatusBar();
             }
 
             initializeEventListeners() {
-                // Drag and drop from palette
-                document.querySelectorAll('.node-template').forEach(template => {
-                    template.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', e.target.dataset.nodeType);
+                // Palette drag and drop
+                document.querySelectorAll('.palette-node').forEach(node => {
+                    node.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', node.dataset.type);
                     });
+                    node.draggable = true;
                 });
 
                 // Canvas drop
-                this.canvas.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                });
-
+                this.canvas.addEventListener('dragover', (e) => e.preventDefault());
                 this.canvas.addEventListener('drop', (e) => {
                     e.preventDefault();
                     const nodeType = e.dataTransfer.getData('text/plain');
                     const rect = this.canvas.getBoundingClientRect();
-                    const x = (e.clientX - rect.left - this.panX) / this.zoom;
-                    const y = (e.clientY - rect.top - this.panY) / this.zoom;
+                    const x = (e.clientX - rect.left) / this.zoom;
+                    const y = (e.clientY - rect.top) / this.zoom;
                     this.createNode(nodeType, x, y);
                 });
 
-                // Canvas panning
-                this.canvas.addEventListener('mousedown', (e) => {
-                    if (e.target === this.canvas || e.target.classList.contains('grid-overlay')) {
-                        this.isPanning = true;
-                        this.lastPanX = e.clientX;
-                        this.lastPanY = e.clientY;
-                        this.canvas.style.cursor = 'grabbing';
-                    }
-                });
+                // Canvas mouse events
+                this.canvas.addEventListener('mousedown', (e) => this.handleCanvasMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.handleCanvasMouseUp(e));
 
+                // Toolbar buttons
+                document.getElementById('runWorkflow').addEventListener('click', () => this.runWorkflow());
+                document.getElementById('stopWorkflow').addEventListener('click', () => this.stopWorkflow());
+                document.getElementById('saveWorkflow').addEventListener('click', () => this.saveWorkflow());
+                document.getElementById('loadWorkflow').addEventListener('click', () => this.loadWorkflow());
+                document.getElementById('clearCanvas').addEventListener('click', () => this.clearCanvas());
+
+                // Zoom controls
+                document.getElementById('zoomIn').addEventListener('click', () => this.zoom *= 1.1);
+                document.getElementById('zoomOut').addEventListener('click', () => this.zoom /= 1.1);
+                document.getElementById('resetZoom').addEventListener('click', () => this.zoom = 1);
+
+                // Mouse tracking
                 document.addEventListener('mousemove', (e) => {
-                    if (this.isPanning) {
-                        const deltaX = e.clientX - this.lastPanX;
-                        const deltaY = e.clientY - this.lastPanY;
-                        this.panX += deltaX;
-                        this.panY += deltaY;
-                        this.lastPanX = e.clientX;
-                        this.lastPanY = e.clientY;
-                        this.updateCanvasTransform();
+                    this.mousePos = { x: e.clientX, y: e.clientY };
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' && this.selectedNode) {
+                        this.deleteNode(this.selectedNode);
                     }
-                });
-
-                document.addEventListener('mouseup', () => {
-                    this.isPanning = false;
-                    this.canvas.style.cursor = 'grab';
-                });
-
-                // Canvas zoom
-                this.canvas.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                    this.zoom *= delta;
-                    this.zoom = Math.max(0.1, Math.min(2, this.zoom));
-                    this.updateCanvasTransform();
-                });
-
-                // Click outside to deselect
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.workflow-node') && !e.target.closest('.properties-panel')) {
-                        this.deselectNode();
+                    if (e.key === 'Escape') {
+                        this.cancelConnection();
                     }
                 });
             }
 
             createNode(type, x, y) {
-                const nodeId = `node-${this.nodeIdCounter++}`;
+                const nodeId = `node_${++this.nodeCounter}`;
+                const nodeConfig = this.getNodeConfig(type);
+                
                 const nodeElement = document.createElement('div');
                 nodeElement.className = 'workflow-node';
-                nodeElement.id = nodeId;
-                nodeElement.style.left = x + 'px';
-                nodeElement.style.top = y + 'px';
+                nodeElement.style.left = `${x}px`;
+                nodeElement.style.top = `${y}px`;
+                nodeElement.dataset.nodeId = nodeId;
+                nodeElement.dataset.type = type;
 
-                const nodeData = this.getNodeTemplate(type);
                 nodeElement.innerHTML = `
-                    <div class="execution-indicator"></div>
-                    <div class="status-indicator"></div>
                     <div class="node-header">
-                        <div class="node-title">${nodeData.title}</div>
-                        <div class="node-delete" onclick="workflowSystem.deleteNode('${nodeId}')">×</div>
+                        <div class="node-title">${nodeConfig.title}</div>
+                        <button class="node-delete" onclick="workflowSystem.deleteNode('${nodeId}')">×</button>
                     </div>
-                    <div class="node-content">${nodeData.content}</div>
-                    <div class="connection-points">
-                        <div class="connection-point input" onclick="workflowSystem.startConnection('${nodeId}', 'input')"></div>
-                        <div class="connection-point output" onclick="workflowSystem.startConnection('${nodeId}', 'output')"></div>
-                    </div>
+                    <div class="node-content">${nodeConfig.description}</div>
+                    <div class="connection-point input-point" data-type="input"></div>
+                    <div class="connection-point output-point" data-type="output"></div>
                 `;
 
                 this.canvas.appendChild(nodeElement);
@@ -653,192 +541,290 @@
                     type: type,
                     x: x,
                     y: y,
-                    data: nodeData
+                    config: nodeConfig
                 });
 
-                this.makeNodeDraggable(nodeElement);
-                this.makeNodeSelectable(nodeElement);
-                this.updateMinimap();
+                this.attachNodeEvents(nodeElement);
+                this.updateStatusBar();
             }
 
-            getNodeTemplate(type) {
-                const templates = {
-                    'script-writer': {
-                        title: 'Script Writer',
-                        content: 'AI-powered script generation and processing engine'
-                    },
-                    'voiceover': {
-                        title: 'Voiceover',
-                        content: 'Text-to-speech conversion with voice synthesis'
-                    },
-                    'logger': {
-                        title: 'Logger',
-                        content: 'Workflow execution monitoring and logging'
-                    },
-                    'data-processor': {
-                        title: 'Data Processor',
-                        content: 'Advanced data transformation and manipulation'
-                    },
-                    'api-connector': {
-                        title: 'API Connector',
-                        content: 'External API integration and data exchange'
-                    },
-                    'trigger': {
-                        title: 'Trigger',
-                        content: 'Workflow initiation based on events or schedules'
-                    },
-                    'condition': {
-                        title: 'Condition',
-                        content: 'Conditional logic and workflow branching'
-                    },
-                    'output': {
-                        title: 'Output',
-                        content: 'Result delivery to external systems'
-                    }
-                };
-                return templates[type] || { title: 'Unknown', content: 'Unknown node type' };
-            }
-
-            makeNodeDraggable(element) {
-                let isDragging = false;
-                let startX, startY, initialX, initialY;
-
-                element.addEventListener('mousedown', (e) => {
-                    if (e.target.classList.contains('connection-point') || e.target.classList.contains('node-delete')) {
-                        return;
-                    }
+            attachNodeEvents(nodeElement) {
+                const nodeId = nodeElement.dataset.nodeId;
+                
+                // Node dragging
+                nodeElement.addEventListener('mousedown', (e) => {
+                    if (e.target.classList.contains('connection-point')) return;
+                    if (e.target.classList.contains('node-delete')) return;
                     
-                    isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    initialX = parseInt(element.style.left);
-                    initialY = parseInt(element.style.top);
+                    this.selectNode(nodeId);
+                    this.isDragging = true;
+                    nodeElement.classList.add('dragging');
                     
-                    e.preventDefault();
+                    const rect = nodeElement.getBoundingClientRect();
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    this.dragOffset = {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
                 });
 
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    
-                    const deltaX = (e.clientX - startX) / this.zoom;
-                    const deltaY = (e.clientY - startY) / this.zoom;
-                    
-                    const newX = initialX + deltaX;
-                    const newY = initialY + deltaY;
-                    
-                    element.style.left = newX + 'px';
-                    element.style.top = newY + 'px';
-                    
-                    this.nodes.get(element.id).x = newX;
-                    this.nodes.get(element.id).y = newY;
-                    
-                    this.updateConnections();
-                    this.updateMinimap();
-                });
-
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
+                // Connection points
+                nodeElement.querySelectorAll('.connection-point').forEach(point => {
+                    point.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        this.startConnection(nodeId, point.dataset.type);
+                    });
                 });
             }
 
-            makeNodeSelectable(element) {
-                element.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.selectNode(element.id);
-                });
-            }
-
-            selectNode(nodeId) {
-                this.deselectNode();
-                this.selectedNode = nodeId;
-                const element = this.nodes.get(nodeId).element;
-                element.classList.add('selected');
-                this.showNodeProperties(nodeId);
-            }
-
-            deselectNode() {
-                if (this.selectedNode) {
-                    const element = this.nodes.get(this.selectedNode).element;
-                    element.classList.remove('selected');
+            handleCanvasMouseDown(e) {
+                if (e.target === this.canvas) {
                     this.selectedNode = null;
-                    this.hideNodeProperties();
+                    this.updateSelectedNode();
                 }
             }
 
-            showNodeProperties(nodeId) {
-                const panel = document.getElementById('propertiesPanel');
-                const node = this.nodes.get(nodeId);
-                
-                document.getElementById('nodeName').value = node.data.title;
-                document.getElementById('nodeDescription').value = node.data.content;
-                document.getElementById('nodeParameters').value = JSON.stringify(node.data.parameters || {}, null, 2);
-                
-                panel.style.display = 'block';
-            }
-
-            hideNodeProperties() {
-                document.getElementById('propertiesPanel').style.display = 'none';
-            }
-
-            deleteNode(nodeId) {
-                const element = this.nodes.get(nodeId).element;
-                element.remove();
-                this.nodes.delete(nodeId);
-                
-                // Remove connections
-                this.connections.forEach((connection, id) => {
-                    if (connection.from === nodeId || connection.to === nodeId) {
-                        this.connections.delete(id);
+            handleCanvasMouseMove(e) {
+                if (this.isDragging && this.selectedNode) {
+                    const node = this.nodes.get(this.selectedNode);
+                    if (node) {
+                        const rect = this.canvas.getBoundingClientRect();
+                        const x = (e.clientX - rect.left - this.dragOffset.x) / this.zoom;
+                        const y = (e.clientY - rect.top - this.dragOffset.y) / this.zoom;
+                        
+                        node.element.style.left = `${x}px`;
+                        node.element.style.top = `${y}px`;
+                        node.x = x;
+                        node.y = y;
+                        
+                        this.updateConnections();
                     }
-                });
-                
-                this.updateConnections();
-                this.updateMinimap();
+                }
+
+                if (this.isConnecting) {
+                    this.updateTempConnection(e);
+                }
+            }
+
+            handleCanvasMouseUp(e) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    document.querySelectorAll('.workflow-node').forEach(node => {
+                        node.classList.remove('dragging');
+                    });
+                }
+
+                if (this.isConnecting) {
+                    const target = e.target.closest('.connection-point');
+                    if (target && target.dataset.type === 'input') {
+                        const targetNodeId = target.closest('.workflow-node').dataset.nodeId;
+                        this.createConnection(this.connectionStart, targetNodeId);
+                    }
+                    this.cancelConnection();
+                }
             }
 
             startConnection(nodeId, type) {
-                if (this.isConnecting) {
-                    this.endConnection(nodeId, type);
-                } else {
+                if (type === 'output') {
                     this.isConnecting = true;
-                    this.connectionStart = { nodeId, type };
-                    
-                    // Visual feedback
-                    const nodes = document.querySelectorAll('.workflow-node');
-                    nodes.forEach(node => {
-                        if (node.id !== nodeId) {
-                            node.style.opacity = '0.6';
-                        }
-                    });
+                    this.connectionStart = nodeId;
+                    this.canvas.classList.add('connecting');
+                    this.createTempConnection();
                 }
             }
 
-            endConnection(nodeId, type) {
-                if (this.connectionStart && this.connectionStart.nodeId !== nodeId) {
-                    const connectionId = `${this.connectionStart.nodeId}-${nodeId}`;
-                    
-                    this.connections.set(connectionId, {
-                        from: this.connectionStart.nodeId,
-                        to: nodeId,
-                        fromType: this.connectionStart.type,
-                        toType: type
-                    });
-                    
-                    this.updateConnections();
-                }
+            createTempConnection() {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.classList.add('connection-path', 'temp-connection');
+                this.connectionSvg.appendChild(path);
+                this.tempConnection = path;
+            }
+
+            updateTempConnection(e) {
+                if (!this.tempConnection) return;
                 
-                this.isConnecting = false;
-                this.connectionStart = null;
+                const startNode = this.nodes.get(this.connectionStart);
+                const rect = this.canvas.getBoundingClientRect();
                 
-                // Remove visual feedback
-                const nodes = document.querySelectorAll('.workflow-node');
-                nodes.forEach(node => {
-                    node.style.opacity = '1';
-                });
+                const startX = startNode.x + 200;
+                const startY = startNode.y + 40;
+                const endX = (e.clientX - rect.left) / this.zoom;
+                const endY = (e.clientY - rect.top) / this.zoom;
+                
+                const path = this.createBezierPath(startX, startY, endX, endY);
+                this.tempConnection.setAttribute('d', path);
+            }
+
+            createConnection(fromNodeId, toNodeId) {
+                const connection = { from: fromNodeId, to: toNodeId };
+                this.connections.push(connection);
+                this.updateConnections();
+                this.updateStatusBar();
             }
 
             updateConnections() {
-                this.svg.innerHTML = '';
+                // Clear existing connections
+                this.connectionSvg.innerHTML = '';
                 
-                this.connections.forEach((connection, id) => {
-                    const fromNode = this
+                this.connections.forEach(conn => {
+                    const fromNode = this.nodes.get(conn.from);
+                    const toNode = this.nodes.get(conn.to);
+                    
+                    if (fromNode && toNode) {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.classList.add('connection-path');
+                        
+                        const startX = fromNode.x + 200;
+                        const startY = fromNode.y + 40;
+                        const endX = toNode.x;
+                        const endY = toNode.y + 40;
+                        
+                        const pathData = this.createBezierPath(startX, startY, endX, endY);
+                        path.setAttribute('d', pathData);
+                        
+                        this.connectionSvg.appendChild(path);
+                    }
+                });
+            }
+
+            createBezierPath(x1, y1, x2, y2) {
+                const dx = x2 - x1;
+                const cp1x = x1 + Math.max(50, Math.abs(dx) * 0.5);
+                const cp1y = y1;
+                const cp2x = x2 - Math.max(50, Math.abs(dx) * 0.5);
+                const cp2y = y2;
+                
+                return `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+            }
+
+            cancelConnection() {
+                this.isConnecting = false;
+                this.connectionStart = null;
+                this.canvas.classList.remove('connecting');
+                if (this.tempConnection) {
+                    this.tempConnection.remove();
+                    this.tempConnection = null;
+                }
+            }
+
+            selectNode(nodeId) {
+                this.selectedNode = nodeId;
+                this.updateSelectedNode();
+            }
+
+            updateSelectedNode() {
+                document.querySelectorAll('.workflow-node').forEach(node => {
+                    node.classList.remove('selected');
+                });
+                
+                if (this.selectedNode) {
+                    const node = this.nodes.get(this.selectedNode);
+                    if (node) {
+                        node.element.classList.add('selected');
+                    }
+                }
+            }
+
+            deleteNode(nodeId) {
+                const node = this.nodes.get(nodeId);
+                if (node) {
+                    node.element.remove();
+                    this.nodes.delete(nodeId);
+                    
+                    // Remove connections
+                    this.connections = this.connections.filter(conn => 
+                        conn.from !== nodeId && conn.to !== nodeId
+                    );
+                    
+                    this.updateConnections();
+                    this.updateStatusBar();
+                }
+            }
+
+            getNodeConfig(type) {
+                const configs = {
+                    api: { title: 'API Request', description: 'Fetch data from external APIs' },
+                    database: { title: 'Database', description: 'Query databases and data stores' },
+                    webhook: { title: 'Webhook', description: 'Receive HTTP requests' },
+                    llm: { title: 'LLM Process', description: 'Large Language Model processing' },
+                    vision: { title: 'Vision AI', description: 'Image and video analysis' },
+                    embedding: { title: 'Embeddings', description: 'Vector embeddings generation' },
+                    filter: { title: 'Filter', description: 'Filter and transform data' },
+                    merge: { title: 'Merge', description: 'Combine multiple data streams' },
+                    split: { title: 'Split', description: 'Split data into branches' },
+                    email: { title: 'Email', description: 'Send email notifications' },
+                    slack: { title: 'Slack', description: 'Send messages to Slack' },
+                    file: { title: 'File Output', description: 'Save data to files' }
+                };
+                return configs[type] || { title: 'Unknown', description: 'Unknown node type' };
+            }
+
+            runWorkflow() {
+                document.getElementById('workflowStatus').textContent = 'Running...';
+                // Simulate workflow execution
+                setTimeout(() => {
+                    document.getElementById('workflowStatus').textContent = 'Completed';
+                    setTimeout(() => {
+                        document.getElementById('workflowStatus').textContent = 'Ready';
+                    }, 2000);
+                }, 1000);
+            }
+
+            stopWorkflow() {
+                document.getElementById('workflowStatus').textContent = 'Stopped';
+                setTimeout(() => {
+                    document.getElementById('workflowStatus').textContent = 'Ready';
+                }, 1000);
+            }
+
+            saveWorkflow() {
+                const workflow = {
+                    nodes: Array.from(this.nodes.entries()).map(([id, node]) => ({
+                        id,
+                        type: node.type,
+                        x: node.x,
+                        y: node.y
+                    })),
+                    connections: this.connections
+                };
+                
+                const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'workflow.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            loadWorkflow() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const workflow = JSON.parse(e.target.result);
+                                this.clearCanvas();
+                                
+                                workflow.nodes.forEach(node => {
+                                    this.createNode(node.type, node.x, node.y);
+                                });
+                                
+                                this.connections = workflow.connections || [];
+                                this.updateConnections();
+                            } catch (error) {
+                                alert('Error loading workflow: ' + error.message);
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                input.click();
+            }
+
+            clearCanvas() {
+                this.nodes
