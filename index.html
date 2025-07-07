@@ -1,252 +1,595 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Boss AI - Visual Automation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to right, #000000, #0a0a2a);
-      color: #00bfff;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      padding: 10px 20px;
-      background: #111;
-      font-size: 20px;
-      color: #00bfff;
-      text-shadow: 0 0 8px #00bfff;
-    }
-    #toolbar {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background: #0d0d0d;
-    }
-    button {
-      font-family: 'Orbitron', sans-serif;
-      padding: 6px 14px;
-      font-size: 14px;
-      background: #001f33;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      cursor: pointer;
-      text-shadow: 0 0 4px #00bfff;
-    }
-    #canvas {
-      flex: 1;
-      position: relative;
-      background: #050b13;
-      overflow: hidden;
-    }
-    .node {
-      position: absolute;
-      width: 160px;
-      padding: 10px;
-      background: #0c0c0c;
-      border: 1px solid #00bfff;
-      color: #00bfff;
-      text-shadow: 0 0 4px #00bfff;
-      cursor: move;
-    }
-    .line {
-      position: absolute;
-      background: #00bfff;
-      height: 2px;
-      transform-origin: 0 0;
-    }
-    #log {
-      height: 100px;
-      background: #0a0a0a;
-      color: #00ffcc;
-      overflow-y: auto;
-      font-size: 12px;
-      padding: 8px;
-      border-top: 1px solid #00bfff;
-    }
-    .glow {
-      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
-    }
-    .highlight {
-      background-color: #003344 !important;
-    }
-  </style>
-</head>
-<body>
-  <header class="glow">Boss AI – Visual Workflow Engine</header>
-  <div id="toolbar">
-    <button onclick="addNode('Script Writer')">+ Script Writer</button>
-    <button onclick="addNode('Voiceover')">+ Voiceover</button>
-    <button onclick="addNode('Logger')">+ Logger</button>
-    <button onclick="runWorkflow()">▶️ Run</button>
-    <button onclick="exportWorkflow()">📤 Export</button>
-    <button onclick="importWorkflow()">📥 Import</button>
-    <button onclick="clearCanvas()">🗑 Clear</button>
-  </div>
-  <div id="canvas"></div>
-  <div id="log"></div>
+import React, { useState, useRef, useCallback } from 'react';
+import { Play, Plus, Settings, Save, Download, Upload, Trash2, Copy, Edit3, Database, Mail, Globe, Calendar, File, Zap, GitBranch, Filter, Timer, Bell, Brain, Crown, Target, TrendingUp, Users, Shield, Cpu, Bot, Code, Mic, FileText, Camera, Volume2, Network, Wrench } from 'lucide-react';
 
-  <script>
-    const canvas = document.getElementById("canvas");
-    const log = document.getElementById("log");
-    let nodes = [];
-    let connections = [];
-
-    function logMsg(msg) {
-      const line = document.createElement("div");
-      line.textContent = msg;
-      log.appendChild(line);
-      log.scrollTop = log.scrollHeight;
+const BossAICyberpunkWorkflow = () => {
+  const [nodes, setNodes] = useState([
+    {
+      id: '1',
+      type: 'trigger',
+      name: 'NEURAL TRIGGER',
+      x: 100,
+      y: 200,
+      config: { signal: 'HIGH_PRIORITY', source: 'BOSS_AI_CORE' }
     }
+  ]);
+  
+  const [connections, setConnections] = useState([]);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [draggedNode, setDraggedNode] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionStart, setConnectionStart] = useState(null);
+  const [showNodePanel, setShowNodePanel] = useState(false);
+  const [workflowName, setWorkflowName] = useState('NEURAL_WORKFLOW_ALPHA');
+  const canvasRef = useRef(null);
 
-    function addNode(type, x = 100, y = 100) {
-      const div = document.createElement("div");
-      div.className = "node";
-      div.textContent = type;
-      div.style.left = x + "px";
-      div.style.top = y + "px";
+  const nodeTypes = [
+    { type: 'trigger', name: 'NEURAL TRIGGER', icon: Zap, color: 'from-cyan-400 to-blue-500' },
+    { type: 'trigger', name: 'SIGNAL DETECTOR', icon: Target, color: 'from-cyan-400 to-blue-500' },
+    { type: 'trigger', name: 'DATA STREAM', icon: Network, color: 'from-cyan-400 to-blue-500' },
+    
+    { type: 'ai', name: 'SCRIPT WRITER', icon: FileText, color: 'from-purple-400 to-violet-500' },
+    { type: 'ai', name: 'VOICEOVER', icon: Mic, color: 'from-purple-400 to-violet-500' },
+    { type: 'ai', name: 'CONTENT ANALYZER', icon: Brain, color: 'from-purple-400 to-violet-500' },
+    { type: 'ai', name: 'NEURAL PROCESSOR', icon: Cpu, color: 'from-purple-400 to-violet-500' },
+    
+    { type: 'media', name: 'VIDEO RENDERER', icon: Camera, color: 'from-pink-400 to-rose-500' },
+    { type: 'media', name: 'AUDIO MIXER', icon: Volume2, color: 'from-pink-400 to-rose-500' },
+    { type: 'media', name: 'MEDIA COMPILER', icon: File, color: 'from-pink-400 to-rose-500' },
+    
+    { type: 'system', name: 'LOGGER', icon: Database, color: 'from-green-400 to-emerald-500' },
+    { type: 'system', name: 'VALIDATOR', icon: Shield, color: 'from-green-400 to-emerald-500' },
+    { type: 'system', name: 'OPTIMIZER', icon: Wrench, color: 'from-green-400 to-emerald-500' },
+    
+    { type: 'output', name: 'TRANSMITTER', icon: Globe, color: 'from-orange-400 to-red-500' },
+    { type: 'output', name: 'DISTRIBUTOR', icon: Users, color: 'from-orange-400 to-red-500' },
+    { type: 'output', name: 'ARCHIVE', icon: Save, color: 'from-orange-400 to-red-500' }
+  ];
 
-      const node = { id: Date.now() + Math.random(), type, div, x, y, outputs: [], run: async function(context) {
-        div.classList.add("highlight");
-        logMsg(`Running ${type}`);
-        await new Promise(r => setTimeout(r, 1000));
-        let output = "";
-        if (type === "Script Writer") {
-          output = "This is AI-generated text.";
-        } else if (type === "Voiceover") {
-          output = `🔊 Speaking: ${context.lastOutput || "No input"}`;
-        } else if (type === "Logger") {
-          logMsg(`📝 Logger: ${context.lastOutput}`);
-        }
-        context.lastOutput = output;
-        div.classList.remove("highlight");
-      }};
+  const addNode = useCallback((nodeType) => {
+    const newNode = {
+      id: Date.now().toString(),
+      type: nodeType.type,
+      name: nodeType.name,
+      x: 300 + Math.random() * 200,
+      y: 200 + Math.random() * 200,
+      config: { status: 'ACTIVE', priority: 'NORMAL' }
+    };
+    setNodes(prev => [...prev, newNode]);
+    setShowNodePanel(false);
+  }, []);
 
-      div.onmousedown = e => {
-        let offsetX = e.offsetX;
-        let offsetY = e.offsetY;
-        function move(e2) {
-          div.style.left = (e2.pageX - offsetX) + "px";
-          div.style.top = (e2.pageY - offsetY) + "px";
-        }
-        function up() {
-          document.removeEventListener("mousemove", move);
-          document.removeEventListener("mouseup", up);
-        }
-        document.addEventListener("mousemove", move);
-        document.addEventListener("mouseup", up);
+  const handleNodeMouseDown = useCallback((e, node) => {
+    e.preventDefault();
+    const rect = canvasRef.current.getBoundingClientRect();
+    setDraggedNode(node);
+    setDragOffset({
+      x: e.clientX - rect.left - node.x,
+      y: e.clientY - rect.top - node.y
+    });
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (draggedNode) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const newX = e.clientX - rect.left - dragOffset.x;
+      const newY = e.clientY - rect.top - dragOffset.y;
+      
+      setNodes(prev => prev.map(node => 
+        node.id === draggedNode.id 
+          ? { ...node, x: newX, y: newY }
+          : node
+      ));
+    }
+  }, [draggedNode, dragOffset]);
+
+  const handleMouseUp = useCallback(() => {
+    setDraggedNode(null);
+  }, []);
+
+  const startConnection = useCallback((nodeId) => {
+    setIsConnecting(true);
+    setConnectionStart(nodeId);
+  }, []);
+
+  const completeConnection = useCallback((targetNodeId) => {
+    if (isConnecting && connectionStart && connectionStart !== targetNodeId) {
+      const newConnection = {
+        id: Date.now().toString(),
+        from: connectionStart,
+        to: targetNodeId
       };
-
-      div.ondblclick = () => {
-        const outNode = prompt("Connect to node ID:");
-        const target = nodes.find(n => n.id == outNode);
-        if (target) {
-          node.outputs.push(target.id);
-          drawLine(node.div, target.div);
-          connections.push({ from: node.id, to: target.id });
-        }
-      };
-
-      canvas.appendChild(div);
-      nodes.push(node);
+      setConnections(prev => [...prev, newConnection]);
     }
+    setIsConnecting(false);
+    setConnectionStart(null);
+  }, [isConnecting, connectionStart]);
 
-    function drawLine(fromDiv, toDiv) {
-      const line = document.createElement("div");
-      line.className = "line";
-      canvas.appendChild(line);
-      const rect1 = fromDiv.getBoundingClientRect();
-      const rect2 = toDiv.getBoundingClientRect();
-      const x1 = rect1.left + rect1.width / 2;
-      const y1 = rect1.top + rect1.height / 2;
-      const x2 = rect2.left + rect2.width / 2;
-      const y2 = rect2.top + rect2.height / 2;
-      const angle = Math.atan2(y2 - y1, x2 - x1);
-      const length = Math.hypot(x2 - x1, y2 - y1);
-      line.style.left = x1 + "px";
-      line.style.top = y1 + "px";
-      line.style.width = length + "px";
-      line.style.transform = `rotate(${angle}rad)`;
-    }
+  const deleteNode = useCallback((nodeId) => {
+    setNodes(prev => prev.filter(node => node.id !== nodeId));
+    setConnections(prev => prev.filter(conn => conn.from !== nodeId && conn.to !== nodeId));
+    setSelectedNode(null);
+  }, []);
 
-    async function runWorkflow() {
-      logMsg("▶️ Executing workflow...");
-      const idToNode = Object.fromEntries(nodes.map(n => [n.id, n]));
-      const visited = new Set();
-      const context = {};
+  const duplicateNode = useCallback((node) => {
+    const newNode = {
+      ...node,
+      id: Date.now().toString(),
+      x: node.x + 30,
+      y: node.y + 30
+    };
+    setNodes(prev => [...prev, newNode]);
+  }, []);
 
-      async function visit(nodeId) {
-        if (visited.has(nodeId)) return;
-        visited.add(nodeId);
-        const node = idToNode[nodeId];
-        await node.run(context);
-        for (let outId of node.outputs) {
-          await visit(outId);
-        }
-      }
+  const renderConnection = useCallback((connection) => {
+    const fromNode = nodes.find(n => n.id === connection.from);
+    const toNode = nodes.find(n => n.id === connection.to);
+    
+    if (!fromNode || !toNode) return null;
+    
+    const fromX = fromNode.x + 160;
+    const fromY = fromNode.y + 45;
+    const toX = toNode.x;
+    const toY = toNode.y + 45;
+    
+    const midX = (fromX + toX) / 2;
+    
+    return (
+      <g key={connection.id}>
+        <defs>
+          <linearGradient id={`connectionGradient-${connection.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style={{stopColor:'#00d4ff', stopOpacity:0.8}} />
+            <stop offset="50%" style={{stopColor:'#0099cc', stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'#00d4ff', stopOpacity:0.8}} />
+          </linearGradient>
+          <filter id={`glow-${connection.id}`}>
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <path
+          d={`M ${fromX} ${fromY} C ${midX} ${fromY}, ${midX} ${toY}, ${toX} ${toY}`}
+          stroke={`url(#connectionGradient-${connection.id})`}
+          strokeWidth="3"
+          fill="none"
+          filter={`url(#glow-${connection.id})`}
+          className="hover:stroke-cyan-300 cursor-pointer animate-pulse"
+        />
+        <circle
+          cx={toX}
+          cy={toY}
+          r="6"
+          fill="#00d4ff"
+          filter={`url(#glow-${connection.id})`}
+          className="animate-pulse"
+        />
+      </g>
+    );
+  }, [nodes]);
 
-      // Run all start nodes
-      for (let node of nodes) {
-        if (!connections.some(c => c.to === node.id)) {
-          await visit(node.id);
-        }
-      }
+  const NodeComponent = ({ node }) => {
+    const nodeType = nodeTypes.find(t => t.name === node.name);
+    const Icon = nodeType?.icon || Bot;
+    
+    return (
+      <div
+        className={`absolute bg-black border-2 ${
+          selectedNode?.id === node.id 
+            ? 'border-cyan-400 shadow-2xl shadow-cyan-400/50' 
+            : 'border-gray-700 hover:border-cyan-400'
+        } rounded-lg cursor-move transition-all duration-300 group`}
+        style={{ 
+          left: node.x, 
+          top: node.y, 
+          minWidth: '160px',
+          fontFamily: 'Orbitron, monospace',
+          boxShadow: selectedNode?.id === node.id 
+            ? '0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 30px rgba(0, 212, 255, 0.1)' 
+            : '0 0 15px rgba(0, 212, 255, 0.3)'
+        }}
+        onMouseDown={(e) => handleNodeMouseDown(e, node)}
+        onClick={() => setSelectedNode(node)}
+      >
+        <div className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className={`p-2 rounded-lg bg-gradient-to-r ${nodeType?.color || 'from-gray-500 to-gray-600'} shadow-lg`}>
+              <Icon className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div 
+                className="text-cyan-400 text-sm font-bold tracking-wider"
+                style={{ 
+                  textShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
+                  fontFamily: 'Orbitron, monospace'
+                }}
+              >
+                {node.name}
+              </div>
+              <div className="text-gray-400 text-xs font-mono uppercase">
+                {node.type}_MODULE
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div
+              className="w-5 h-5 bg-cyan-400 rounded-full cursor-pointer transition-all duration-200 hover:bg-cyan-300 hover:scale-110"
+              style={{ 
+                boxShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
+                border: '2px solid rgba(0, 212, 255, 0.3)'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                completeConnection(node.id);
+              }}
+            />
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span 
+                className="text-xs text-green-400 font-mono"
+                style={{ textShadow: '0 0 5px rgba(0, 255, 0, 0.5)' }}
+              >
+                ONLINE
+              </span>
+            </div>
+            <div
+              className="w-5 h-5 bg-cyan-400 rounded-full cursor-pointer transition-all duration-200 hover:bg-cyan-300 hover:scale-110"
+              style={{ 
+                boxShadow: '0 0 10px rgba(0, 212, 255, 0.8)',
+                border: '2px solid rgba(0, 212, 255, 0.3)'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                startConnection(node.id);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
 
-      logMsg("✅ Workflow complete.");
-    }
+  const NodePanel = () => (
+    <div 
+      className="absolute right-6 top-24 w-96 bg-black border-2 border-cyan-400 rounded-lg z-10"
+      style={{ 
+        boxShadow: '0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 30px rgba(0, 212, 255, 0.1)',
+        fontFamily: 'Orbitron, monospace'
+      }}
+    >
+      <div className="p-6 border-b border-cyan-400/30">
+        <h3 
+          className="text-cyan-400 font-bold text-lg tracking-wider"
+          style={{ textShadow: '0 0 10px rgba(0, 212, 255, 0.8)' }}
+        >
+          DEPLOY MODULE
+        </h3>
+        <p className="text-gray-400 text-sm mt-1 font-mono">SELECT NEURAL COMPONENT</p>
+      </div>
+      <div className="p-6 max-h-96 overflow-y-auto">
+        {Object.entries(
+          nodeTypes.reduce((acc, node) => {
+            acc[node.type] = acc[node.type] || [];
+            acc[node.type].push(node);
+            return acc;
+          }, {})
+        ).map(([type, nodes]) => (
+          <div key={type} className="mb-6">
+            <h4 
+              className="text-cyan-300 text-sm font-bold mb-3 uppercase tracking-widest"
+              style={{ textShadow: '0 0 8px rgba(0, 212, 255, 0.6)' }}
+            >
+              {type}_MODULES
+            </h4>
+            {nodes.map((nodeType) => {
+              const Icon = nodeType.icon;
+              return (
+                <button
+                  key={nodeType.name}
+                  onClick={() => addNode(nodeType)}
+                  className="w-full flex items-center gap-3 p-3 text-gray-300 hover:bg-cyan-400/10 rounded-lg transition-all duration-200 hover:text-cyan-400 border border-transparent hover:border-cyan-400/30 group"
+                  style={{ fontFamily: 'Orbitron, monospace' }}
+                >
+                  <div className={`p-2 rounded-lg bg-gradient-to-r ${nodeType.color} shadow-lg group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-4 h-4 text-white" />
+                  </div>
+                  <span 
+                    className="text-sm font-bold tracking-wide group-hover:text-shadow"
+                    style={{ 
+                      textShadow: 'none',
+                      transition: 'text-shadow 0.2s'
+                    }}
+                  >
+                    {nodeType.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
-    function exportWorkflow() {
-      const data = {
-        nodes: nodes.map(n => ({
-          id: n.id,
-          type: n.type,
-          x: parseInt(n.div.style.left),
-          y: parseInt(n.div.style.top),
-          outputs: n.outputs
-        })),
-        connections
-      };
-      navigator.clipboard.writeText(JSON.stringify(data)).then(() =>
-        logMsg("📤 Workflow copied to clipboard!")
-      );
-    }
+  const PropertiesPanel = () => (
+    selectedNode && (
+      <div 
+        className="absolute right-6 top-24 w-96 bg-black border-2 border-cyan-400 rounded-lg z-10"
+        style={{ 
+          boxShadow: '0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 30px rgba(0, 212, 255, 0.1)',
+          fontFamily: 'Orbitron, monospace'
+        }}
+      >
+        <div className="p-6 border-b border-cyan-400/30">
+          <h3 
+            className="text-cyan-400 font-bold text-lg tracking-wider"
+            style={{ textShadow: '0 0 10px rgba(0, 212, 255, 0.8)' }}
+          >
+            MODULE CONFIG
+          </h3>
+          <p className="text-gray-400 text-sm mt-1 font-mono">NEURAL PARAMETERS</p>
+        </div>
+        <div className="p-6">
+          <div className="mb-4">
+            <label 
+              className="block text-cyan-400 text-sm font-bold mb-2 tracking-wide"
+              style={{ textShadow: '0 0 5px rgba(0, 212, 255, 0.5)' }}
+            >
+              MODULE_NAME
+            </label>
+            <input
+              type="text"
+              value={selectedNode.name}
+              onChange={(e) => setNodes(prev => prev.map(node => 
+                node.id === selectedNode.id 
+                  ? { ...node, name: e.target.value.toUpperCase() }
+                  : node
+              ))}
+              className="w-full bg-black border-2 border-cyan-400/50 rounded-lg px-4 py-2 text-cyan-400 focus:border-cyan-400 focus:outline-none font-mono text-sm"
+              style={{ 
+                boxShadow: 'inset 0 0 10px rgba(0, 212, 255, 0.2)',
+                fontFamily: 'Orbitron, monospace'
+              }}
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label 
+              className="block text-cyan-400 text-sm font-bold mb-2 tracking-wide"
+              style={{ textShadow: '0 0 5px rgba(0, 212, 255, 0.5)' }}
+            >
+              NEURAL_CONFIG
+            </label>
+            <textarea
+              value={JSON.stringify(selectedNode.config, null, 2)}
+              onChange={(e) => {
+                try {
+                  const config = JSON.parse(e.target.value);
+                  setNodes(prev => prev.map(node => 
+                    node.id === selectedNode.id 
+                      ? { ...node, config }
+                      : node
+                  ));
+                } catch (err) {
+                  // Invalid JSON, ignore
+                }
+              }}
+              className="w-full bg-black border-2 border-cyan-400/50 rounded-lg px-4 py-2 text-cyan-400 focus:border-cyan-400 focus:outline-none h-32 font-mono text-sm"
+              style={{ 
+                boxShadow: 'inset 0 0 10px rgba(0, 212, 255, 0.2)',
+                fontFamily: 'Orbitron, monospace'
+              }}
+            />
+          </div>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={() => duplicateNode(selectedNode)}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-lg transition-all duration-200 font-bold border border-cyan-400/50 hover:border-cyan-400"
+              style={{ 
+                fontFamily: 'Orbitron, monospace',
+                textShadow: '0 0 5px rgba(0, 212, 255, 0.5)'
+              }}
+            >
+              <Copy className="w-4 h-4" />
+              CLONE
+            </button>
+            <button
+              onClick={() => deleteNode(selectedNode.id)}
+              className="flex items-center gap-2 px-4 py-2 bg-red-400/20 hover:bg-red-400/30 text-red-400 rounded-lg transition-all duration-200 font-bold border border-red-400/50 hover:border-red-400"
+              style={{ 
+                fontFamily: 'Orbitron, monospace',
+                textShadow: '0 0 5px rgba(255, 0, 0, 0.5)'
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+              DELETE
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  );
 
-    function importWorkflow() {
-      const json = prompt("Paste workflow JSON:");
-      if (!json) return;
-      clearCanvas();
-      try {
-        const data = JSON.parse(json);
-        for (let n of data.nodes) addNode(n.type, n.x, n.y);
-        setTimeout(() => {
-          for (let i = 0; i < data.connections.length; i++) {
-            const c = data.connections[i];
-            const from = nodes.find(n => n.id == c.from);
-            const to = nodes.find(n => n.id == c.to);
-            if (from && to) {
-              from.outputs.push(to.id);
-              drawLine(from.div, to.div);
-              connections.push(c);
-            }
-          }
-        }, 100);
-      } catch (e) {
-        logMsg("❌ Invalid JSON");
-      }
-    }
+  return (
+    <div 
+      className="h-screen bg-black text-cyan-400 flex flex-col"
+      style={{ fontFamily: 'Orbitron, monospace' }}
+    >
+      {/* Header */}
+      <header 
+        className="bg-black border-b-2 border-cyan-400 p-6"
+        style={{ boxShadow: '0 2px 20px rgba(0, 212, 255, 0.3)' }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center"
+                style={{ boxShadow: '0 0 20px rgba(0, 212, 255, 0.8)' }}
+              >
+                <Crown className="w-7 h-7 text-black" />
+              </div>
+              <div>
+                <span 
+                  className="text-3xl font-bold text-cyan-400 tracking-widest"
+                  style={{ textShadow: '0 0 15px rgba(0, 212, 255, 0.8)' }}
+                >
+                  BOSS AI
+                </span>
+                <p className="text-gray-400 text-sm font-mono">NEURAL_WORKFLOW_SYSTEM</p>
+              </div>
+            </div>
+            <input
+              type="text"
+              value={workflowName}
+              onChange={(e) => setWorkflowName(e.target.value.toUpperCase())}
+              className="bg-black border-2 border-cyan-400/50 rounded-lg px-4 py-2 text-cyan-400 focus:border-cyan-400 focus:outline-none font-bold tracking-wide"
+              style={{ 
+                boxShadow: 'inset 0 0 10px rgba(0, 212, 255, 0.2)',
+                fontFamily: 'Orbitron, monospace'
+              }}
+              placeholder="WORKFLOW_NAME"
+            />
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowNodePanel(!showNodePanel)}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-lg transition-all duration-200 font-bold border border-cyan-400/50 hover:border-cyan-400"
+              style={{ 
+                fontFamily: 'Orbitron, monospace',
+                textShadow: '0 0 5px rgba(0, 212, 255, 0.5)'
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              DEPLOY
+            </button>
+            <button 
+              className="flex items-center gap-2 px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 rounded-lg transition-all duration-200 font-bold border border-green-400/50 hover:border-green-400"
+              style={{ 
+                fontFamily: 'Orbitron, monospace',
+                textShadow: '0 0 5px rgba(0, 255, 0, 0.5)'
+              }}
+            >
+              <Play className="w-4 h-4" />
+              EXECUTE
+            </button>
+            <button 
+              className="flex items-center gap-2 px-4 py-2 bg-blue-400/20 hover:bg-blue-400/30 text-blue-400 rounded-lg transition-all duration-200 font-bold border border-blue-400/50 hover:border-blue-400"
+              style={{ 
+                fontFamily: 'Orbitron, monospace',
+                textShadow: '0 0 5px rgba(0, 100, 255, 0.5)'
+              }}
+            >
+              <Save className="w-4 h-4" />
+              SAVE
+            </button>
+          </div>
+        </div>
+      </header>
 
-    function clearCanvas() {
-      canvas.innerHTML = "";
-      nodes = [];
-      connections = [];
-      logMsg("🧹 Canvas cleared");
-    }
-  </script>
-</body>
-</html>
+      {/* Main Content */}
+      <div className="flex-1 relative overflow-hidden">
+        {/* Canvas */}
+        <div
+          ref={canvasRef}
+          className="w-full h-full bg-black relative"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle, rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+              radial-gradient(circle, rgba(0, 212, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '30px 30px',
+            backgroundPosition: '0 0, 15px 15px'
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {/* Connections SVG */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            {connections.map(renderConnection)}
+          </svg>
+          
+          {/* Nodes */}
+          {nodes.map(node => (
+            <NodeComponent key={node.id} node={node} />
+          ))}
+        </div>
+        
+        {/* Side Panels */}
+        {showNodePanel && <NodePanel />}
+        {!showNodePanel && <PropertiesPanel />}
+      </div>
+
+      {/* Status Bar */}
+      <div 
+        className="bg-black border-t-2 border-cyan-400 p-4"
+        style={{ boxShadow: '0 -2px 20px rgba(0, 212, 255, 0.3)' }}
+      >
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span 
+                className="text-cyan-400 font-bold tracking-wide"
+                style={{ textShadow: '0 0 5px rgba(0, 212, 255, 0.5)' }}
+              >
+                MODULES:
+              </span>
+              <span 
+                className="text-white font-bold"
+                style={{ textShadow: '0 0 5px rgba(255, 255, 255, 0.5)' }}
+              >
+                {nodes.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span 
+                className="text-cyan-400 font-bold tracking-wide"
+                style={{ textShadow: '0 0 5px rgba(0, 212, 255, 0.5)' }}
+              >
+                LINKS:
+              </span>
+              <span 
+                className="text-white font-bold"
+                style={{ textShadow: '0 0 5px rgba(255, 255, 255, 0.5)' }}
+              >
+                {connections.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span 
+                className="text-green-400 font-bold tracking-wide"
+                style={{ textShadow: '0 0 5px rgba(0, 255, 0, 0.5)' }}
+              >
+                NEURAL_CORE_ONLINE
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400 font-mono">UPTIME:</span>
+              <span 
+                className="text-green-400 font-bold"
+                style={{ textShadow: '0 0 5px rgba(0, 255, 0, 0.5)' }}
+              >
+                99.9%
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400 font-mono">LAST_SYNC:</span>
+              <span className="text-cyan-400 font-bold">00:00:42</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BossAICyberpunkWorkflow;
