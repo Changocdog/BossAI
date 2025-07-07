@@ -1,1077 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boss AI - Visual Automation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Orbitron', monospace;
-            background: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-        }
-
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #0099ff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-
-        .header h1 {
-            font-weight: 900;
-            font-size: 24px;
-            color: #0099ff;
-            text-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            color: #0099ff;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 4px;
-        }
-
-        .btn:hover {
-            background: rgba(0, 153, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 153, 255, 0.4);
-        }
-
-        .btn.primary {
-            background: #0099ff;
-            color: #000;
-        }
-
-        .btn.primary:hover {
-            background: #0077cc;
-            box-shadow: 0 0 20px rgba(0, 153, 255, 0.6);
-        }
-
-        .btn.danger {
-            border-color: #ff4444;
-            color: #ff4444;
-            background: rgba(255, 68, 68, 0.1);
-        }
-
-        .btn.danger:hover {
-            background: rgba(255, 68, 68, 0.2);
-            box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: rgba(0, 0, 0, 0.9);
-            border-right: 1px solid #0099ff;
-            padding: 80px 20px 20px;
-            overflow-y: auto;
-        }
-
-        .sidebar h2 {
-            color: #0099ff;
-            font-size: 16px;
-            margin-bottom: 15px;
-            text-shadow: 0 0 5px rgba(0, 153, 255, 0.3);
-        }
-
-        .api-config {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: rgba(0, 153, 255, 0.05);
-            border: 1px solid #0099ff;
-            border-radius: 6px;
-        }
-
-        .api-config h3 {
-            color: #0099ff;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .api-config input {
-            width: 100%;
-            padding: 8px;
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            border-radius: 4px;
-            color: #fff;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .api-config input::placeholder {
-            color: #888;
-        }
-
-        .node-type {
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            padding: 12px;
-            margin: 10px 0;
-            cursor: grab;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
-
-        .node-type:hover {
-            background: rgba(0, 153, 255, 0.2);
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
-        }
-
-        .node-type:active {
-            cursor: grabbing;
-        }
-
-        .node-type h3 {
-            font-size: 14px;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .node-type p {
-            font-size: 11px;
-            color: #aaa;
-            line-height: 1.4;
-        }
-
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            margin-top: 60px;
-        }
-
-        .canvas {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: 
-                radial-gradient(circle at 25% 25%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 153, 255, 0.05) 0%, transparent 50%);
-            cursor: crosshair;
-        }
-
-        .canvas-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .node {
-            position: absolute;
-            min-width: 180px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #0099ff;
-            border-radius: 8px;
-            padding: 15px;
-            cursor: move;
-            z-index: 10;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px rgba(0, 153, 255, 0.1);
-        }
-
-        .node:hover {
-            box-shadow: 0 6px 30px rgba(0, 153, 255, 0.2);
-            border-color: #00bbff;
-        }
-
-        .node.executing {
-            border-color: #00ff00;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-            animation: pulse 1s infinite;
-        }
-
-        .node.executed {
-            border-color: #888;
-            opacity: 0.8;
-        }
-
-        .node.error {
-            border-color: #ff4444;
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
-        }
-
-        .node-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .node-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0099ff;
-            text-shadow: 0 0 5px rgba(0, 153, 255, 0.3);
-        }
-
-        .node-type-label {
-            font-size: 10px;
-            color: #888;
-            background: rgba(0, 153, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-            border: 1px solid #0099ff;
-        }
-
-        .node-content {
-            font-size: 12px;
-            color: #ccc;
-            line-height: 1.4;
-            margin-bottom: 10px;
-        }
-
-        .node-ports {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 20px;
-        }
-
-        .port {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid #0099ff;
-            background: rgba(0, 153, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .port.input {
-            margin-left: -20px;
-        }
-
-        .port.output {
-            margin-right: -20px;
-            background: rgba(0, 153, 255, 0.3);
-        }
-
-        .port:hover {
-            background: #0099ff;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.6);
-        }
-
-        .connection {
-            stroke: #0099ff;
-            stroke-width: 2;
-            fill: none;
-            filter: drop-shadow(0 0 5px rgba(0, 153, 255, 0.3));
-        }
-
-        .connection.active {
-            stroke: #00ff00;
-            stroke-width: 3;
-            filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
-            animation: flow 2s infinite;
-        }
-
-        @keyframes flow {
-            0% { stroke-dasharray: 0 10; }
-            100% { stroke-dasharray: 10 0; }
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #000;
-            border: 1px solid #0099ff;
-            border-radius: 8px;
-            padding: 30px;
-            min-width: 400px;
-            max-width: 600px;
-            box-shadow: 0 10px 50px rgba(0, 153, 255, 0.3);
-        }
-
-        .modal h2 {
-            color: #0099ff;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #0099ff;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            border-radius: 4px;
-            color: #fff;
-            font-family: 'Orbitron', monospace;
-            font-size: 14px;
-        }
-
-        .form-group textarea {
-            height: 120px;
-            resize: vertical;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #00bbff;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .execution-log {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            max-height: 300px;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid #0099ff;
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 12px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-        }
-
-        .execution-log.active {
-            display: block;
-        }
-
-        .log-entry {
-            margin-bottom: 8px;
-            padding: 5px;
-            border-radius: 4px;
-            word-wrap: break-word;
-        }
-
-        .log-entry.info {
-            background: rgba(0, 153, 255, 0.1);
-            color: #0099ff;
-        }
-
-        .log-entry.success {
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-        }
-
-        .log-entry.error {
-            background: rgba(255, 68, 68, 0.1);
-            color: #ff4444;
-        }
-
-        .log-entry.warning {
-            background: rgba(255, 165, 0, 0.1);
-            color: #ffa500;
-        }
-
-        .status-indicator {
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #0099ff;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #0099ff;
-            display: none;
-        }
-
-        .status-indicator.active {
-            display: block;
-        }
-
-        .status-indicator.executing {
-            border-color: #00ff00;
-            color: #00ff00;
-            animation: pulse 1s infinite;
-        }
-
-        .progress-bar {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(0, 153, 255, 0.2);
-            z-index: 999;
-            display: none;
-        }
-
-        .progress-bar.active {
-            display: block;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0099ff, #00ff00);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .audio-player {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.95);
-            border: 1px solid #0099ff;
-            border-radius: 8px;
-            padding: 15px;
-            display: none;
-            z-index: 100;
-        }
-
-        .audio-player.active {
-            display: block;
-        }
-
-        .audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .audio-controls button {
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            color: #0099ff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-        }
-
-        .audio-controls button:hover {
-            background: rgba(0, 153, 255, 0.2);
-        }
-
-        .delete-btn {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
-            background: #ff4444;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-        }
-
-        .node:hover .delete-btn {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Boss AI Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to right, #000000, #0a0a2a);
+      color: #00bfff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    #sidebar {
+      width: 250px;
+      background: #111;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #canvas {
+      flex-grow: 1;
+      position: relative;
+      background: #0a0a0a;
+    }
+    .node {
+      position: absolute;
+      padding: 10px;
+      background: #222;
+      border: 2px solid #00bfff;
+      color: #fff;
+      border-radius: 5px;
+      cursor: move;
+    }
+    button {
+      background: #00bfff;
+      color: black;
+      border: none;
+      padding: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #log {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: #111;
+      color: #0f0;
+      font-size: 12px;
+      padding: 5px;
+      height: 100px;
+      overflow-y: auto;
+      border-top: 1px solid #00bfff;
+    }
+  </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h1>Boss AI - Visual Automation</h1>
-            <div class="header-controls">
-                <button class="btn primary" id="runBtn">▶ RUN</button>
-                <button class="btn" id="exportBtn">📤 EXPORT</button>
-                <button class="btn" id="importBtn">📥 IMPORT</button>
-                <button class="btn danger" id="clearBtn">🗑 CLEAR</button>
-            </div>
-        </div>
+  <div id="sidebar">
+    <button onclick="createNode('ScriptWriter')">+ Script Writer</button>
+    <button onclick="createNode('Voiceover')">+ Voiceover</button>
+    <button onclick="createNode('Logger')">+ Logger</button>
+    <hr />
+    <button onclick="exportWorkflow()">Export</button>
+    <button onclick="importWorkflow()">Import</button>
+    <button onclick="clearWorkflow()">Clear</button>
+    <button onclick="runWorkflow()">Run</button>
+  </div>
+  <div id="canvas"></div>
+  <div id="log">[Log Output]</div>
 
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+  <script>
+    let nodes = [];
+    let nodeId = 0;
 
-        <div class="sidebar">
-            <div class="api-config">
-                <h3>API Configuration</h3>
-                <input type="password" id="openrouterKey" placeholder="OpenRouter API Key">
-                <input type="password" id="elevenlabsKey" placeholder="ElevenLabs API Key">
-                <small style="color: #888; font-size: 10px;">Keys are stored locally in your browser</small>
-            </div>
+    function createNode(type) {
+      const canvas = document.getElementById('canvas');
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.contentEditable = true;
+      node.style.left = Math.random() * 500 + 'px';
+      node.style.top = Math.random() * 300 + 'px';
+      node.dataset.id = nodeId++;
+      node.dataset.type = type;
+      node.innerText = type;
+      canvas.appendChild(node);
 
-            <h2>Node Types</h2>
-            <div class="node-type" draggable="true" data-type="script">
-                <h3>Script Writer</h3>
-                <p>Generate scripts and content using AI prompts via OpenRouter</p>
-            </div>
-            <div class="node-type" draggable="true" data-type="voiceover">
-                <h3>Voiceover</h3>
-                <p>Convert text to speech using ElevenLabs API</p>
-            </div>
-            <div class="node-type" draggable="true" data-type="logger">
-                <h3>Logger</h3>
-                <p>Log messages and data for debugging</p>
-            </div>
-            <div class="node-type" draggable="true" data-type="http">
-                <h3>HTTP Request</h3>
-                <p>Make custom API calls and web requests</p>
-            </div>
-            <div class="node-type" draggable="true" data-type="delay">
-                <h3>Delay</h3>
-                <p>Add time delays between operations</p>
-            </div>
-            <div class="node-type" draggable="true" data-type="conditional">
-                <h3>Conditional</h3>
-                <p>Branch workflow based on conditions</p>
-            </div>
-        </div>
+      nodes.push({
+        id: node.dataset.id,
+        type: type,
+        el: node,
+        run: async function (context) {
+          node.style.borderColor = 'yellow';
+          log('Running ' + type);
+          await new Promise(res => setTimeout(res, 500));
+          if (type === 'ScriptWriter') {
+            context.output = 'Generated script about AI';
+          } else if (type === 'Voiceover') {
+            context.output = 'Audio generated from: ' + context.output;
+          } else if (type === 'Logger') {
+            log('Final Output: ' + context.output);
+          }
+          node.style.borderColor = '#00bfff';
+        }
+      });
 
-        <div class="canvas-container">
-            <div class="canvas" id="canvas">
-                <svg class="canvas-svg" id="canvasSvg"></svg>
-            </div>
-        </div>
+      makeDraggable(node);
+    }
 
-        <div class="status-indicator" id="statusIndicator">Ready</div>
-        
-        <div class="execution-log" id="executionLog">
-            <h3 style="color: #0099ff; margin-bottom: 10px;">Execution Log</h3>
-            <div id="logContent"></div>
-        </div>
-
-        <div class="audio-player" id="audioPlayer">
-            <div class="audio-controls">
-                <button onclick="playAudio()">▶ Play</button>
-                <button onclick="pauseAudio()">⏸ Pause</button>
-                <button onclick="stopAudio()">⏹ Stop</button>
-                <span id="audioStatus" style="color: #0099ff; font-size: 12px;">No audio</span>
-            </div>
-            <audio id="audioElement" controls style="width: 100%; margin-top: 10px;"></audio>
-        </div>
-    </div>
-
-    <!-- Modal for editing nodes -->
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <h2>Edit Node</h2>
-            <div class="form-group">
-                <label for="nodeTitle">Node Title:</label>
-                <input type="text" id="nodeTitle" placeholder="Enter node title">
-            </div>
-            <div class="form-group">
-                <label for="nodeConfig">Configuration:</label>
-                <textarea id="nodeConfig" placeholder="Enter configuration details..."></textarea>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn" onclick="closeModal()">Cancel</button>
-                <button class="btn primary" onclick="saveNode()">Save</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Global variables
-        let nodes = [];
-        let connections = [];
-        let nodeIdCounter = 0;
-        let isDragging = false;
-        let draggedNode = null;
-        let isConnecting = false;
-        let connectionStart = null;
-        let currentEditingNode = null;
-        let executionState = 'idle';
-        let executionContext = {};
-        let currentAudio = null;
-        let dragOffset = { x: 0, y: 0 };
-        let tempConnection = null;
-
-        // API configuration
-        let apiKeys = {
-            openrouter: '',
-            elevenlabs: ''
+    function makeDraggable(el) {
+      let offsetX, offsetY;
+      el.onmousedown = function (e) {
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        document.onmousemove = function (e) {
+          el.style.left = e.clientX - offsetX + 'px';
+          el.style.top = e.clientY - offsetY + 'px';
         };
-
-        // Node type definitions
-        const nodeTypes = {
-            script: {
-                title: 'Script Writer',
-                defaultConfig: 'Write a creative 30-second script about artificial intelligence',
-                execute: async function(config, input, context) {
-                    log('info', `Executing Script Writer with prompt: ${config.substring(0, 50)}...`);
-                    await delay(2000);
-                    const demoScript = `Welcome to the future of AI automation! 
-                    
-With Boss AI, you can create powerful workflows that connect different AI services seamlessly. Generate content, create voiceovers, and build complex automation pipelines - all with a visual interface that makes AI accessible to everyone.
-
-The future is here, and it's powered by intelligent automation.`;
-                    context.generatedScript = demoScript;
-                    return demoScript;
-                }
-            },
-            voiceover: {
-                title: 'Voiceover',
-                defaultConfig: 'voice_id:21m00Tcm4TlvDq8ikWAM,stability:0.5,similarity_boost:0.8',
-                execute: async function(config, input, context) {
-                    if (!input) {
-                        throw new Error('No text input provided for voiceover');
-                    }
-                    log('info', `Executing Voiceover for text: ${input.substring(0, 50)}...`);
-                    await delay(3000);
-                    log('success', 'Demo voiceover completed');
-                    return `Voiceover for: ${input.substring(0, 50)}...`;
-                }
-            },
-            logger: {
-                title: 'Logger',
-                defaultConfig: 'Log level: INFO',
-                execute: async function(config, input, context) {
-                    const logLevel = config.toLowerCase().includes('error') ? 'error' : 
-                                   config.toLowerCase().includes('warning') ? 'warning' : 'info';
-                    const message = input || 'No input data';
-                    log(logLevel, `Logger: ${message}`);
-                    context.loggedData = message;
-                    await delay(300);
-                    return message;
-                }
-            },
-            http: {
-                title: 'HTTP Request',
-                defaultConfig: 'GET https://httpbin.org/json',
-                execute: async function(config, input, context) {
-                    log('info', `Making HTTP request: ${config}`);
-                    await delay(1500);
-                    const mockResponse = { status: 'success', data: input || 'test data' };
-                    context.httpResponse = mockResponse;
-                    log('success', 'HTTP request completed');
-                    return JSON.stringify(mockResponse);
-                }
-            },
-            delay: {
-                title: 'Delay',
-                defaultConfig: '2000',
-                execute: async function(config, input, context) {
-                    const ms = parseInt(config) || 2000;
-                    log('info', `Waiting ${ms}ms...`);
-                    await delay(ms);
-                    log('success', 'Delay completed');
-                    return input;
-                }
-            },
-            conditional: {
-                title: 'Conditional',
-                defaultConfig: 'condition: input.length > 10',
-                execute: async function(config, input, context) {
-                    log('info', `Evaluating condition: ${config}`);
-                    await delay(500);
-                    const result = input && input.length > 10;
-                    log('success', `Condition result: ${result}`);
-                    return result;
-                }
-            }
+        document.onmouseup = function () {
+          document.onmousemove = null;
+          document.onmouseup = null;
         };
+      };
+    }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadApiKeys();
-            setupEventListeners();
-            log('info', 'Boss AI initialized successfully');
+    function exportWorkflow() {
+      const exportData = nodes.map(n => ({
+        id: n.id,
+        type: n.type,
+        x: n.el.style.left,
+        y: n.el.style.top
+      }));
+      navigator.clipboard.writeText(JSON.stringify(exportData));
+      log('Workflow exported to clipboard');
+    }
+
+    function importWorkflow() {
+      const input = prompt('Paste your JSON here:');
+      try {
+        const data = JSON.parse(input);
+        clearWorkflow();
+        data.forEach(n => {
+          createNode(n.type);
+          const node = nodes.find(node => node.id == n.id);
+          node.el.style.left = n.x;
+          node.el.style.top = n.y;
         });
+        log('Workflow imported');
+      } catch {
+        alert('Invalid JSON');
+      }
+    }
 
-        // Load API keys from localStorage
-        function loadApiKeys() {
-            const saved = localStorage.getItem('bossai_api_keys');
-            if (saved) {
-                apiKeys = JSON.parse(saved);
-                document.getElementById('openrouterKey').value = apiKeys.openrouter || '';
-                document.getElementById('elevenlabsKey').value = apiKeys.elevenlabs || '';
-            }
-        }
+    function clearWorkflow() {
+      document.getElementById('canvas').innerHTML = '';
+      nodes = [];
+      log('Workflow cleared');
+    }
 
-        // Save API keys to localStorage
-        function saveApiKeys() {
-            apiKeys.openrouter = document.getElementById('openrouterKey').value;
-            apiKeys.elevenlabs = document.getElementById('elevenlabsKey').value;
-            localStorage.setItem('bossai_api_keys', JSON.stringify(apiKeys));
-        }
+    async function runWorkflow() {
+      log('Running workflow...');
+      const context = {};
+      for (let n of nodes) {
+        await n.run(context);
+      }
+    }
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // Header buttons
-            document.getElementById('runBtn').addEventListener('click', runWorkflow);
-            document.getElementById('exportBtn').addEventListener('click', exportWorkflow);
-            document.getElementById('importBtn').addEventListener('click', importWorkflow);
-            document.getElementById('clearBtn').addEventListener('click', clearCanvas);
-
-            // API key inputs
-            document.getElementById('openrouterKey').addEventListener('change', saveApiKeys);
-            document.getElementById('elevenlabsKey').addEventListener('change', saveApiKeys);
-
-            // Drag and drop for node types
-            document.querySelectorAll('.node-type').forEach(nodeType => {
-                nodeType.addEventListener('dragstart', handleDragStart);
-                nodeType.addEventListener('dragend', handleDragEnd);
-            });
-
-            // Canvas events
-            const canvas = document.getElementById('canvas');
-            canvas.addEventListener('dragover', handleDragOver);
-            canvas.addEventListener('drop', handleDrop);
-            canvas.addEventListener('click', handleCanvasClick);
-
-            // Modal close on outside click
-            document.getElementById('editModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal();
-                }
-            });
-
-            // Document mouse events for dragging
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        }
-
-        // Drag and drop handlers
-        function handleDragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.dataset.type);
-            e.dataTransfer.effectAllowed = 'copy';
-        }
-
-        function handleDragEnd(e) {
-            // Clean up
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'copy';
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const nodeType = e.dataTransfer.getData('text/plain');
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            createNode(nodeType, x, y);
-        }
-
-        function handleCanvasClick(e) {
-            if (e.target.classList.contains('canvas')) {
-                // Clear selection
-                document.querySelectorAll('.node').forEach(node => {
-                    node.classList.remove('selected');
-                });
-            }
-        }
-
-        // Node creation and management
-        function createNode(type, x, y) {
-            const nodeId = `node_${nodeIdCounter++}`;
-            const nodeTypeConfig = nodeTypes[type];
-            
-            const node = {
-                id: nodeId,
-                type: type,
-                title: nodeTypeConfig.title,
-                config: nodeTypeConfig.defaultConfig,
-                x: x,
-                y: y,
-                inputs: [],
-                outputs: []
-            };
-
-            nodes.push(node);
-            renderNode(node);
-            log('info', `Created ${nodeTypeConfig.title} node`);
-        }
-
-        function renderNode(node) {
-            const nodeElement = document.createElement('div');
-            nodeElement.className = 'node';
-            nodeElement.id = node.id;
-            nodeElement.style.left = node.x + 'px';
-            nodeElement.style.top = node.y + 'px';
-            
-            nodeElement.innerHTML = `
-                <div class="node-header">
-                    <div class="node-title">${node.title}</div>
-                    <div class="node-type-label">${node.type}</div>
-                </div>
-                <div class="node-content">${node.config.substring(0, 50)}${node.config.length > 50 ? '...' : ''}</div>
-                <div class="node-ports">
-                    <div class="port input" data-port="input"></div>
-                    <div class="port output" data-port="output"></div>
-                </div>
-                <button class="delete-btn" onclick="deleteNode('${node.id}')">×</button>
-            `;
-
-            // Add event listeners
-            nodeElement.addEventListener('mousedown', (e) => handleNodeMouseDown(e, node));
-            nodeElement.addEventListener('dblclick', () => editNode(node));
-            
-            // Port event listeners
-            const inputPort = nodeElement.querySelector('.port.input');
-            const outputPort = nodeElement.querySelector('.port.output');
-            
-            inputPort.addEventListener('click', (e) => handlePortClick(e, node, 'input'));
-            outputPort.addEventListener('click', (e) => handlePortClick(e, node, 'output'));
-
-            document.getElementById('canvas').appendChild(nodeElement);
-        }
-
-        function handleNodeMouseDown(e, node) {
-            if (e.target.classList.contains('delete-btn')) return;
-            
-            isDragging = true;
-            draggedNode = node;
-            
-            const rect = e.currentTarget.getBoundingClientRect();
-            dragOffset.x = e.clientX - rect.left;
-            dragOffset.y = e.clientY - rect.top;
-            
-            e.stopPropagation();
-        }
-
-        function handleMouseMove(e) {
-            if (isDragging && draggedNode) {
-                const canvas = document.getElementById('canvas');
-                const rect = canvas.getBoundingClientRect();
-                
-                // Calculate new position
-                draggedNode.x = e.clientX - rect.left - dragOffset.x;
-                draggedNode.y = e.clientY - rect.top - dragOffset.y;
-                
-                // Update node position
-                const nodeElement = document.getElementById(draggedNode.id);
-                if (nodeElement) {
-                    nodeElement.style.left = draggedNode.x + 'px';
-                    nodeElement.style.top = draggedNode.y + 'px';
-                }
-                
-                // Update connections
-                updateConnections();
-            }
-        }
-
-        function handleMouseUp() {
-            isDragging = false;
-            draggedNode = null;
-        }
-
-        function handlePortClick(e, node, portType) {
-            e.stopPropagation();
-            
-            if (!isConnecting) {
-                // Start a new connection
-                isConnecting = true;
-                connectionStart = { nodeId: node.id, portType: portType };
-                
-                // Highlight the port
-                e.target.classList.add('active');
-                
-                // Create a temporary connection line
-                const svg = document.getElementById('canvasSvg');
-                tempConnection = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                tempConnection.classList.add('connection');
-                svg.appendChild(tempConnection);
-                
-                // Update connection line on mouse move
-                document.addEventListener('mousemove', updateTempConnection);
-                document.addEventListener('click', finishConnection);
-            } else {
-                // Finish the connection
-                if (connectionStart.nodeId !== node.id && connectionStart.portType !== portType) {
-                    // Only allow input to output or output to input connections
-                    if ((connectionStart.portType === 'input' && portType === 'output') || 
-                        (connectionStart.portType === 'output' && portType === 'input')) {
-                        
-                        // Create the connection
-                        const connection = {
-                            from: connectionStart.portType === 'output' ? connectionStart.nodeId : node.id,
-                            to: connectionStart.portType === 'input' ? connectionStart.nodeId : node.id
-                        };
-                        
-                        connections.push(connection);
-                        renderConnection(connection);
-                        log('info', `Connected ${connection.from} to ${connection.to}`);
-                    }
-                }
-                
-                // Clean up
-                cleanupConnection();
-            }
-        }
-
-        function updateTempConnection(e) {
-            if (!isConnecting || !connectionStart || !tempConnection) return;
-            
-            const canvas = document.getElementById('canvas');
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            
-            // Get start port position
-            const startNode = document.getElementById(connectionStart.nodeId);
-            const startPort = startNode.querySelector(`.port.${connectionStart.portType}`);
-            const startRect = startPort.getBoundingClientRect();
-            const startX = startRect.left - rect.left + startRect.width / 2;
-            const startY = startRect.top - rect.top + startRect.height / 2;
-            
-            // Create path data
-            const pathData = `M ${startX} ${startY} C ${startX + 100} ${startY}, ${mouseX - 100} ${mouseY}, ${mouseX} ${mouseY}`;
-            tempConnection.setAttribute('d', pathData);
-        }
-
-        function finishConnection(e) {
-            if (isConnecting && e.target.classList.contains('port')) {
-                // Let the port click handler handle it
-                return;
-            }
-            
-            // If we clicked anywhere else, cancel the connection
-            cleanupConnection();
-        }
-
-        function cleanupConnection() {
-            isConnecting = false;
-            connectionStart = null;
-            
-            // Remove active class from all ports
-            document.querySelectorAll('.port').forEach(port => {
-                port.classList.remove('active');
-            });
-            
-            // Remove temporary connection
-            if (tempConnection) {
-                tempConnection.remove();
-                tempConnection = null;
-            }
-            
-            // Remove event listeners
-            document.removeEventListener('mousemove', updateTempConnection);
-            document.removeEventListener('click', finishConnection);
-        }
-
-        function renderConnection(connection) {
-            const svg = document.getElementById('canvasSvg');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.classList.add('connection');
-            path.dataset.from = connection.from;
-            path.dataset.to = connection.to;
-            svg.appendChild(path);
-            
-            updateConnection(connection);
-        }
-
-        function updateConnection(connection) {
-            const path = document.querySelector(`.connection[data-from="${connection.from}"][data-to="${connection.to}"]`);
-            if (!path) return;
-            
-            const canvas = document.getElementById('canvas');
-            const rect = canvas.getBoundingClientRect();
-            
-            // Get from node and port
-            const fromNode = document.getElementById(connection.from);
-            const fromPort = fromNode.querySelector('.port.output');
-            const fromPortRect = fromPort.getBoundingClientRect();
-            const fromX = fromPortRect.left - rect.left + fromPortRect.width / 2;
-            const fromY = fromPortRect.top - rect.top + fromPortRect.height / 2;
-            
-            // Get to node and port
-            const toNode = document.getElementById(connection.to);
-            const toPort = toNode.querySelector('.port.input');
-            const toPortRect = toPort.getBoundingClientRect();
-            const toX = toPortRect.left - rect.left + toPortRect.width / 2;
-            const toY = toPortRect.top - rect.top + toPortRect.height / 2;
-            
-            // Create path data
-            const pathData = `M ${fromX} ${fromY} C ${fromX + 100} ${fromY}, ${toX - 100} ${toY}, ${toX} ${toY}`;
-            path.setAttribute('d', pathData);
-        }
-
-        function updateConnections() {
-            connections.forEach(connection => {
-                updateConnection(connection);
-            });
-        }
-
-        function deleteNode(nodeId) {
-            // Remove the node
-            nodes = nodes.filter(node => node.id !== nodeId);
-            const nodeElement = document.getElementById(nodeId);
-            if (nodeElement) {
-                nodeElement.remove();
-            }
-            
-            // Remove any connections to/from this node
-            connections = connections.filter(conn => 
-                conn.from !== nodeId && conn.to !== nodeId
-            );
-            
-            // Update SVG connections
-            const svg = document.getElementById('canvasSvg
+    function log(msg) {
+      const logEl = document.getElementById('log');
+      logEl.innerHTML += `<div>> ${msg}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  </script>
+</body>
+</html>
