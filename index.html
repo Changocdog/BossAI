@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Automation Canvas</title>
+    <title>Boss AI - Visual Automation</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * {
@@ -92,6 +92,11 @@
             box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .sidebar {
             width: 250px;
             background: rgba(0, 0, 0, 0.9);
@@ -105,6 +110,36 @@
             font-size: 16px;
             margin-bottom: 15px;
             text-shadow: 0 0 5px rgba(0, 153, 255, 0.3);
+        }
+
+        .api-config {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(0, 153, 255, 0.05);
+            border: 1px solid #0099ff;
+            border-radius: 6px;
+        }
+
+        .api-config h3 {
+            color: #0099ff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .api-config input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid #0099ff;
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .api-config input::placeholder {
+            color: #888;
         }
 
         .node-type {
@@ -186,11 +221,17 @@
         .node.executing {
             border-color: #00ff00;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: pulse 1s infinite;
         }
 
         .node.executed {
             border-color: #888;
             opacity: 0.8;
+        }
+
+        .node.error {
+            border-color: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
         }
 
         .node-header {
@@ -265,6 +306,12 @@
             stroke: #00ff00;
             stroke-width: 3;
             filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.6));
+            animation: flow 2s infinite;
+        }
+
+        @keyframes flow {
+            0% { stroke-dasharray: 0 10; }
+            100% { stroke-dasharray: 10 0; }
         }
 
         .modal {
@@ -342,8 +389,8 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 300px;
-            max-height: 200px;
+            width: 350px;
+            max-height: 300px;
             background: rgba(0, 0, 0, 0.95);
             border: 1px solid #0099ff;
             border-radius: 8px;
@@ -362,6 +409,7 @@
             margin-bottom: 8px;
             padding: 5px;
             border-radius: 4px;
+            word-wrap: break-word;
         }
 
         .log-entry.info {
@@ -377,6 +425,11 @@
         .log-entry.error {
             background: rgba(255, 68, 68, 0.1);
             color: #ff4444;
+        }
+
+        .log-entry.warning {
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
         }
 
         .status-indicator {
@@ -402,41 +455,106 @@
             animation: pulse 1s infinite;
         }
 
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(0, 153, 255, 0.2);
+            z-index: 999;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0099ff, #00ff00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
 
-        .drag-preview {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0.8;
+        .audio-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #0099ff;
+            border-radius: 8px;
+            padding: 15px;
+            display: none;
+            z-index: 100;
+        }
+
+        .audio-player.active {
+            display: block;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audio-controls button {
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid #0099ff;
+            color: #0099ff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+        }
+
+        .audio-controls button:hover {
+            background: rgba(0, 153, 255, 0.2);
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>Visual Automation Canvas</h1>
+            <h1>Boss AI - Visual Automation</h1>
             <div class="header-controls">
-                <button class="btn primary" onclick="runWorkflow()">▶ RUN</button>
+                <button class="btn primary" id="runBtn" onclick="runWorkflow()">▶ RUN</button>
                 <button class="btn" onclick="exportWorkflow()">📤 EXPORT</button>
                 <button class="btn" onclick="importWorkflow()">📥 IMPORT</button>
                 <button class="btn danger" onclick="clearCanvas()">🗑 CLEAR</button>
             </div>
         </div>
 
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
         <div class="sidebar">
+            <div class="api-config">
+                <h3>API Configuration</h3>
+                <input type="password" id="openrouterKey" placeholder="OpenRouter API Key" 
+                       value="" onchange="saveApiKeys()">
+                <input type="password" id="elevenlabsKey" placeholder="ElevenLabs API Key" 
+                       value="" onchange="saveApiKeys()">
+                <small style="color: #888; font-size: 10px;">Keys are stored locally in your browser</small>
+            </div>
+
             <h2>Node Types</h2>
             <div class="node-type" draggable="true" data-type="script">
                 <h3>Script Writer</h3>
-                <p>Generate scripts and content using AI prompts</p>
+                <p>Generate scripts and content using AI prompts via OpenRouter</p>
             </div>
             <div class="node-type" draggable="true" data-type="voiceover">
                 <h3>Voiceover</h3>
-                <p>Convert text to speech with voice settings</p>
+                <p>Convert text to speech using ElevenLabs API</p>
             </div>
             <div class="node-type" draggable="true" data-type="logger">
                 <h3>Logger</h3>
@@ -444,7 +562,7 @@
             </div>
             <div class="node-type" draggable="true" data-type="http">
                 <h3>HTTP Request</h3>
-                <p>Make API calls and web requests</p>
+                <p>Make custom API calls and web requests</p>
             </div>
             <div class="node-type" draggable="true" data-type="delay">
                 <h3>Delay</h3>
@@ -467,6 +585,16 @@
         <div class="execution-log" id="executionLog">
             <h3 style="color: #0099ff; margin-bottom: 10px;">Execution Log</h3>
             <div id="logContent"></div>
+        </div>
+
+        <div class="audio-player" id="audioPlayer">
+            <div class="audio-controls">
+                <button onclick="playAudio()">▶ Play</button>
+                <button onclick="pauseAudio()">⏸ Pause</button>
+                <button onclick="stopAudio()">⏹ Stop</button>
+                <span id="audioStatus" style="color: #0099ff; font-size: 12px;">No audio</span>
+            </div>
+            <audio id="audioElement" controls style="width: 100%; margin-top: 10px;"></audio>
         </div>
     </div>
 
@@ -500,49 +628,197 @@
         let connectionStart = null;
         let currentEditingNode = null;
         let executionState = 'idle';
+        let executionContext = {};
+        let currentAudio = null;
 
-        // Node type definitions
+        // API configuration
+        let apiKeys = {
+            openrouter: '',
+            elevenlabs: ''
+        };
+
+        // Load API keys from localStorage
+        function loadApiKeys() {
+            const saved = localStorage.getItem('bossai_api_keys');
+            if (saved) {
+                apiKeys = JSON.parse(saved);
+                document.getElementById('openrouterKey').value = apiKeys.openrouter || '';
+                document.getElementById('elevenlabsKey').value = apiKeys.elevenlabs || '';
+            }
+        }
+
+        // Save API keys to localStorage
+        function saveApiKeys() {
+            apiKeys.openrouter = document.getElementById('openrouterKey').value;
+            apiKeys.elevenlabs = document.getElementById('elevenlabsKey').value;
+            localStorage.setItem('bossai_api_keys', JSON.stringify(apiKeys));
+        }
+
+        // Node type definitions with real execution logic
         const nodeTypes = {
             script: {
                 title: 'Script Writer',
-                defaultConfig: 'Write a creative script about...',
-                execute: async function(config, input) {
-                    log('info', `Executing Script Writer: ${config.substring(0, 50)}...`);
-                    await delay(1000);
-                    return `Generated script: ${config}`;
+                defaultConfig: 'Write a creative 30-second script about artificial intelligence',
+                execute: async function(config, input, context) {
+                    if (!apiKeys.openrouter) {
+                        throw new Error('OpenRouter API key not configured');
+                    }
+
+                    log('info', `Executing Script Writer with prompt: ${config.substring(0, 50)}...`);
+                    
+                    const prompt = input ? `${config}\n\nContext: ${input}` : config;
+                    
+                    try {
+                        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKeys.openrouter}`,
+                                'Content-Type': 'application/json',
+                                'HTTP-Referer': window.location.href,
+                            },
+                            body: JSON.stringify({
+                                model: 'anthropic/claude-3-haiku',
+                                messages: [
+                                    {
+                                        role: 'user',
+                                        content: prompt
+                                    }
+                                ],
+                                max_tokens: 1000,
+                                temperature: 0.7
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`OpenRouter API error: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        const generatedText = data.choices[0].message.content;
+                        
+                        context.generatedScript = generatedText;
+                        log('success', `Script generated: ${generatedText.substring(0, 100)}...`);
+                        
+                        return generatedText;
+                    } catch (error) {
+                        log('error', `Script generation failed: ${error.message}`);
+                        throw error;
+                    }
                 }
             },
             voiceover: {
                 title: 'Voiceover',
-                defaultConfig: 'Voice: Natural, Speed: 1.0x',
-                execute: async function(config, input) {
-                    log('info', `Executing Voiceover: ${config}`);
-                    await delay(1500);
-                    return `Audio generated with settings: ${config}`;
+                defaultConfig: 'voice_id:21m00Tcm4TlvDq8ikWAM,stability:0.5,similarity_boost:0.8',
+                execute: async function(config, input, context) {
+                    if (!apiKeys.elevenlabs) {
+                        throw new Error('ElevenLabs API key not configured');
+                    }
+
+                    if (!input) {
+                        throw new Error('No text input provided for voiceover');
+                    }
+
+                    log('info', `Executing Voiceover for text: ${input.substring(0, 50)}...`);
+                    
+                    // Parse config
+                    const configParts = config.split(',');
+                    const voiceId = configParts[0].split(':')[1] || '21m00Tcm4TlvDq8ikWAM';
+                    const stability = parseFloat(configParts[1]?.split(':')[1]) || 0.5;
+                    const similarityBoost = parseFloat(configParts[2]?.split(':')[1]) || 0.8;
+                    
+                    try {
+                        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'audio/mpeg',
+                                'Content-Type': 'application/json',
+                                'xi-api-key': apiKeys.elevenlabs
+                            },
+                            body: JSON.stringify({
+                                text: input,
+                                model_id: 'eleven_monolingual_v1',
+                                voice_settings: {
+                                    stability: stability,
+                                    similarity_boost: similarityBoost
+                                }
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`ElevenLabs API error: ${response.status}`);
+                        }
+
+                        const audioBlob = await response.blob();
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        
+                        // Store audio in context and play it
+                        context.audioUrl = audioUrl;
+                        playGeneratedAudio(audioUrl);
+                        
+                        log('success', `Voiceover generated and playing`);
+                        
+                        return `Audio generated from: ${input.substring(0, 50)}...`;
+                    } catch (error) {
+                        log('error', `Voiceover generation failed: ${error.message}`);
+                        throw error;
+                    }
                 }
             },
             logger: {
                 title: 'Logger',
                 defaultConfig: 'Log level: INFO',
-                execute: async function(config, input) {
-                    log('info', `Logger: ${input || 'No input data'}`);
+                execute: async function(config, input, context) {
+                    const logLevel = config.toLowerCase().includes('error') ? 'error' : 
+                                   config.toLowerCase().includes('warning') ? 'warning' : 'info';
+                    
+                    const message = input || 'No input data';
+                    log(logLevel, `Logger: ${message}`);
+                    
+                    context.loggedData = message;
                     await delay(300);
-                    return input;
+                    
+                    return message;
                 }
             },
             http: {
                 title: 'HTTP Request',
                 defaultConfig: 'GET https://api.example.com/data',
-                execute: async function(config, input) {
+                execute: async function(config, input, context) {
                     log('info', `Making HTTP request: ${config}`);
-                    await delay(2000);
-                    return `HTTP response: ${config}`;
+                    
+                    const parts = config.split(' ');
+                    const method = parts[0] || 'GET';
+                    const url = parts[1] || 'https://httpbin.org/get';
+                    
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: method !== 'GET' && input ? JSON.stringify({data: input}) : undefined
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        const data = await response.json();
+                        context.httpResponse = data;
+                        
+                        log('success', `HTTP request successful: ${JSON.stringify(data).substring(0, 100)}...`);
+                        
+                        return JSON.stringify(data);
+                    } catch (error) {
+                        log('error', `HTTP request failed: ${error.message}`);
+                        throw error;
+                    }
                 }
             },
             delay: {
                 title: 'Delay',
-                defaultConfig: '2000ms',
-                execute: async function(config, input) {
+                defaultConfig: '2000',
+                execute: async function(config, input, context) {
                     const ms = parseInt(config) || 2000;
                     log('info', `Waiting ${ms}ms...`);
                     await delay(ms);
@@ -551,14 +827,58 @@
             },
             conditional: {
                 title: 'Conditional',
-                defaultConfig: 'if (input.length > 0) return true',
-                execute: async function(config, input) {
+                defaultConfig: 'input && input.length > 0',
+                execute: async function(config, input, context) {
                     log('info', `Evaluating condition: ${config}`);
-                    await delay(500);
-                    return input;
+                    
+                    try {
+                        // Simple condition evaluation
+                        const condition = config.replace(/input/g, JSON.stringify(input));
+                        const result = eval(`(${condition})`);
+                        
+                        context.conditionResult = result;
+                        log('success', `Condition evaluated to: ${result}`);
+                        
+                        return result ? input : null;
+                    } catch (error) {
+                        log('error', `Condition evaluation failed: ${error.message}`);
+                        return input;
+                    }
                 }
             }
         };
+
+        // Audio management
+        function playGeneratedAudio(audioUrl) {
+            const audioElement = document.getElementById('audioElement');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            audioElement.src = audioUrl;
+            audioPlayer.classList.add('active');
+            audioStatus.textContent = 'Audio ready';
+            
+            // Auto-play the audio
+            audioElement.play().catch(e => {
+                log('warning', 'Auto-play blocked by browser. Click play button to hear audio.');
+            });
+        }
+
+        function playAudio() {
+            const audioElement = document.getElementById('audioElement');
+            audioElement.play();
+        }
+
+        function pauseAudio() {
+            const audioElement = document.getElementById('audioElement');
+            audioElement.pause();
+        }
+
+        function stopAudio() {
+            const audioElement = document.getElementById('audioElement');
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
 
         // Initialize canvas
         function initCanvas() {
@@ -577,422 +897,4 @@
             canvas.addEventListener('dblclick', handleCanvasDoubleClick);
 
             // Handle connection drawing
-            document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('keyup', handleKeyUp);
-
-            updateCanvas();
-        }
-
-        // Drag and drop handlers
-        function handleDragStart(e) {
-            if (e.target.classList.contains('node-type')) {
-                e.dataTransfer.setData('nodeType', e.target.dataset.type);
-            }
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const nodeType = e.dataTransfer.getData('nodeType');
-            if (nodeType) {
-                const rect = document.getElementById('canvas').getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                createNode(nodeType, x, y);
-            }
-        }
-
-        // Create new node
-        function createNode(type, x, y) {
-            const nodeType = nodeTypes[type];
-            const node = {
-                id: `node_${nodeIdCounter++}`,
-                type: type,
-                title: nodeType.title,
-                config: nodeType.defaultConfig,
-                x: x,
-                y: y,
-                executed: false
-            };
-            nodes.push(node);
-            updateCanvas();
-            return node;
-        }
-
-        // Canvas interaction handlers
-        function handleCanvasMouseDown(e) {
-            const node = getNodeAtPosition(e.clientX, e.clientY);
-            if (node) {
-                if (isConnecting) {
-                    if (connectionStart && connectionStart.id !== node.id) {
-                        createConnection(connectionStart.id, node.id);
-                        isConnecting = false;
-                        connectionStart = null;
-                        updateCanvas();
-                    }
-                } else {
-                    isDragging = true;
-                    draggedNode = node;
-                    const rect = document.getElementById('canvas').getBoundingClientRect();
-                    draggedNode.offsetX = e.clientX - rect.left - node.x;
-                    draggedNode.offsetY = e.clientY - rect.top - node.y;
-                }
-            }
-        }
-
-        function handleCanvasMouseMove(e) {
-            if (isDragging && draggedNode) {
-                const rect = document.getElementById('canvas').getBoundingClientRect();
-                draggedNode.x = e.clientX - rect.left - draggedNode.offsetX;
-                draggedNode.y = e.clientY - rect.top - draggedNode.offsetY;
-                updateCanvas();
-            }
-        }
-
-        function handleCanvasMouseUp(e) {
-            isDragging = false;
-            draggedNode = null;
-        }
-
-        function handleCanvasDoubleClick(e) {
-            const node = getNodeAtPosition(e.clientX, e.clientY);
-            if (node) {
-                openEditModal(node);
-            }
-        }
-
-        // Connection handling
-        function handleKeyDown(e) {
-            if (e.ctrlKey && !isConnecting) {
-                const node = getNodeAtPosition(e.clientX, e.clientY);
-                if (node) {
-                    isConnecting = true;
-                    connectionStart = node;
-                    document.getElementById('canvas').style.cursor = 'crosshair';
-                }
-            }
-        }
-
-        function handleKeyUp(e) {
-            if (!e.ctrlKey && isConnecting) {
-                isConnecting = false;
-                connectionStart = null;
-                document.getElementById('canvas').style.cursor = 'default';
-            }
-        }
-
-        // Utility functions
-        function getNodeAtPosition(clientX, clientY) {
-            const rect = document.getElementById('canvas').getBoundingClientRect();
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            
-            return nodes.find(node => 
-                x >= node.x && x <= node.x + 180 &&
-                y >= node.y && y <= node.y + 120
-            );
-        }
-
-        function createConnection(fromId, toId) {
-            if (!connections.find(conn => conn.from === fromId && conn.to === toId)) {
-                connections.push({ from: fromId, to: toId });
-            }
-        }
-
-        // Modal functions
-        function openEditModal(node) {
-            currentEditingNode = node;
-            document.getElementById('nodeTitle').value = node.title;
-            document.getElementById('nodeConfig').value = node.config;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-            currentEditingNode = null;
-        }
-
-        function saveNode() {
-            if (currentEditingNode) {
-                currentEditingNode.title = document.getElementById('nodeTitle').value;
-                currentEditingNode.config = document.getElementById('nodeConfig').value;
-                updateCanvas();
-                closeModal();
-            }
-        }
-
-        // Canvas rendering
-        function updateCanvas() {
-            const canvas = document.getElementById('canvas');
-            const svg = document.getElementById('canvas-svg');
-            
-            // Clear existing nodes
-            const existingNodes = canvas.querySelectorAll('.node');
-            existingNodes.forEach(node => node.remove());
-            
-            // Render nodes
-            nodes.forEach(node => {
-                const nodeElement = document.createElement('div');
-                nodeElement.className = `node ${node.executed ? 'executed' : ''}`;
-                nodeElement.style.left = node.x + 'px';
-                nodeElement.style.top = node.y + 'px';
-                nodeElement.innerHTML = `
-                    <div class="node-header">
-                        <div class="node-title">${node.title}</div>
-                        <div class="node-type-label">${node.type}</div>
-                    </div>
-                    <div class="node-content">${node.config}</div>
-                    <div class="node-ports">
-                        <div class="port input"></div>
-                        <div class="port output"></div>
-                    </div>
-                `;
-                canvas.appendChild(nodeElement);
-            });
-            
-            // Render connections
-            svg.innerHTML = '';
-            connections.forEach(conn => {
-                const fromNode = nodes.find(n => n.id === conn.from);
-                const toNode = nodes.find(n => n.id === conn.to);
-                if (fromNode && toNode) {
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    const fromX = fromNode.x + 180;
-                    const fromY = fromNode.y + 60;
-                    const toX = toNode.x;
-                    const toY = toNode.y + 60;
-                    
-                    const midX = (fromX + toX) / 2;
-                    const d = `M ${fromX} ${fromY} C ${midX} ${fromY}, ${midX} ${toY}, ${toX} ${toY}`;
-                    
-                    path.setAttribute('d', d);
-                    path.setAttribute('class', 'connection');
-                    svg.appendChild(path);
-                }
-            });
-        }
-
-        // Workflow execution
-        async function runWorkflow() {
-            if (executionState === 'executing') return;
-            
-            executionState = 'executing';
-            updateStatus('Executing workflow...', 'executing');
-            showExecutionLog();
-            
-            // Reset execution state
-            nodes.forEach(node => {
-                node.executed = false;
-                node.result = null;
-            });
-            
-            clearLog();
-            log('info', 'Starting workflow execution...');
-            
-            try {
-                // Find starting nodes (nodes with no incoming connections)
-                const startNodes = nodes.filter(node => 
-                    !connections.some(conn => conn.to === node.id)
-                );
-                
-                if (startNodes.length === 0) {
-                    log('error', 'No starting nodes found. Add nodes without input connections.');
-                    return;
-                }
-                
-                // Execute nodes in topological order
-                const executedNodes = new Set();
-                const executing = [];
-                
-                for (const startNode of startNodes) {
-                    executing.push(executeNodeChain(startNode, executedNodes));
-                }
-                
-                await Promise.all(executing);
-                
-                log('success', 'Workflow execution completed successfully!');
-                
-            } catch (error) {
-                log('error', `Workflow execution failed: ${error.message}`);
-            } finally {
-                executionState = 'idle';
-                updateStatus('Ready', 'idle');
-                updateCanvas();
-            }
-        }
-
-        async function executeNodeChain(node, executedNodes) {
-            if (executedNodes.has(node.id)) return node.result;
-            
-            // Wait for all input nodes to complete
-            const inputConnections = connections.filter(conn => conn.to === node.id);
-            const inputResults = [];
-            
-            for (const conn of inputConnections) {
-                const inputNode = nodes.find(n => n.id === conn.from);
-                if (inputNode) {
-                    const result = await executeNodeChain(inputNode, executedNodes);
-                    inputResults.push(result);
-                }
-            }
-            
-            // Execute current node
-            const nodeElement = document.querySelector(`.node:nth-child(${nodes.indexOf(node) + 1})`);
-            if (nodeElement) {
-                nodeElement.classList.add('executing');
-            }
-            
-            const nodeType = nodeTypes[node.type];
-            const inputData = inputResults.length > 0 ? inputResults.join('\n') : null;
-            
-            try {
-                node.result = await nodeType.execute(node.config, inputData);
-                node.executed = true;
-                executedNodes.add(node.id);
-                
-                if (nodeElement) {
-                    nodeElement.classList.remove('executing');
-                    nodeElement.classList.add('executed');
-                }
-                
-                log('success', `${node.title} completed: ${node.result.substring(0, 100)}...`);
-                
-            } catch (error) {
-                log('error', `${node.title} failed: ${error.message}`);
-                throw error;
-            }
-            
-            return node.result;
-        }
-
-        // Export/Import functions
-        function exportWorkflow() {
-            const workflow = {
-                nodes: nodes,
-                connections: connections
-            };
-            const jsonStr = JSON.stringify(workflow, null, 2);
-            
-            navigator.clipboard.writeText(jsonStr).then(() => {
-                log('success', 'Workflow exported to clipboard!');
-                showExecutionLog();
-            }).catch(() => {
-                // Fallback for browsers that don't support clipboard API
-                const textarea = document.createElement('textarea');
-                textarea.value = jsonStr;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                log('success', 'Workflow exported to clipboard!');
-                showExecutionLog();
-            });
-        }
-
-        function importWorkflow() {
-            const jsonStr = prompt('Paste your workflow JSON:');
-            if (!jsonStr) return;
-            
-            try {
-                const workflow = JSON.parse(jsonStr);
-                nodes = workflow.nodes || [];
-                connections = workflow.connections || [];
-                
-                // Update counter to avoid ID conflicts
-                nodeIdCounter = Math.max(...nodes.map(n => parseInt(n.id.split('_')[1]) || 0), 0) + 1;
-                
-                updateCanvas();
-                log('success', 'Workflow imported successfully!');
-                showExecutionLog();
-                
-            } catch (error) {
-                log('error', 'Failed to import workflow: Invalid JSON');
-                showExecutionLog();
-            }
-        }
-
-        function clearCanvas() {
-            if (confirm('Are you sure you want to clear the canvas?')) {
-                nodes = [];
-                connections = [];
-                nodeIdCounter = 0;
-                updateCanvas();
-                clearLog();
-                log('info', 'Canvas cleared');
-                showExecutionLog();
-            }
-        }
-
-        // Logging functions
-        function log(type, message) {
-            const logContent = document.getElementById('logContent');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            logContent.appendChild(entry);
-            logContent.scrollTop = logContent.scrollHeight;
-        }
-
-        function clearLog() {
-            document.getElementById('logContent').innerHTML = '';
-        }
-
-        function showExecutionLog() {
-            document.getElementById('executionLog').classList.add('active');
-            setTimeout(() => {
-                document.getElementById('executionLog').classList.remove('active');
-            }, 5000);
-        }
-
-        // Status functions
-        function updateStatus(message, state) {
-            const indicator = document.getElementById('statusIndicator');
-            indicator.textContent = message;
-            indicator.className = `status-indicator active ${state}`;
-            
-            if (state === 'idle') {
-                setTimeout(() => {
-                    indicator.classList.remove('active');
-                }, 2000);
-            }
-        }
-
-        // Utility function for delays
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // Close modal on outside click
-        document.addEventListener('click', (e) => {
-            const modal = document.getElementById('editModal');
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-            if (e.ctrlKey && e.key === 'Enter') {
-                runWorkflow();
-            }
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                exportWorkflow();
-            }
-        });
-
-        // Initialize the application
-        window.addEventListener('load', () => {
-            initCanvas();
-            log('info', 'Visual Automation Canvas initialized');
-            updateStatus('Ready', 'idle');
-        });
-    </script>
-</body>
-</html>
+            document.addEventListener('keydown', handle
