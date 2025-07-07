@@ -1,935 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boss AI - Visual Automation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Orbitron', monospace;
-            background: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-        }
-
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #0099ff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 900;
-            color: #0099ff;
-            text-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
-        }
-
-        .workflow-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .run-button {
-            background: linear-gradient(45deg, #00ff00, #00cc00);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-        }
-
-        .run-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 25px rgba(0, 255, 0, 0.5);
-        }
-
-        .run-button:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .status-indicator {
-            padding: 8px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-idle {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .status-running {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffa500;
-            animation: pulse 2s infinite;
-        }
-
-        .status-success {
-            background: rgba(0, 255, 0, 0.2);
-            color: #00ff00;
-        }
-
-        .status-error {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff0000;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .sidebar {
-            width: 300px;
-            background: rgba(0, 0, 0, 0.8);
-            border-right: 1px solid #0099ff;
-            padding: 80px 20px 20px;
-            backdrop-filter: blur(10px);
-            overflow-y: auto;
-        }
-
-        .sidebar h3 {
-            color: #0099ff;
-            margin-bottom: 15px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .node-library {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .node-template {
-            background: rgba(0, 153, 255, 0.1);
-            border: 1px solid #0099ff;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: grab;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .node-template:hover {
-            background: rgba(0, 153, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 153, 255, 0.3);
-        }
-
-        .node-template:active {
-            cursor: grabbing;
-        }
-
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            margin-top: 60px;
-        }
-
-        .canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            cursor: move;
-        }
-
-        .canvas-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(0, 153, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 255, 153, 0.1) 0%, transparent 50%);
-            background-size: 100px 100px;
-            opacity: 0.5;
-        }
-
-        .workflow-node {
-            position: absolute;
-            width: 200px;
-            min-height: 100px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #0099ff;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: move;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            z-index: 10;
-        }
-
-        .workflow-node.executing {
-            border-color: #ffa500;
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
-            animation: executing 1s infinite;
-        }
-
-        .workflow-node.success {
-            border-color: #00ff00;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-        }
-
-        .workflow-node.error {
-            border-color: #ff0000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-        }
-
-        @keyframes executing {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .workflow-node:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 153, 255, 0.3);
-        }
-
-        .workflow-node.dragging {
-            transform: rotate(5deg);
-            box-shadow: 0 15px 40px rgba(0, 153, 255, 0.5);
-        }
-
-        .node-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .node-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0099ff;
-        }
-
-        .node-type {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .node-content {
-            font-size: 12px;
-            color: #ccc;
-            margin-bottom: 15px;
-        }
-
-        .node-status {
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .node-status.idle {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .node-status.executing {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffa500;
-        }
-
-        .node-status.success {
-            background: rgba(0, 255, 0, 0.2);
-            color: #00ff00;
-        }
-
-        .node-status.error {
-            background: rgba(255, 0, 0, 0.2);
-            color: #ff0000;
-        }
-
-        .node-output {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 8px;
-            font-size: 11px;
-            color: #ccc;
-            min-height: 40px;
-            max-height: 80px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-        }
-
-        .connection-point {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #0099ff;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 20;
-        }
-
-        .connection-point:hover {
-            background: #fff;
-            transform: scale(1.3);
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.8);
-        }
-
-        .connection-point.input {
-            left: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .connection-point.output {
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .connection-line {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-        }
-
-        .connection-line path {
-            stroke: #0099ff;
-            stroke-width: 2;
-            fill: none;
-            filter: drop-shadow(0 0 3px rgba(0, 153, 255, 0.5));
-        }
-
-        .connection-line.active path {
-            stroke: #ffa500;
-            stroke-width: 3;
-            animation: flow 2s linear infinite;
-        }
-
-        @keyframes flow {
-            0% { stroke-dasharray: 0 10; }
-            100% { stroke-dasharray: 10 0; }
-        }
-
-        .delete-btn {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
-            background: #ff0000;
-            border: none;
-            border-radius: 50%;
-            color: #fff;
-            cursor: pointer;
-            font-size: 12px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 30;
-        }
-
-        .workflow-node:hover .delete-btn {
-            display: flex;
-        }
-
-        .execution-log {
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .log-entry {
-            font-size: 11px;
-            font-family: 'Courier New', monospace;
-            margin: 2px 0;
-            padding: 2px 0;
-            border-bottom: 1px solid #333;
-        }
-
-        .log-entry.info { color: #0099ff; }
-        .log-entry.success { color: #00ff00; }
-        .log-entry.error { color: #ff0000; }
-        .log-entry.warning { color: #ffa500; }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #1a1a1a;
-            border: 1px solid #0099ff;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            color: #0099ff;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            display: block;
-            color: #ccc;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .form-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 8px;
-            color: #fff;
-            font-family: 'Orbitron', monospace;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #0099ff;
-            box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #0099ff;
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background: #333;
-            color: #fff;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BossAI - Workflow Automation</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.9/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-flow-renderer@10.3.17/dist/ReactFlow.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #app { height: 100vh; display: flex; }
+    .react-flow__node { cursor: grab; }
+    .react-flow__node:hover { cursor: grabbing; }
+    .sidebar { width: 300px; background: #f9fafb; border-left: 1px solid #e5e7eb; overflow-y: auto; }
+    .node-panel { background: #f3f4f6; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+  </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <div class="logo">BOSS AI</div>
-            <div class="workflow-controls">
-                <div class="status-indicator status-idle" id="workflowStatus">Ready</div>
-                <button class="run-button" id="runWorkflow">▶ Run Workflow</button>
-            </div>
+  <div id="app"></div>
+  <script type="text/babel">
+    const { useState, useCallback } = React;
+    const ReactFlow = window.ReactFlow.default;
+
+    // Initial nodes and edges
+    const initialNodes = [
+      { id: '1', type: 'input', data: { label: 'Trigger', config: { type: 'manual' } }, position: { x: 250, y: 25 } },
+      { id: '2', data: { label: 'HTTP Request', config: { url: '' } }, position: { x: 250, y: 150 } },
+    ];
+    const initialEdges = [{ id: 'e1-2', source: '1', target: '2', animated: true }];
+
+    const nodeTypes = {
+      input: ({ data }) => (
+        <div className="bg-blue-500 text-white px-4 py-2 rounded shadow">
+          <strong>{data.label}</strong>
         </div>
-
-        <div class="sidebar">
-            <h3>Node Library</h3>
-            <div class="node-library">
-                <div class="node-template" draggable="true" data-type="trigger">
-                    🚀 Trigger
-                </div>
-                <div class="node-template" draggable="true" data-type="script-writer">
-                    ✍️ Script Writer
-                </div>
-                <div class="node-template" draggable="true" data-type="voiceover">
-                    🎤 Voiceover
-                </div>
-                <div class="node-template" draggable="true" data-type="logger">
-                    📝 Logger
-                </div>
-                <div class="node-template" draggable="true" data-type="api-call">
-                    🌐 API Call
-                </div>
-                <div class="node-template" draggable="true" data-type="text-processor">
-                    📄 Text Processor
-                </div>
-                <div class="node-template" draggable="true" data-type="condition">
-                    🔀 Condition
-                </div>
-                <div class="node-template" draggable="true" data-type="delay">
-                    ⏱️ Delay
-                </div>
-            </div>
-
-            <h3>Execution Log</h3>
-            <div class="execution-log" id="executionLog">
-                <div class="log-entry info">System initialized</div>
-            </div>
+      ),
+      default: ({ data }) => (
+        <div className="bg-white border border-gray-300 px-4 py-2 rounded shadow">
+          <strong>{data.label}</strong>
         </div>
+      ),
+    };
 
-        <div class="canvas-container">
-            <div class="canvas-bg"></div>
-            <div class="canvas" id="canvas">
-                <svg class="connection-line" id="connectionLines"></svg>
-            </div>
-        </div>
-    </div>
+    const App = () => {
+      const [nodes, setNodes] = useState(initialNodes);
+      const [edges, setEdges] = useState(initialEdges);
+      const [selectedNode, setSelectedNode] = useState(null);
 
-    <!-- Node Configuration Modal -->
-    <div class="modal" id="nodeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Configure Node</div>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div id="nodeConfigForm">
-                <!-- Dynamic form content will be inserted here -->
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveNodeConfig()">Save</button>
-            </div>
-        </div>
-    </div>
+      // Handle node drag and drop
+      const onNodesChange = useCallback((changes) => {
+        setNodes((nds) => window.ReactFlow.applyNodeChanges(changes, nds));
+      }, []);
 
-    <script>
-        // Global variables
-        let canvas, connectionLines;
-        let nodes = [];
-        let connections = [];
-        let draggedNode = null;
-        let isDragging = false;
-        let isConnecting = false;
-        let connectionStart = null;
-        let nodeIdCounter = 0;
-        let panOffset = { x: 0, y: 0 };
-        let isPanning = false;
-        let panStart = { x: 0, y: 0 };
-        let currentEditingNode = null;
-        let workflowRunning = false;
+      // Handle edge creation
+      const onConnect = useCallback((params) => {
+        setEdges((eds) => window.ReactFlow.addEdge({ ...params, animated: true }, eds));
+      }, []);
 
-        // Node execution functions
-        const nodeExecutors = {
-            trigger: async (node, input) => {
-                addLog('Workflow triggered', 'info');
-                return { 
-                    message: 'Workflow started', 
-                    timestamp: new Date().toISOString(),
-                    data: node.config.initialData || 'Initial trigger data'
-                };
-            },
-
-            'script-writer': async (node, input) => {
-                addLog(`Script Writer: ${node.config.topic || 'Processing...'}`, 'info');
-                await delay(1500);
-                
-                const script = `# ${node.config.topic || 'Sample Topic'}
-
-Welcome to our presentation about ${node.config.topic || 'this amazing topic'}.
-
-Key points to cover:
-- Introduction and background
-- Main concepts and benefits
-- Practical examples
-- Conclusion and next steps
-
-This script was generated automatically and is ready for voiceover production.
-
-Word count: ~150 words
-Estimated reading time: 1-2 minutes`;
-
-                return {
-                    script: script,
-                    topic: node.config.topic || 'Sample Topic',
-                    wordCount: 150,
-                    estimatedTime: '1-2 minutes'
-                };
-            },
-
-            voiceover: async (node, input) => {
-                addLog(`Voiceover: Processing ${input?.script ? 'script' : 'text'}`, 'info');
-                await delay(2000);
-                
-                const voice = node.config.voice || 'neural-voice';
-                const speed = node.config.speed || '1.0x';
-                
-                return {
-                    audioUrl: `https://example.com/audio/${Date.now()}.mp3`,
-                    voice: voice,
-                    speed: speed,
-                    duration: '2:15',
-                    status: 'Generated successfully'
-                };
-            },
-
-            logger: async (node, input) => {
-                const logData = JSON.stringify(input, null, 2);
-                addLog(`Logger: Captured data`, 'info');
-                console.log('Logger Node Output:', input);
-                
-                return {
-                    logged: true,
-                    timestamp: new Date().toISOString(),
-                    data: input,
-                    logLevel: node.config.logLevel || 'info'
-                };
-            },
-
-            'api-call': async (node, input) => {
-                addLog(`API Call: ${node.config.method || 'GET'} ${node.config.url || 'endpoint'}`, 'info');
-                await delay(1000);
-                
-                // Simulate API response
-                const mockResponse = {
-                    status: 200,
-                    data: {
-                        id: Math.floor(Math.random() * 1000),
-                        result: 'API call successful',
-                        timestamp: new Date().toISOString(),
-                        input: input
-                    }
-                };
-                
-                return mockResponse;
-            },
-
-            'text-processor': async (node, input) => {
-                addLog('Text Processor: Processing text', 'info');
-                await delay(800);
-                
-                const text = input?.script || input?.text || 'No text provided';
-                const operation = node.config.operation || 'word-count';
-                
-                let result;
-                switch (operation) {
-                    case 'word-count':
-                        result = { wordCount: text.split(' ').length };
-                        break;
-                    case 'uppercase':
-                        result = { processedText: text.toUpperCase() };
-                        break;
-                    case 'lowercase':
-                        result = { processedText: text.toLowerCase() };
-                        break;
-                    case 'summary':
-                        result = { summary: text.substring(0, 100) + '...' };
-                        break;
-                    default:
-                        result = { originalText: text };
-                }
-                
-                return {
-                    operation: operation,
-                    input: text,
-                    ...result
-                };
-            },
-
-            condition: async (node, input) => {
-                addLog(`Condition: Evaluating ${node.config.condition || 'default'}`, 'info');
-                await delay(500);
-                
-                const condition = node.config.condition || 'true';
-                const result = evaluateCondition(condition, input);
-                
-                return {
-                    condition: condition,
-                    result: result,
-                    input: input,
-                    branch: result ? 'true' : 'false'
-                };
-            },
-
-            delay: async (node, input) => {
-                const delayTime = parseInt(node.config.delay || '1000');
-                addLog(`Delay: Waiting ${delayTime}ms`, 'info');
-                await delay(delayTime);
-                
-                return {
-                    delayed: true,
-                    duration: delayTime,
-                    input: input
-                };
-            }
+      // Add new node
+      const addNode = (type, label) => {
+        const newNode = {
+          id: `${nodes.length + 1}`,
+          type: type === 'trigger' ? 'input' : 'default',
+          data: { label, config: type === 'trigger' ? { type: 'manual' } : { url: '' } },
+          position: { x: Math.random() * 400, y: Math.random() * 400 },
         };
+        setNodes((nds) => [...nds, newNode]);
+      };
 
-        // Helper functions
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+      // Handle node selection
+      const onNodeClick = (event, node) => {
+        setSelectedNode(node);
+      };
 
-        function evaluateCondition(condition, input) {
-            try {
-                // Simple condition evaluation (in a real app, use a proper expression parser)
-                if (condition.includes('wordCount')) {
-                    const count = input?.wordCount || 0;
-                    return eval(condition.replace('wordCount', count));
-                }
-                return eval(condition);
-            } catch (e) {
-                addLog(`Condition evaluation error: ${e.message}`, 'error');
-                return false;
-            }
-        }
+      // Update node config
+      const updateNodeConfig = (id, config) => {
+        setNodes((nds) =>
+          nds.map((node) =>
+            node.id === id ? { ...node, data: { ...node.data, config } } : node
+          )
+        );
+      };
 
-        function addLog(message, type = 'info') {
-            const log = document.getElementById('executionLog');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
-            entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-        }
+      // Simulate workflow execution
+      const runWorkflow = () => {
+        console.log('Running workflow...');
+        nodes.forEach((node) => {
+          console.log(`Executing ${node.data.label}:`, node.data.config);
+        });
+      };
 
-        // Initialize the application
-        function init() {
-            canvas = document.getElementById('canvas');
-            connectionLines = document.getElementById('connectionLines');
-            
-            setupEventListeners();
-            addLog('Boss AI initialized and ready', 'success');
-        }
+      return (
+        <div className="flex h-full">
+          {/* Node Panel */}
+          <div className="node-panel w-64 bg-gray-100 p-4">
+            <h2 className="text-lg font-bold mb-4">Nodes</h2>
+            <button
+              className="w-full bg-blue-500 text-white py-2 mb-2 rounded hover:bg-blue-600"
+              onClick={() => addNode('trigger', 'Trigger')}
+            >
+              Add Trigger
+            </button>
+            <button
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+              onClick={() => addNode('action', 'HTTP Request')}
+            >
+              Add HTTP Request
+            </button>
+            <button
+              className="w-full bg-green-500 text-white py-2 mt-4 rounded hover:bg-green-600"
+              onClick={runWorkflow}
+            >
+              Run Workflow
+            </button>
+          </div>
 
-        function setupEventListeners() {
-            // Node template drag handlers
-            document.querySelectorAll('.node-template').forEach(template => {
-                template.addEventListener('dragstart', handleTemplateDragStart);
-                template.addEventListener('dragend', handleTemplateDragEnd);
-            });
+          {/* Workflow Canvas */}
+          <div className="flex-1">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              nodeTypes={nodeTypes}
+              fitView
+            >
+              <ReactFlow.Controls />
+              <ReactFlow.Background />
+            </ReactFlow>
+          </div>
 
-            // Canvas drop handlers
-            canvas.addEventListener('dragover', handleCanvasDragOver);
-            canvas.addEventListener('drop', handleCanvasDrop);
-
-            // Canvas panning
-            canvas.addEventListener('mousedown', handleCanvasMouseDown);
-            document.addEventListener('mousemove', handleCanvasMouseMove);
-            document.addEventListener('mouseup', handleCanvasMouseUp);
-
-            // Run workflow button
-            document.getElementById('runWorkflow').addEventListener('click', runWorkflow);
-
-            // Prevent default drag behavior
-            document.addEventListener('dragover', e => e.preventDefault());
-            document.addEventListener('drop', e => e.preventDefault());
-        }
-
-        function handleTemplateDragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.dataset.type);
-            e.target.style.opacity = '0.5';
-        }
-
-        function handleTemplateDragEnd(e) {
-            e.target.style.opacity = '1';
-        }
-
-        function handleCanvasDragOver(e) {
-            e.preventDefault();
-        }
-
-        function handleCanvasDrop(e) {
-            e.preventDefault();
-            const nodeType = e.dataTransfer.getData('text/plain');
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left - panOffset.x;
-            const y = e.clientY - rect.top - panOffset.y;
-            
-            createNode(nodeType, x, y);
-        }
-
-        function handleCanvasMouseDown(e) {
-            if (e.target === canvas || e.target.classList.contains('canvas-bg')) {
-                isPanning = true;
-                panStart = { x: e.clientX - panOffset.x, y: e.clientY - panOffset.y };
-                canvas.style.cursor = 'grabbing';
-            }
-        }
-
-        function handleCanvasMouseMove(e) {
-            if (isPanning) {
-                panOffset.x = e.clientX - panStart.x;
-                panOffset.y = e.clientY - panStart.y;
-                updateCanvasTransform();
-            }
-        }
-
-        function handleCanvasMouseUp(e) {
-            if (isPanning) {
-                isPanning = false;
-                canvas.style.cursor = 'move';
-            }
-        }
-
-        function updateCanvasTransform() {
-            const nodeElements = canvas.querySelectorAll('.workflow-node');
-            nodeElements.forEach(element => {
-                const node = nodes.find(n => n.id === element.dataset.nodeId);
-                if (node) {
-                    element.style.transform = `translate(${node.x + panOffset.x}px, ${node.y + panOffset.y}px)`;
-                }
-            });
-            updateConnectionLines();
-        }
-
-        function createNode(type, x, y) {
-            const node = {
-                id: `node-${++nodeIdCounter}`,
-                type: type,
-                x: x,
-                y: y,
-                config: getDefaultConfig(type),
-                status: 'idle',
-                output: null,
-                inputs: [],
-                outputs: []
-            };
-
-            nodes.push(node);
-            renderNode(node);
-            addLog(`Created ${type} node`, 'info');
-        }
-
-        function getDefaultConfig(type) {
-            const defaults = {
-                trigger: { initialData: 'Workflow started' },
-                'script-writer': { topic: 'Sample Topic', length: 'medium' },
-                voiceover: { voice: 'neural-voice', speed: '1.0x' },
-                logger: { logLevel: 'info' },
-                'api-call': { method: 'GET', url: 'https://api.example.com/data' },
-                'text-processor': { operation: 'word-count' },
-                condition: { condition: 'wordCount > 100' },
-                delay: { delay: '1000' }
-            };
-            return defaults[type] || {};
-        }
-
-        function renderNode(node) {
-            const element = document.createElement('div');
-            element.className = 'workflow-node';
-            element.dataset.nodeId = node.id;
-            element.style.transform = `translate(${node.x + panOffset.x}px, ${node.y + panOffset.y}px)`;
-
-            element.innerHTML = `
-                <button class="delete-btn" onclick="deleteNode('${node.id}')">&times;</button>
-                <div class="node-header">
-                    <div class="node-title">${getNodeTitle(node.type)}</div>
-                    <div class="node-type">${node.type}</div>
+          {/* Sidebar for Node Configuration */}
+          {selectedNode && (
+            <div className="sidebar p-4">
+              <h2 className="text-lg font-bold mb-4">Configure {selectedNode.data.label}</h2>
+              {selectedNode.type === 'input' ? (
+                <div>
+                  <label className="block mb-2">Trigger Type</label>
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={selectedNode.data.config.type}
+                    onChange={(e) =>
+                      updateNodeConfig(selectedNode.id, { type: e.target.value })
+                    }
+                  >
+                    <option value="manual">Manual</option>
+                    <option value="schedule">Schedule</option>
+                  </select>
                 </div>
-                <div class="node-status idle" id="status-${node.id}">Ready</div>
-                <div class="node-content">${getNodeDescription(node.type)}</div>
-                <div class="node-output" id="output-${node.id}">No output yet</div>
-                <div class="connection-point input" onclick="handleConnectionPoint(event, '${node.id}', 'input')"></div>
-                <div class="connection-point output" onclick="handleConnectionPoint(event, '${node.id}', 'output')"></div>
-            `;
+              ) : (
+                <div>
+                  <label className="block mb-2">URL</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded"
+                    value={selectedNode.data.config.url}
+                    onChange={(e) =>
+                      updateNodeConfig(selectedNode.id, { url: e.target.value })
+                    }
+                    placeholder="Enter URL"
+                  />
+                </div>
+              )}
+              <button
+                className="mt-4 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                onClick={() => setSelectedNode(null)}
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    };
 
-            element.addEventListener('mousedown', e => handleNodeMouseDown(e, node));
-            element.addEventListener('dblclick', () => openNodeConfig(node));
-
-            canvas.appendChild(element);
-        }
-
-        function getNodeTitle(type) {
-            const titles = {
-                trigger: '🚀 Trigger',
-                'script-writer': '✍️ Script Writer',
-                voiceover: '🎤 Voiceover',
-                logger: '📝 Logger',
-                'api-call': '🌐 API Call',
-                'text-processor': '📄 Text Processor',
-                condition: '🔀 Condition',
-                delay: '⏱️ Delay'
-            };
-            return titles[type] || type;
-        }
-
-        function getNodeDescription(type) {
-            const descriptions = {
-                trigger: 'Starts the
+    ReactDOM.render(<App />, document.getElementById('app'));
+  </script>
+</body>
+</html>
