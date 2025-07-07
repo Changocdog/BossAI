@@ -1,142 +1,194 @@
-* {
-  box-sizing: border-box;
+:root {
+    --node-width: 220px;
+    --node-header-height: 30px;
+    --node-border-radius: 5px;
+    --node-border: 1px solid #ddd;
+    --primary-color: #4e73df;
+    --success-color: #1cc88a;
+    --info-color: #36b9cc;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  display: flex;
-  height: 100vh;
-  background-color: #0e0e11;
-  color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
 }
 
-.sidebar {
-  width: 240px;
-  background: #0b0b0d;
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
+#workflow-canvas-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 150px);
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    background-image: 
+        linear-gradient(#eee 1px, transparent 1px),
+        linear-gradient(90deg, #eee 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
-.sidebar.hidden {
-  transform: translateX(-100%);
+#workflow-canvas {
+    position: absolute;
+    width: 3000px;
+    height: 3000px;
+    transform-origin: 0 0;
+    transform: scale(1);
+    transition: transform 0.2s ease;
 }
 
-.sidebar button {
-  display: block;
-  width: 100%;
-  margin: 8px 0;
-  padding: 12px;
-  background: #1b1d22;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  font-size: 15px;
+.node {
+    position: absolute;
+    width: var(--node-width);
+    background: white;
+    border: var(--node-border);
+    border-radius: var(--node-border-radius);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: move;
+    z-index: 10;
+    transition: box-shadow 0.2s ease;
 }
 
-.sidebar button:hover {
-  background: #2a2d33;
+.node:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.sidebar button.active {
-  background: linear-gradient(to right, #007bff, #3399ff);
-  color: white;
+.node-header {
+    height: var(--node-header-height);
+    padding: 5px 10px;
+    border-bottom: var(--node-border);
+    border-radius: var(--node-border-radius) var(--node-border-radius) 0 0;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
 }
 
-.main {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  background: linear-gradient(to bottom right, #0a1729, #122b46);
+.node-body {
+    padding: 10px;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #0d121c;
-  border-bottom: 1px solid #1c1f25;
+.node-connector {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #aaa;
+    position: absolute;
+    cursor: pointer;
+    z-index: 20;
 }
 
-.header img {
-  height: 36px;
-  margin-right: 12px;
+.node-connector:hover {
+    background: var(--primary-color);
+    transform: scale(1.2);
 }
 
-.header h1 {
-  font-size: 18px;
-  margin: 0;
-  color: #fff;
+.node-connector.input {
+    left: -6px;
 }
 
-.main-content {
-  padding: 20px;
-  flex-grow: 1;
+.node-connector.output {
+    right: -6px;
 }
 
-#toggle-btn {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  z-index: 10;
+.node-connection {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
 }
 
-#api-key {
-  width: 100%;
-  margin-bottom: 25px;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  background: #1c1f24;
-  color: white;
+.node-trigger .node-header {
+    background-color: var(--primary-color);
 }
 
-textarea, input, select {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  background: #1b1f24;
-  color: white;
+.node-action .node-header {
+    background-color: var(--success-color);
 }
 
-button {
-  padding: 10px 16px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.node-function .node-header {
+    background-color: var(--info-color);
 }
 
-pre {
-  background-color: #1f1f1f;
-  padding: 12px;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  color: #00ff00;
-  font-size: 14px;
+.node-utility .node-header {
+    background-color: var(--warning-color);
 }
 
-video {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-top: 10px;
+.node-error .node-header {
+    background-color: var(--danger-color);
+}
+
+.node-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.node-actions button {
+    padding: 2px 5px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.nodes-list {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.node-type {
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.node-type:hover {
+    background: #f0f0f0;
+    border-color: #bbb;
+}
+
+.node-type-icon {
+    margin-right: 8px;
+    color: #666;
+}
+
+.node-category {
+    margin-bottom: 15px;
+}
+
+.node-category-header {
+    font-weight: bold;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.execution-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.status-success {
+    background-color: var(--success-color);
+}
+
+.status-error {
+    background-color: var(--danger-color);
+}
+
+.status-pending {
+    background-color: var(--warning-color);
+}
+
+.status-running {
+    background-color: var(--info-color);
 }
