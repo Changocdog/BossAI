@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,64 +9,102 @@
   <script src="https://cdn.jsdelivr.net/npm/react-flow-renderer@10.3.17/dist/ReactFlow.umd.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     #app { height: 100vh; display: flex; }
-    .react-flow__node { cursor: grab; }
+    .react-flow__node { cursor: grab; border-radius: 8px; }
     .react-flow__node:hover { cursor: grabbing; }
-    .sidebar { width: 300px; background: #f9fafb; border-left: 1px solid #e5e7eb; overflow-y: auto; }
-    .node-panel { background: #f3f4f6; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+    .sidebar { width: 320px; background: #ffffff; border-left: 1px solid #e2e8f0; overflow-y: auto; }
+    .node-panel { background: #f7fafc; padding: 1.5rem; border-bottom: 1px solid #e2e8f0; }
+    .error-boundary { color: red; padding: 1rem; }
   </style>
 </head>
 <body>
   <div id="app"></div>
   <script type="text/babel">
-    const { useState, useCallback } = React;
+    const { useState, useCallback, useEffect } = React;
     const ReactFlow = window.ReactFlow.default;
 
     // Initial nodes and edges
     const initialNodes = [
       { id: '1', type: 'input', data: { label: 'Trigger', config: { type: 'manual' } }, position: { x: 250, y: 25 } },
-      { id: '2', data: { label: 'HTTP Request', config: { url: '' } }, position: { x: 250, y: 150 } },
+      { id: '2', data: { label: 'HTTP Request', config: { url: '', method: 'GET' } }, position: { x: 250, y: 150 } },
     ];
-    const initialEdges = [{ id: 'e1-2', source: '1', target: '2', animated: true }];
+    const initialEdges = [{ id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#4b5563' } }];
 
+    // Custom node styles
     const nodeTypes = {
       input: ({ data }) => (
-        <div className="bg-blue-500 text-white px-4 py-2 rounded shadow">
+        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md border border-blue-700">
           <strong>{data.label}</strong>
         </div>
       ),
       default: ({ data }) => (
-        <div className="bg-white border border-gray-300 px-4 py-2 rounded shadow">
+        <div className="bg-white px-4 py-2 rounded-lg shadow-md border border-gray-300">
           <strong>{data.label}</strong>
         </div>
       ),
     };
 
+    // Error Boundary Component
+    class ErrorBoundary extends React.Component {
+      state = { hasError: false };
+      static getDerivedStateFromError() {
+        return { hasError: true };
+      }
+      render() {
+        if (this.state.hasError) {
+          return <div className="error-boundary">An error occurred. Please refresh the page.</div>;
+        }
+        return this.props.children;
+      }
+    }
+
     const App = () => {
       const [nodes, setNodes] = useState(initialNodes);
       const [edges, setEdges] = useState(initialEdges);
       const [selectedNode, setSelectedNode] = useState(null);
+      const [history, setHistory] = useState([{ nodes: initialNodes, edges: initialEdges }]);
+      const [historyIndex, setHistoryIndex] = useState(0);
 
-      // Handle node drag and drop
+      // Save state to history
+      const saveToHistory = useCallback(() => {
+        setHistory((prev) => {
+          const newHistory = prev.slice(0, historyIndex + 1);
+          return [...newHistory, { nodes: [...nodes], edges: [...edges] }];
+        });
+        setHistoryIndex((prev) => prev + 1);
+      }, [nodes, edges, historyIndex]);
+
+      // Handle node changes
       const onNodesChange = useCallback((changes) => {
         setNodes((nds) => window.ReactFlow.applyNodeChanges(changes, nds));
-      }, []);
+        saveToHistory();
+      }, [saveToHistory]);
 
       // Handle edge creation
       const onConnect = useCallback((params) => {
-        setEdges((eds) => window.ReactFlow.addEdge({ ...params, animated: true }, eds));
-      }, []);
+        setEdges((eds) => window.ReactFlow.addEdge({ ...params, animated: true, style: { stroke: '#4b5563' } }, eds));
+        saveToHistory();
+      }, [saveToHistory]);
 
       // Add new node
       const addNode = (type, label) => {
         const newNode = {
-          id: `${nodes.length + 1}`,
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: type === 'trigger' ? 'input' : 'default',
-          data: { label, config: type === 'trigger' ? { type: 'manual' } : { url: '' } },
-          position: { x: Math.random() * 400, y: Math.random() * 400 },
+          data: { label, config: type === 'trigger' ? { type: 'manual' } : { url: '', method: 'GET' } },
+          position: { x: Math.random() * 400 + 50, y: Math.random() * 400 + 50 },
         };
         setNodes((nds) => [...nds, newNode]);
+        saveToHistory();
+      };
+
+      // Delete node
+      const deleteNode = (id) => {
+        setNodes((nds) => nds.filter((node) => node.id !== id));
+        setEdges((eds) => eds.filter((edge) => edge.source !== id && edge.target !== id));
+        setSelectedNode(null);
+        saveToHistory();
       };
 
       // Handle node selection
@@ -75,105 +112,165 @@
         setSelectedNode(node);
       };
 
-      // Update node config
+      // Update node config with validation
       const updateNodeConfig = (id, config) => {
         setNodes((nds) =>
           nds.map((node) =>
-            node.id === id ? { ...node, data: { ...node.data, config } } : node
+            node.id === id
+              ? {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    config: {
+                      ...node.data.config,
+                      ...config,
+                      url: config.url ? config.url.trim() : node.data.config.url,
+                    },
+                  },
+                }
+              : node
           )
         );
+        saveToHistory();
+      };
+
+      // Undo action
+      const undo = () => {
+        if (historyIndex > 0) {
+          setHistoryIndex((prev) => prev - 1);
+          setNodes([...history[historyIndex - 1].nodes]);
+          setEdges([...history[historyIndex - 1].edges]);
+          setSelectedNode(null);
+        }
       };
 
       // Simulate workflow execution
       const runWorkflow = () => {
         console.log('Running workflow...');
         nodes.forEach((node) => {
+          if (node.data.config.url && !/^https?:\/\/[^\s$.?#].[^\s]*$/.test(node.data.config.url)) {
+            console.error(`Invalid URL in ${node.data.label}: ${node.data.config.url}`);
+            return;
+          }
           console.log(`Executing ${node.data.label}:`, node.data.config);
         });
       };
 
       return (
-        <div className="flex h-full">
-          {/* Node Panel */}
-          <div className="node-panel w-64 bg-gray-100 p-4">
-            <h2 className="text-lg font-bold mb-4">Nodes</h2>
-            <button
-              className="w-full bg-blue-500 text-white py-2 mb-2 rounded hover:bg-blue-600"
-              onClick={() => addNode('trigger', 'Trigger')}
-            >
-              Add Trigger
-            </button>
-            <button
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-              onClick={() => addNode('action', 'HTTP Request')}
-            >
-              Add HTTP Request
-            </button>
-            <button
-              className="w-full bg-green-500 text-white py-2 mt-4 rounded hover:bg-green-600"
-              onClick={runWorkflow}
-            >
-              Run Workflow
-            </button>
-          </div>
-
-          {/* Workflow Canvas */}
-          <div className="flex-1">
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onConnect={onConnect}
-              onNodeClick={onNodeClick}
-              nodeTypes={nodeTypes}
-              fitView
-            >
-              <ReactFlow.Controls />
-              <ReactFlow.Background />
-            </ReactFlow>
-          </div>
-
-          {/* Sidebar for Node Configuration */}
-          {selectedNode && (
-            <div className="sidebar p-4">
-              <h2 className="text-lg font-bold mb-4">Configure {selectedNode.data.label}</h2>
-              {selectedNode.type === 'input' ? (
-                <div>
-                  <label className="block mb-2">Trigger Type</label>
-                  <select
-                    className="w-full p-2 border rounded"
-                    value={selectedNode.data.config.type}
-                    onChange={(e) =>
-                      updateNodeConfig(selectedNode.id, { type: e.target.value })
-                    }
-                  >
-                    <option value="manual">Manual</option>
-                    <option value="schedule">Schedule</option>
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <label className="block mb-2">URL</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded"
-                    value={selectedNode.data.config.url}
-                    onChange={(e) =>
-                      updateNodeConfig(selectedNode.id, { url: e.target.value })
-                    }
-                    placeholder="Enter URL"
-                  />
-                </div>
-              )}
+        <ErrorBoundary>
+          <div className="flex h-full bg-gray-50">
+            {/* Node Panel */}
+            <div className="node-panel w-64 p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-6">Nodes</h2>
               <button
-                className="mt-4 bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-                onClick={() => setSelectedNode(null)}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition mb-3"
+                onClick={() => addNode('trigger', 'Trigger')}
               >
-                Close
+                Add Trigger
+              </button>
+              <button
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition mb-3"
+                onClick={() => addNode('action', 'HTTP Request')}
+              >
+                Add HTTP Request
+              </button>
+              <button
+                className="w-full bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition mb-3"
+                onClick={runWorkflow}
+              >
+                Run Workflow
+              </button>
+              <button
+                className="w-full bg-gray-600 text-white py-2.5 rounded-lg hover:bg-gray-700 transition"
+                onClick={undo}
+                disabled={historyIndex === 0}
+              >
+                Undo
               </button>
             </div>
-          )}
-        </div>
+
+            {/* Workflow Canvas */}
+            <div className="flex-1">
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onConnect={onConnect}
+                onNodeClick={onNodeClick}
+                nodeTypes={nodeTypes}
+                fitView
+                minZoom={0.2}
+                maxZoom={2}
+              >
+                <ReactFlow.Controls />
+                <ReactFlow.Background color="#a0aec0" gap={16} />
+              </ReactFlow>
+            </div>
+
+            {/* Sidebar for Node Configuration */}
+            {selectedNode && (
+              <div className="sidebar p-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Configure {selectedNode.data.label}
+                </h2>
+                {selectedNode.type === 'input' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Trigger Type</label>
+                    <select
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      value={selectedNode.data.config.type}
+                      onChange={(e) =>
+                        updateNodeConfig(selectedNode.id, { type: e.target.value })
+                      }
+                    >
+                      <option value="manual">Manual</option>
+                      <option value="schedule">Schedule</option>
+                      <option value="webhook">Webhook</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">URL</label>
+                    <input
+                      type="text"
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      value={selectedNode.data.config.url}
+                      onChange={(e) =>
+                        updateNodeConfig(selectedNode.id, { url: e.target.value })
+                      }
+                      placeholder="https://example.com"
+                    />
+                    <label className="block text-sm font-medium text-gray-700 mt-4 mb-2">Method</label>
+                    <select
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      value={selectedNode.data.config.method}
+                      onChange={(e) =>
+                        updateNodeConfig(selectedNode.id, { method: e.target.value })
+                      }
+                    >
+                      <option value="GET">GET</option>
+                      <option value="POST">POST</option>
+                      <option value="PUT">PUT</option>
+                      <option value="DELETE">DELETE</option>
+                    </select>
+                  </div>
+                )}
+                <button
+                  className="mt-4 bg-red-600 text-white py-2.5 px-4 rounded-lg hover:bg-red-700 transition"
+                  onClick={() => deleteNode(selectedNode.id)}
+                >
+                  Delete Node
+                </button>
+                <button
+                  className="mt-2 bg-gray-600 text-white py-2.5 px-4 rounded-lg hover:bg-gray-700 transition"
+                  onClick={() => setSelectedNode(null)}
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </ErrorBoundary>
       );
     };
 
