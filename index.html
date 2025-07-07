@@ -2,177 +2,250 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Boss AI Automation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+  <title>Boss AI - Visual Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: linear-gradient(to right, #000000, #0a0a2a);
       color: #00bfff;
-      display: flex;
       height: 100vh;
       overflow: hidden;
-    }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
-    #sidebar {
-      width: 250px;
-      background: #111;
-      padding: 20px;
       display: flex;
       flex-direction: column;
+    }
+    header {
+      padding: 10px 20px;
+      background: #111;
+      font-size: 20px;
+      color: #00bfff;
+      text-shadow: 0 0 8px #00bfff;
+    }
+    #toolbar {
+      display: flex;
       gap: 10px;
+      padding: 10px;
+      background: #0d0d0d;
+    }
+    button {
+      font-family: 'Orbitron', sans-serif;
+      padding: 6px 14px;
+      font-size: 14px;
+      background: #001f33;
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      cursor: pointer;
+      text-shadow: 0 0 4px #00bfff;
     }
     #canvas {
-      flex-grow: 1;
+      flex: 1;
       position: relative;
-      background: #0a0a0a;
+      background: #050b13;
+      overflow: hidden;
     }
     .node {
       position: absolute;
+      width: 160px;
       padding: 10px;
-      background: #222;
-      border: 2px solid #00bfff;
-      color: #fff;
-      border-radius: 5px;
+      background: #0c0c0c;
+      border: 1px solid #00bfff;
+      color: #00bfff;
+      text-shadow: 0 0 4px #00bfff;
       cursor: move;
     }
-    button {
+    .line {
+      position: absolute;
       background: #00bfff;
-      color: black;
-      border: none;
-      padding: 8px;
-      font-weight: bold;
-      cursor: pointer;
+      height: 2px;
+      transform-origin: 0 0;
     }
     #log {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      background: #111;
-      color: #0f0;
-      font-size: 12px;
-      padding: 5px;
       height: 100px;
+      background: #0a0a0a;
+      color: #00ffcc;
       overflow-y: auto;
+      font-size: 12px;
+      padding: 8px;
       border-top: 1px solid #00bfff;
+    }
+    .glow {
+      text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff;
+    }
+    .highlight {
+      background-color: #003344 !important;
     }
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <button onclick="createNode('ScriptWriter')">+ Script Writer</button>
-    <button onclick="createNode('Voiceover')">+ Voiceover</button>
-    <button onclick="createNode('Logger')">+ Logger</button>
-    <hr />
-    <button onclick="exportWorkflow()">Export</button>
-    <button onclick="importWorkflow()">Import</button>
-    <button onclick="clearWorkflow()">Clear</button>
-    <button onclick="runWorkflow()">Run</button>
+  <header class="glow">Boss AI – Visual Workflow Engine</header>
+  <div id="toolbar">
+    <button onclick="addNode('Script Writer')">+ Script Writer</button>
+    <button onclick="addNode('Voiceover')">+ Voiceover</button>
+    <button onclick="addNode('Logger')">+ Logger</button>
+    <button onclick="runWorkflow()">▶️ Run</button>
+    <button onclick="exportWorkflow()">📤 Export</button>
+    <button onclick="importWorkflow()">📥 Import</button>
+    <button onclick="clearCanvas()">🗑 Clear</button>
   </div>
   <div id="canvas"></div>
-  <div id="log">[Log Output]</div>
+  <div id="log"></div>
 
   <script>
+    const canvas = document.getElementById("canvas");
+    const log = document.getElementById("log");
     let nodes = [];
-    let nodeId = 0;
+    let connections = [];
 
-    function createNode(type) {
-      const canvas = document.getElementById('canvas');
-      const node = document.createElement('div');
-      node.className = 'node';
-      node.contentEditable = true;
-      node.style.left = Math.random() * 500 + 'px';
-      node.style.top = Math.random() * 300 + 'px';
-      node.dataset.id = nodeId++;
-      node.dataset.type = type;
-      node.innerText = type;
-      canvas.appendChild(node);
+    function logMsg(msg) {
+      const line = document.createElement("div");
+      line.textContent = msg;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
 
-      nodes.push({
-        id: node.dataset.id,
-        type: type,
-        el: node,
-        run: async function (context) {
-          node.style.borderColor = 'yellow';
-          log('Running ' + type);
-          await new Promise(res => setTimeout(res, 500));
-          if (type === 'ScriptWriter') {
-            context.output = 'Generated script about AI';
-          } else if (type === 'Voiceover') {
-            context.output = 'Audio generated from: ' + context.output;
-          } else if (type === 'Logger') {
-            log('Final Output: ' + context.output);
-          }
-          node.style.borderColor = '#00bfff';
+    function addNode(type, x = 100, y = 100) {
+      const div = document.createElement("div");
+      div.className = "node";
+      div.textContent = type;
+      div.style.left = x + "px";
+      div.style.top = y + "px";
+
+      const node = { id: Date.now() + Math.random(), type, div, x, y, outputs: [], run: async function(context) {
+        div.classList.add("highlight");
+        logMsg(`Running ${type}`);
+        await new Promise(r => setTimeout(r, 1000));
+        let output = "";
+        if (type === "Script Writer") {
+          output = "This is AI-generated text.";
+        } else if (type === "Voiceover") {
+          output = `🔊 Speaking: ${context.lastOutput || "No input"}`;
+        } else if (type === "Logger") {
+          logMsg(`📝 Logger: ${context.lastOutput}`);
         }
-      });
+        context.lastOutput = output;
+        div.classList.remove("highlight");
+      }};
 
-      makeDraggable(node);
-    }
-
-    function makeDraggable(el) {
-      let offsetX, offsetY;
-      el.onmousedown = function (e) {
-        offsetX = e.clientX - el.offsetLeft;
-        offsetY = e.clientY - el.offsetTop;
-        document.onmousemove = function (e) {
-          el.style.left = e.clientX - offsetX + 'px';
-          el.style.top = e.clientY - offsetY + 'px';
-        };
-        document.onmouseup = function () {
-          document.onmousemove = null;
-          document.onmouseup = null;
-        };
+      div.onmousedown = e => {
+        let offsetX = e.offsetX;
+        let offsetY = e.offsetY;
+        function move(e2) {
+          div.style.left = (e2.pageX - offsetX) + "px";
+          div.style.top = (e2.pageY - offsetY) + "px";
+        }
+        function up() {
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", up);
+        }
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", up);
       };
+
+      div.ondblclick = () => {
+        const outNode = prompt("Connect to node ID:");
+        const target = nodes.find(n => n.id == outNode);
+        if (target) {
+          node.outputs.push(target.id);
+          drawLine(node.div, target.div);
+          connections.push({ from: node.id, to: target.id });
+        }
+      };
+
+      canvas.appendChild(div);
+      nodes.push(node);
     }
 
-    function exportWorkflow() {
-      const exportData = nodes.map(n => ({
-        id: n.id,
-        type: n.type,
-        x: n.el.style.left,
-        y: n.el.style.top
-      }));
-      navigator.clipboard.writeText(JSON.stringify(exportData));
-      log('Workflow exported to clipboard');
-    }
-
-    function importWorkflow() {
-      const input = prompt('Paste your JSON here:');
-      try {
-        const data = JSON.parse(input);
-        clearWorkflow();
-        data.forEach(n => {
-          createNode(n.type);
-          const node = nodes.find(node => node.id == n.id);
-          node.el.style.left = n.x;
-          node.el.style.top = n.y;
-        });
-        log('Workflow imported');
-      } catch {
-        alert('Invalid JSON');
-      }
-    }
-
-    function clearWorkflow() {
-      document.getElementById('canvas').innerHTML = '';
-      nodes = [];
-      log('Workflow cleared');
+    function drawLine(fromDiv, toDiv) {
+      const line = document.createElement("div");
+      line.className = "line";
+      canvas.appendChild(line);
+      const rect1 = fromDiv.getBoundingClientRect();
+      const rect2 = toDiv.getBoundingClientRect();
+      const x1 = rect1.left + rect1.width / 2;
+      const y1 = rect1.top + rect1.height / 2;
+      const x2 = rect2.left + rect2.width / 2;
+      const y2 = rect2.top + rect2.height / 2;
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      line.style.left = x1 + "px";
+      line.style.top = y1 + "px";
+      line.style.width = length + "px";
+      line.style.transform = `rotate(${angle}rad)`;
     }
 
     async function runWorkflow() {
-      log('Running workflow...');
+      logMsg("▶️ Executing workflow...");
+      const idToNode = Object.fromEntries(nodes.map(n => [n.id, n]));
+      const visited = new Set();
       const context = {};
-      for (let n of nodes) {
-        await n.run(context);
+
+      async function visit(nodeId) {
+        if (visited.has(nodeId)) return;
+        visited.add(nodeId);
+        const node = idToNode[nodeId];
+        await node.run(context);
+        for (let outId of node.outputs) {
+          await visit(outId);
+        }
+      }
+
+      // Run all start nodes
+      for (let node of nodes) {
+        if (!connections.some(c => c.to === node.id)) {
+          await visit(node.id);
+        }
+      }
+
+      logMsg("✅ Workflow complete.");
+    }
+
+    function exportWorkflow() {
+      const data = {
+        nodes: nodes.map(n => ({
+          id: n.id,
+          type: n.type,
+          x: parseInt(n.div.style.left),
+          y: parseInt(n.div.style.top),
+          outputs: n.outputs
+        })),
+        connections
+      };
+      navigator.clipboard.writeText(JSON.stringify(data)).then(() =>
+        logMsg("📤 Workflow copied to clipboard!")
+      );
+    }
+
+    function importWorkflow() {
+      const json = prompt("Paste workflow JSON:");
+      if (!json) return;
+      clearCanvas();
+      try {
+        const data = JSON.parse(json);
+        for (let n of data.nodes) addNode(n.type, n.x, n.y);
+        setTimeout(() => {
+          for (let i = 0; i < data.connections.length; i++) {
+            const c = data.connections[i];
+            const from = nodes.find(n => n.id == c.from);
+            const to = nodes.find(n => n.id == c.to);
+            if (from && to) {
+              from.outputs.push(to.id);
+              drawLine(from.div, to.div);
+              connections.push(c);
+            }
+          }
+        }, 100);
+      } catch (e) {
+        logMsg("❌ Invalid JSON");
       }
     }
 
-    function log(msg) {
-      const logEl = document.getElementById('log');
-      logEl.innerHTML += `<div>> ${msg}</div>`;
-      logEl.scrollTop = logEl.scrollHeight;
+    function clearCanvas() {
+      canvas.innerHTML = "";
+      nodes = [];
+      connections = [];
+      logMsg("🧹 Canvas cleared");
     }
   </script>
 </body>
