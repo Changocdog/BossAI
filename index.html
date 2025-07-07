@@ -654,6 +654,51 @@
             localStorage.setItem('bossai_api_keys', JSON.stringify(apiKeys));
         }
 
+        // Utility functions
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function log(level, message) {
+            const logContent = document.getElementById('logContent');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${level}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+            
+            // Show log
+            document.getElementById('executionLog').classList.add('active');
+            
+            console.log(`[${level.toUpperCase()}] ${message}`);
+        }
+
+        function updateStatus(message, isExecuting = false) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            statusIndicator.textContent = message;
+            statusIndicator.classList.add('active');
+            
+            if (isExecuting) {
+                statusIndicator.classList.add('executing');
+            } else {
+                statusIndicator.classList.remove('executing');
+            }
+        }
+
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            progressBar.classList.add('active');
+            progressFill.style.width = percentage + '%';
+            
+            if (percentage >= 100) {
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                }, 1000);
+            }
+        }
+
         // Node type definitions with real execution logic
         const nodeTypes = {
             script: {
@@ -850,51 +895,4 @@
 
         // Audio management
         function playGeneratedAudio(audioUrl) {
-            const audioElement = document.getElementById('audioElement');
-            const audioPlayer = document.getElementById('audioPlayer');
-            const audioStatus = document.getElementById('audioStatus');
-            
-            audioElement.src = audioUrl;
-            audioPlayer.classList.add('active');
-            audioStatus.textContent = 'Audio ready';
-            
-            // Auto-play the audio
-            audioElement.play().catch(e => {
-                log('warning', 'Auto-play blocked by browser. Click play button to hear audio.');
-            });
-        }
-
-        function playAudio() {
-            const audioElement = document.getElementById('audioElement');
-            audioElement.play();
-        }
-
-        function pauseAudio() {
-            const audioElement = document.getElementById('audioElement');
-            audioElement.pause();
-        }
-
-        function stopAudio() {
-            const audioElement = document.getElementById('audioElement');
-            audioElement.pause();
-            audioElement.currentTime = 0;
-        }
-
-        // Initialize canvas
-        function initCanvas() {
-            const canvas = document.getElementById('canvas');
-            const svg = document.getElementById('canvas-svg');
-
-            // Handle drag and drop from sidebar
-            document.addEventListener('dragstart', handleDragStart);
-            document.addEventListener('dragover', handleDragOver);
-            document.addEventListener('drop', handleDrop);
-
-            // Handle node interactions
-            canvas.addEventListener('mousedown', handleCanvasMouseDown);
-            canvas.addEventListener('mousemove', handleCanvasMouseMove);
-            canvas.addEventListener('mouseup', handleCanvasMouseUp);
-            canvas.addEventListener('dblclick', handleCanvasDoubleClick);
-
-            // Handle connection drawing
-            document.addEventListener('keydown', handle
+            const audioElement
