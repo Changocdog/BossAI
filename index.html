@@ -1,830 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boss AI - Visual Workflow System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Orbitron', monospace;
-            background: #000;
-            color: #00ffff;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-            background: linear-gradient(135deg, #000000 0%, #111111 50%, #000000 100%);
-        }
-
-        .sidebar {
-            width: 280px;
-            background: rgba(0, 0, 0, 0.9);
-            border-right: 2px solid #00ffff;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 900;
-            color: #00ffff;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-            letter-spacing: 2px;
-        }
-
-        .node-palette {
-            margin-bottom: 30px;
-        }
-
-        .palette-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .palette-node {
-            background: linear-gradient(135deg, #001122 0%, #003366 100%);
-            border: 1px solid #00ffff;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: grab;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-        }
-
-        .palette-node:hover {
-            border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .palette-node:active {
-            cursor: grabbing;
-        }
-
-        .node-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #00ffff;
-            margin-bottom: 5px;
-        }
-
-        .node-desc {
-            font-size: 10px;
-            color: #888;
-            line-height: 1.4;
-        }
-
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            background: radial-gradient(circle at 50% 50%, #001122 0%, #000000 100%);
-            overflow: hidden;
-        }
-
-        .canvas {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
-            background-size: 200px 200px;
-            cursor: move;
-        }
-
-        .grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-        }
-
-        .workflow-node {
-            position: absolute;
-            width: 200px;
-            min-height: 80px;
-            background: linear-gradient(135deg, #001122 0%, #003366 100%);
-            border: 2px solid #00ffff;
-            border-radius: 12px;
-            padding: 15px;
-            cursor: move;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            z-index: 10;
-        }
-
-        .workflow-node:hover {
-            border-color: #ffffff;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
-            transform: translateY(-3px);
-        }
-
-        .workflow-node.selected {
-            border-color: #ff00ff;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
-        }
-
-        .workflow-node.dragging {
-            z-index: 1000;
-            cursor: grabbing;
-        }
-
-        .node-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .node-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #00ffff;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .node-delete {
-            background: none;
-            border: none;
-            color: #ff0066;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0;
-            margin-left: auto;
-            transition: color 0.3s ease;
-        }
-
-        .node-delete:hover {
-            color: #ff3388;
-            text-shadow: 0 0 10px rgba(255, 0, 102, 0.5);
-        }
-
-        .node-content {
-            font-size: 11px;
-            color: #aaa;
-            line-height: 1.4;
-        }
-
-        .connection-point {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #00ffff;
-            border: 2px solid #ffffff;
-            border-radius: 50%;
-            cursor: crosshair;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .connection-point:hover {
-            background: #ffffff;
-            transform: scale(1.2);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-        }
-
-        .input-point {
-            left: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .output-point {
-            right: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .connection-line {
-            position: absolute;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .connection-path {
-            fill: none;
-            stroke: #00ffff;
-            stroke-width: 2;
-            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
-        }
-
-        .temp-connection {
-            stroke: #ff00ff;
-            stroke-dasharray: 5,5;
-            animation: dash 1s linear infinite;
-        }
-
-        @keyframes dash {
-            to {
-                stroke-dashoffset: -10;
-            }
-        }
-
-        .toolbar {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-        }
-
-        .toolbar-btn {
-            background: linear-gradient(135deg, #001122 0%, #003366 100%);
-            border: 1px solid #00ffff;
-            border-radius: 6px;
-            padding: 10px 15px;
-            color: #00ffff;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-        }
-
-        .toolbar-btn:hover {
-            border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .status-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: rgba(0, 0, 0, 0.9);
-            border-top: 1px solid #00ffff;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            font-size: 12px;
-            color: #00ffff;
-            z-index: 100;
-        }
-
-        .status-item {
-            margin-right: 30px;
-        }
-
-        .connection-mode {
-            cursor: crosshair;
-        }
-
-        .node-types {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .connecting .connection-point {
-            animation: pulse 1s infinite;
-        }
-
-        .zoom-controls {
-            position: absolute;
-            bottom: 60px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .zoom-btn {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #001122 0%, #003366 100%);
-            border: 1px solid #00ffff;
-            border-radius: 50%;
-            color: #00ffff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .zoom-btn:hover {
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Boss AI – Visual Automation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to right, #000000, #0a0a2a);
+      color: #00bfff;
+      overflow: hidden;
+    }
+    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
+    #toolbar {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+    }
+    #toolbar button {
+      background: #001f33;
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      padding: 6px 12px;
+      margin-right: 8px;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+    }
+    #canvas {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .node {
+      position: absolute;
+      width: 180px;
+      padding: 10px;
+      background: #0c0c0c;
+      border: 1px solid #00bfff;
+      color: #00bfff;
+      cursor: move;
+      text-align: center;
+    }
+    .active { border: 2px solid yellow; }
+    .success { border: 2px solid lime; }
+    .error { border: 2px solid red; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="logo">BOSS AI</div>
-            
-            <div class="node-palette">
-                <div class="palette-title">Data Sources</div>
-                <div class="palette-node" data-type="api">
-                    <div class="node-title">API Request</div>
-                    <div class="node-desc">Fetch data from external APIs</div>
-                </div>
-                <div class="palette-node" data-type="database">
-                    <div class="node-title">Database</div>
-                    <div class="node-desc">Query databases and data stores</div>
-                </div>
-                <div class="palette-node" data-type="webhook">
-                    <div class="node-title">Webhook</div>
-                    <div class="node-desc">Receive HTTP requests</div>
-                </div>
-            </div>
+  <div id="toolbar">
+    <button onclick="addNode('Script Writer')">Script Writer</button>
+    <button onclick="addNode('HTML Extract')">HTML Extract</button>
+    <button onclick="addNode('Logger')">Logger</button>
+    <button onclick="runFlow()">Run</button>
+    <button onclick="clearFlow()">Clear</button>
+  </div>
+  <div id="canvas"></div>
 
-            <div class="node-palette">
-                <div class="palette-title">AI Processing</div>
-                <div class="palette-node" data-type="llm">
-                    <div class="node-title">LLM Process</div>
-                    <div class="node-desc">Large Language Model processing</div>
-                </div>
-                <div class="palette-node" data-type="vision">
-                    <div class="node-title">Vision AI</div>
-                    <div class="node-desc">Image and video analysis</div>
-                </div>
-                <div class="palette-node" data-type="embedding">
-                    <div class="node-title">Embeddings</div>
-                    <div class="node-desc">Vector embeddings generation</div>
-                </div>
-            </div>
+  <script>
+    let nodes = [];
+    let connections = [];
+    let nodeId = 0;
 
-            <div class="node-palette">
-                <div class="palette-title">Data Processing</div>
-                <div class="palette-node" data-type="filter">
-                    <div class="node-title">Filter</div>
-                    <div class="node-desc">Filter and transform data</div>
-                </div>
-                <div class="palette-node" data-type="merge">
-                    <div class="node-title">Merge</div>
-                    <div class="node-desc">Combine multiple data streams</div>
-                </div>
-                <div class="palette-node" data-type="split">
-                    <div class="node-title">Split</div>
-                    <div class="node-desc">Split data into branches</div>
-                </div>
-            </div>
+    function addNode(type) {
+      const div = document.createElement('div');
+      div.className = 'node';
+      div.innerText = type;
+      div.style.left = Math.random() * 600 + 'px';
+      div.style.top = Math.random() * 400 + 'px';
+      div.setAttribute('data-id', nodeId);
+      div.setAttribute('data-type', type);
+      div.onclick = () => {
+        const targetId = prompt("Connect to node ID:");
+        if (targetId) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
+      };
+      makeDraggable(div);
+      document.getElementById('canvas').appendChild(div);
+      nodes.push({ id: nodeId, type, el: div });
+      nodeId++;
+    }
 
-            <div class="node-palette">
-                <div class="palette-title">Outputs</div>
-                <div class="palette-node" data-type="email">
-                    <div class="node-title">Email</div>
-                    <div class="node-desc">Send email notifications</div>
-                </div>
-                <div class="palette-node" data-type="slack">
-                    <div class="node-title">Slack</div>
-                    <div class="node-desc">Send messages to Slack</div>
-                </div>
-                <div class="palette-node" data-type="file">
-                    <div class="node-title">File Output</div>
-                    <div class="node-desc">Save data to files</div>
-                </div>
-            </div>
-        </div>
+    function makeDraggable(el) {
+      let offsetX = 0, offsetY = 0, isDown = false;
+      el.onmousedown = function(e) {
+        isDown = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+      };
+      document.onmouseup = () => isDown = false;
+      document.onmousemove = (e) => {
+        if (!isDown) return;
+        el.style.left = (e.pageX - offsetX) + 'px';
+        el.style.top = (e.pageY - offsetY) + 'px';
+      };
+    }
 
-        <div class="canvas-container">
-            <div class="grid"></div>
-            <div class="canvas" id="canvas">
-                <svg class="connection-line" id="connectionSvg"></svg>
-            </div>
-            
-            <div class="toolbar">
-                <button class="toolbar-btn" id="runWorkflow">▶ RUN</button>
-                <button class="toolbar-btn" id="stopWorkflow">⏹ STOP</button>
-                <button class="toolbar-btn" id="saveWorkflow">💾 SAVE</button>
-                <button class="toolbar-btn" id="loadWorkflow">📁 LOAD</button>
-                <button class="toolbar-btn" id="clearCanvas">🗑 CLEAR</button>
-            </div>
+    function clearFlow() {
+      document.getElementById('canvas').innerHTML = '';
+      nodes = [];
+      connections = [];
+      nodeId = 0;
+    }
 
-            <div class="zoom-controls">
-                <button class="zoom-btn" id="zoomIn">+</button>
-                <button class="zoom-btn" id="zoomOut">-</button>
-                <button class="zoom-btn" id="resetZoom">⌂</button>
-            </div>
+    async function runFlow() {
+      const context = {};
+      const sorted = topologicalSort(nodes.map(n => n.id), connections);
+      for (let id of sorted) {
+        const node = nodes.find(n => n.id === id);
+        if (!node) continue;
+        try {
+          node.el.classList.remove('success', 'error');
+          node.el.classList.add('active');
+          await runNode(node, context);
+          node.el.classList.remove('active');
+          node.el.classList.add('success');
+        } catch (e) {
+          node.el.classList.remove('active');
+          node.el.classList.add('error');
+          console.error("Node error:", e);
+          break;
+        }
+      }
+    }
 
-            <div class="status-bar">
-                <div class="status-item">Nodes: <span id="nodeCount">0</span></div>
-                <div class="status-item">Connections: <span id="connectionCount">0</span></div>
-                <div class="status-item">Status: <span id="workflowStatus">Ready</span></div>
-                <div class="status-item">Zoom: <span id="zoomLevel">100%</span></div>
-            </div>
-        </div>
-    </div>
+    async function runNode(node, context) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const type = node.type;
+          if (type === 'Script Writer') {
+            context.output = `<html><head><title>Hello BossAI</title></head><body><h1>Welcome</h1></body></html>`;
+          } else if (type === 'HTML Extract') {
+            try {
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(context.output, 'text/html');
+              const title = doc.querySelector('title')?.innerText || 'No <title>';
+              context.output = title;
+            } catch (e) { reject(e); return; }
+          } else if (type === 'Logger') {
+            alert("Logged Output: " + context.output);
+            console.log("Logger:", context.output);
+          }
+          resolve();
+        }, 800);
+      });
+    }
 
-    <script>
-        class WorkflowSystem {
-            constructor() {
-                this.canvas = document.getElementById('canvas');
-                this.connectionSvg = document.getElementById('connectionSvg');
-                this.nodes = new Map();
-                this.connections = [];
-                this.nodeCounter = 0;
-                this.isDragging = false;
-                this.isConnecting = false;
-                this.connectionStart = null;
-                this.tempConnection = null;
-                this.selectedNode = null;
-                this.canvasOffset = { x: 0, y: 0 };
-                this.zoom = 1;
-                this.mousePos = { x: 0, y: 0 };
-                
-                this.initializeEventListeners();
-                this.updateStatusBar();
-            }
-
-            initializeEventListeners() {
-                // Palette drag and drop
-                document.querySelectorAll('.palette-node').forEach(node => {
-                    node.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', node.dataset.type);
-                    });
-                    node.draggable = true;
-                });
-
-                // Canvas drop
-                this.canvas.addEventListener('dragover', (e) => e.preventDefault());
-                this.canvas.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    const nodeType = e.dataTransfer.getData('text/plain');
-                    const rect = this.canvas.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / this.zoom;
-                    const y = (e.clientY - rect.top) / this.zoom;
-                    this.createNode(nodeType, x, y);
-                });
-
-                // Canvas mouse events
-                this.canvas.addEventListener('mousedown', (e) => this.handleCanvasMouseDown(e));
-                this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
-                this.canvas.addEventListener('mouseup', (e) => this.handleCanvasMouseUp(e));
-
-                // Toolbar buttons
-                document.getElementById('runWorkflow').addEventListener('click', () => this.runWorkflow());
-                document.getElementById('stopWorkflow').addEventListener('click', () => this.stopWorkflow());
-                document.getElementById('saveWorkflow').addEventListener('click', () => this.saveWorkflow());
-                document.getElementById('loadWorkflow').addEventListener('click', () => this.loadWorkflow());
-                document.getElementById('clearCanvas').addEventListener('click', () => this.clearCanvas());
-
-                // Zoom controls
-                document.getElementById('zoomIn').addEventListener('click', () => this.zoom *= 1.1);
-                document.getElementById('zoomOut').addEventListener('click', () => this.zoom /= 1.1);
-                document.getElementById('resetZoom').addEventListener('click', () => this.zoom = 1);
-
-                // Mouse tracking
-                document.addEventListener('mousemove', (e) => {
-                    this.mousePos = { x: e.clientX, y: e.clientY };
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Delete' && this.selectedNode) {
-                        this.deleteNode(this.selectedNode);
-                    }
-                    if (e.key === 'Escape') {
-                        this.cancelConnection();
-                    }
-                });
-            }
-
-            createNode(type, x, y) {
-                const nodeId = `node_${++this.nodeCounter}`;
-                const nodeConfig = this.getNodeConfig(type);
-                
-                const nodeElement = document.createElement('div');
-                nodeElement.className = 'workflow-node';
-                nodeElement.style.left = `${x}px`;
-                nodeElement.style.top = `${y}px`;
-                nodeElement.dataset.nodeId = nodeId;
-                nodeElement.dataset.type = type;
-
-                nodeElement.innerHTML = `
-                    <div class="node-header">
-                        <div class="node-title">${nodeConfig.title}</div>
-                        <button class="node-delete" onclick="workflowSystem.deleteNode('${nodeId}')">×</button>
-                    </div>
-                    <div class="node-content">${nodeConfig.description}</div>
-                    <div class="connection-point input-point" data-type="input"></div>
-                    <div class="connection-point output-point" data-type="output"></div>
-                `;
-
-                this.canvas.appendChild(nodeElement);
-                this.nodes.set(nodeId, {
-                    element: nodeElement,
-                    type: type,
-                    x: x,
-                    y: y,
-                    config: nodeConfig
-                });
-
-                this.attachNodeEvents(nodeElement);
-                this.updateStatusBar();
-            }
-
-            attachNodeEvents(nodeElement) {
-                const nodeId = nodeElement.dataset.nodeId;
-                
-                // Node dragging
-                nodeElement.addEventListener('mousedown', (e) => {
-                    if (e.target.classList.contains('connection-point')) return;
-                    if (e.target.classList.contains('node-delete')) return;
-                    
-                    this.selectNode(nodeId);
-                    this.isDragging = true;
-                    nodeElement.classList.add('dragging');
-                    
-                    const rect = nodeElement.getBoundingClientRect();
-                    const canvasRect = this.canvas.getBoundingClientRect();
-                    this.dragOffset = {
-                        x: e.clientX - rect.left,
-                        y: e.clientY - rect.top
-                    };
-                });
-
-                // Connection points
-                nodeElement.querySelectorAll('.connection-point').forEach(point => {
-                    point.addEventListener('mousedown', (e) => {
-                        e.stopPropagation();
-                        this.startConnection(nodeId, point.dataset.type);
-                    });
-                });
-            }
-
-            handleCanvasMouseDown(e) {
-                if (e.target === this.canvas) {
-                    this.selectedNode = null;
-                    this.updateSelectedNode();
-                }
-            }
-
-            handleCanvasMouseMove(e) {
-                if (this.isDragging && this.selectedNode) {
-                    const node = this.nodes.get(this.selectedNode);
-                    if (node) {
-                        const rect = this.canvas.getBoundingClientRect();
-                        const x = (e.clientX - rect.left - this.dragOffset.x) / this.zoom;
-                        const y = (e.clientY - rect.top - this.dragOffset.y) / this.zoom;
-                        
-                        node.element.style.left = `${x}px`;
-                        node.element.style.top = `${y}px`;
-                        node.x = x;
-                        node.y = y;
-                        
-                        this.updateConnections();
-                    }
-                }
-
-                if (this.isConnecting) {
-                    this.updateTempConnection(e);
-                }
-            }
-
-            handleCanvasMouseUp(e) {
-                if (this.isDragging) {
-                    this.isDragging = false;
-                    document.querySelectorAll('.workflow-node').forEach(node => {
-                        node.classList.remove('dragging');
-                    });
-                }
-
-                if (this.isConnecting) {
-                    const target = e.target.closest('.connection-point');
-                    if (target && target.dataset.type === 'input') {
-                        const targetNodeId = target.closest('.workflow-node').dataset.nodeId;
-                        this.createConnection(this.connectionStart, targetNodeId);
-                    }
-                    this.cancelConnection();
-                }
-            }
-
-            startConnection(nodeId, type) {
-                if (type === 'output') {
-                    this.isConnecting = true;
-                    this.connectionStart = nodeId;
-                    this.canvas.classList.add('connecting');
-                    this.createTempConnection();
-                }
-            }
-
-            createTempConnection() {
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.classList.add('connection-path', 'temp-connection');
-                this.connectionSvg.appendChild(path);
-                this.tempConnection = path;
-            }
-
-            updateTempConnection(e) {
-                if (!this.tempConnection) return;
-                
-                const startNode = this.nodes.get(this.connectionStart);
-                const rect = this.canvas.getBoundingClientRect();
-                
-                const startX = startNode.x + 200;
-                const startY = startNode.y + 40;
-                const endX = (e.clientX - rect.left) / this.zoom;
-                const endY = (e.clientY - rect.top) / this.zoom;
-                
-                const path = this.createBezierPath(startX, startY, endX, endY);
-                this.tempConnection.setAttribute('d', path);
-            }
-
-            createConnection(fromNodeId, toNodeId) {
-                const connection = { from: fromNodeId, to: toNodeId };
-                this.connections.push(connection);
-                this.updateConnections();
-                this.updateStatusBar();
-            }
-
-            updateConnections() {
-                // Clear existing connections
-                this.connectionSvg.innerHTML = '';
-                
-                this.connections.forEach(conn => {
-                    const fromNode = this.nodes.get(conn.from);
-                    const toNode = this.nodes.get(conn.to);
-                    
-                    if (fromNode && toNode) {
-                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                        path.classList.add('connection-path');
-                        
-                        const startX = fromNode.x + 200;
-                        const startY = fromNode.y + 40;
-                        const endX = toNode.x;
-                        const endY = toNode.y + 40;
-                        
-                        const pathData = this.createBezierPath(startX, startY, endX, endY);
-                        path.setAttribute('d', pathData);
-                        
-                        this.connectionSvg.appendChild(path);
-                    }
-                });
-            }
-
-            createBezierPath(x1, y1, x2, y2) {
-                const dx = x2 - x1;
-                const cp1x = x1 + Math.max(50, Math.abs(dx) * 0.5);
-                const cp1y = y1;
-                const cp2x = x2 - Math.max(50, Math.abs(dx) * 0.5);
-                const cp2y = y2;
-                
-                return `M ${x1} ${y1} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
-            }
-
-            cancelConnection() {
-                this.isConnecting = false;
-                this.connectionStart = null;
-                this.canvas.classList.remove('connecting');
-                if (this.tempConnection) {
-                    this.tempConnection.remove();
-                    this.tempConnection = null;
-                }
-            }
-
-            selectNode(nodeId) {
-                this.selectedNode = nodeId;
-                this.updateSelectedNode();
-            }
-
-            updateSelectedNode() {
-                document.querySelectorAll('.workflow-node').forEach(node => {
-                    node.classList.remove('selected');
-                });
-                
-                if (this.selectedNode) {
-                    const node = this.nodes.get(this.selectedNode);
-                    if (node) {
-                        node.element.classList.add('selected');
-                    }
-                }
-            }
-
-            deleteNode(nodeId) {
-                const node = this.nodes.get(nodeId);
-                if (node) {
-                    node.element.remove();
-                    this.nodes.delete(nodeId);
-                    
-                    // Remove connections
-                    this.connections = this.connections.filter(conn => 
-                        conn.from !== nodeId && conn.to !== nodeId
-                    );
-                    
-                    this.updateConnections();
-                    this.updateStatusBar();
-                }
-            }
-
-            getNodeConfig(type) {
-                const configs = {
-                    api: { title: 'API Request', description: 'Fetch data from external APIs' },
-                    database: { title: 'Database', description: 'Query databases and data stores' },
-                    webhook: { title: 'Webhook', description: 'Receive HTTP requests' },
-                    llm: { title: 'LLM Process', description: 'Large Language Model processing' },
-                    vision: { title: 'Vision AI', description: 'Image and video analysis' },
-                    embedding: { title: 'Embeddings', description: 'Vector embeddings generation' },
-                    filter: { title: 'Filter', description: 'Filter and transform data' },
-                    merge: { title: 'Merge', description: 'Combine multiple data streams' },
-                    split: { title: 'Split', description: 'Split data into branches' },
-                    email: { title: 'Email', description: 'Send email notifications' },
-                    slack: { title: 'Slack', description: 'Send messages to Slack' },
-                    file: { title: 'File Output', description: 'Save data to files' }
-                };
-                return configs[type] || { title: 'Unknown', description: 'Unknown node type' };
-            }
-
-            runWorkflow() {
-                document.getElementById('workflowStatus').textContent = 'Running...';
-                // Simulate workflow execution
-                setTimeout(() => {
-                    document.getElementById('workflowStatus').textContent = 'Completed';
-                    setTimeout(() => {
-                        document.getElementById('workflowStatus').textContent = 'Ready';
-                    }, 2000);
-                }, 1000);
-            }
-
-            stopWorkflow() {
-                document.getElementById('workflowStatus').textContent = 'Stopped';
-                setTimeout(() => {
-                    document.getElementById('workflowStatus').textContent = 'Ready';
-                }, 1000);
-            }
-
-            saveWorkflow() {
-                const workflow = {
-                    nodes: Array.from(this.nodes.entries()).map(([id, node]) => ({
-                        id,
-                        type: node.type,
-                        x: node.x,
-                        y: node.y
-                    })),
-                    connections: this.connections
-                };
-                
-                const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'workflow.json';
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-
-            loadWorkflow() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            try {
-                                const workflow = JSON.parse(e.target.result);
-                                this.clearCanvas();
-                                
-                                workflow.nodes.forEach(node => {
-                                    this.createNode(node.type, node.x, node.y);
-                                });
-                                
-                                this.connections = workflow.connections || [];
-                                this.updateConnections();
-                            } catch (error) {
-                                alert('Error loading workflow: ' + error.message);
-                            }
-                        };
-                        reader.readAsText(file);
-                    }
-                };
-                input.click();
-            }
-
-            clearCanvas() {
-                this.nodes
+    function topologicalSort(nodes, edges) {
+      const adj = {}, inDegree = {}, result = [];
+      nodes.forEach(n => {
+        adj[n] = [];
+        inDegree[n] = 0;
+      });
+      edges.forEach(([from, to]) => {
+        adj[from].push(to);
+        inDegree[to]++;
+      });
+      const queue = nodes.filter(n => inDegree[n] === 0);
+      while (queue.length) {
+        const node = queue.shift();
+        result.push(node);
+        adj[node].forEach(neigh => {
+          inDegree[neigh]--;
+          if (inDegree[neigh] === 0) queue.push(neigh);
+        });
+      }
+      return result;
+    }
+  </script>
+</body>
+</html>
