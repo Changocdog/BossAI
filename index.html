@@ -59,6 +59,8 @@
     <button onclick="addNode('Logger')">Logger</button>
     <button onclick="runFlow()">Run</button>
     <button onclick="clearFlow()">Clear</button>
+    <button onclick="exportFlow()">Export</button>
+    <button onclick="importFlow()">Import</button>
   </div>
   <div id="canvas"></div>
 
@@ -70,14 +72,14 @@
     function addNode(type) {
       const div = document.createElement('div');
       div.className = 'node';
-      div.innerText = type;
+      div.innerText = type + " (ID: " + nodeId + ")";
       div.style.left = Math.random() * 600 + 'px';
       div.style.top = Math.random() * 400 + 'px';
       div.setAttribute('data-id', nodeId);
       div.setAttribute('data-type', type);
       div.onclick = () => {
         const targetId = prompt("Connect to node ID:");
-        if (targetId) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
+        if (targetId !== null) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
       };
       makeDraggable(div);
       document.getElementById('canvas').appendChild(div);
@@ -105,6 +107,41 @@
       nodes = [];
       connections = [];
       nodeId = 0;
+    }
+
+    function exportFlow() {
+      const data = {
+        nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.el.style.left, y: n.el.style.top })),
+        connections
+      };
+      navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
+        alert("Flow exported to clipboard!");
+      });
+    }
+
+    function importFlow() {
+      const input = prompt("Paste your flow JSON:");
+      if (!input) return;
+      const data = JSON.parse(input);
+      clearFlow();
+      data.nodes.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'node';
+        div.innerText = n.type + " (ID: " + n.id + ")";
+        div.style.left = n.x;
+        div.style.top = n.y;
+        div.setAttribute('data-id', n.id);
+        div.setAttribute('data-type', n.type);
+        div.onclick = () => {
+          const targetId = prompt("Connect to node ID:");
+          if (targetId !== null) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
+        };
+        makeDraggable(div);
+        document.getElementById('canvas').appendChild(div);
+        nodes.push({ id: n.id, type: n.type, el: div });
+        nodeId = Math.max(nodeId, n.id + 1);
+      });
+      connections = data.connections;
     }
 
     async function runFlow() {
@@ -138,24 +175,24 @@
             try {
               const parser = new DOMParser();
               const doc = parser.parseFromString(context.output, 'text/html');
-              const title = doc.querySelector('title')?.innerText || 'No <title>';
+              const title = doc.querySelector('title')?.innerText || 'No title found';
               context.output = title;
-            } catch (e) { reject(e); return; }
+            } catch (e) {
+              reject(e);
+              return;
+            }
           } else if (type === 'Logger') {
-            alert("Logged Output: " + context.output);
+            alert("Logger Output: " + context.output);
             console.log("Logger:", context.output);
           }
           resolve();
-        }, 800);
+        }, 600);
       });
     }
 
     function topologicalSort(nodes, edges) {
       const adj = {}, inDegree = {}, result = [];
-      nodes.forEach(n => {
-        adj[n] = [];
-        inDegree[n] = 0;
-      });
+      nodes.forEach(n => { adj[n] = []; inDegree[n] = 0; });
       edges.forEach(([from, to]) => {
         adj[from].push(to);
         inDegree[to]++;
