@@ -1,6 +1,944 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n - Workflow Editor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar */
+    .left-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 65px;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      z-index: 100;
+      transition: width 0.3s ease;
+    }
+
+    .left-sidebar.expanded {
+      width: 280px;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      padding: 5px;
+    }
+
+    .sidebar-toggle:hover {
+      color: #007acc;
+    }
+
+    .sidebar-menu {
+      margin-top: 60px;
+      width: 100%;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-item:hover {
+      background: #f5f5f5;
+      color: #007acc;
+    }
+
+    .sidebar-item.active {
+      background: #e3f2fd;
+      color: #007acc;
+      border-left-color: #007acc;
+    }
+
+    .sidebar-item-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      font-size: 18px;
+    }
+
+    .sidebar-item-text {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .left-sidebar.expanded .sidebar-item-text {
+      opacity: 1;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 65px;
+      right: 0;
+      height: 60px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 90;
+    }
+
+    .workflow-name {
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      margin-right: 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .workflow-name:hover {
+      color: #007acc;
+    }
+
+    .tag-button {
+      background: none;
+      border: 1px dashed #ccc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      color: #666;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 15px;
+    }
+
+    .tag-button:hover {
+      border-color: #007acc;
+      color: #007acc;
+    }
+
+    .top-bar-controls {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-switch.active {
+      background: #007acc;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+
+    .top-bar-button {
+      background: none;
+      border: 1px solid #e0e0e0;
+      padding: 8px 16px;
+      border-radius: 4px;
+      color: #666;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .top-bar-button:hover {
+      border-color: #007acc;
+      color: #007acc;
+    }
+
+    .top-bar-button.primary {
+      background: #007acc;
+      color: white;
+      border-color: #007acc;
+    }
+
+    .top-bar-button.primary:hover {
+      background: #0056b3;
+    }
+
+    /* Canvas */
+    .canvas-container {
+      position: absolute;
+      top: 60px;
+      left: 65px;
+      right: 0;
+      bottom: 0;
+      background: #f9f9f9;
+      background-image: radial-gradient(circle, #ddd 1px, transparent 1px);
+      background-size: 20px 20px;
+      overflow: hidden;
+    }
+
+    .canvas {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    .canvas.dragging {
+      cursor: grabbing;
+    }
+
+    /* Canvas Controls */
+    .canvas-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .canvas-control {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      transition: all 0.2s ease;
+    }
+
+    .canvas-control:hover {
+      border-color: #007acc;
+      color: #007acc;
+    }
+
+    /* Add Node Button */
+    .add-node-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: #007acc;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .add-node-btn:hover {
+      background: #0056b3;
+      transform: scale(1.1);
+    }
+
+    /* Initial Node */
+    .initial-node {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 240px;
+      height: 80px;
+      background: white;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .initial-node:hover {
+      border-color: #007acc;
+      color: #007acc;
+    }
+
+    /* Node */
+    .node {
+      position: absolute;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      min-width: 180px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      cursor: move;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .node:hover {
+      border-color: #007acc;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .node.selected {
+      border-color: #007acc;
+      box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+    }
+
+    .node.executing {
+      border-color: #ff9800;
+      animation: pulse 2s infinite;
+    }
+
+    .node.success {
+      border-color: #4caf50;
+    }
+
+    .node.error {
+      border-color: #f44336;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+    }
+
+    .node-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+
+    .node-content {
+      flex: 1;
+    }
+
+    .node-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .node-subtitle {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .node-controls {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      display: none;
+      gap: 5px;
+    }
+
+    .node:hover .node-controls {
+      display: flex;
+    }
+
+    .node-control {
+      width: 24px;
+      height: 24px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .node-control:hover {
+      border-color: #007acc;
+      color: #007acc;
+    }
+
+    .node-control.delete:hover {
+      border-color: #f44336;
+      color: #f44336;
+    }
+
+    /* Connection Points */
+    .connection-point {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #007acc;
+      border: 2px solid white;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .connection-point.input {
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .connection-point.output {
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .connection-point:hover {
+      transform: scale(1.2) translateY(-50%);
+    }
+
+    /* SVG Connections */
+    .connections-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .connection-path {
+      fill: none;
+      stroke: #007acc;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .connection-path.active {
+      stroke: #ff9800;
+      stroke-width: 3;
+    }
+
+    /* Node Panel */
+    .node-panel {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      width: 320px;
+      height: calc(100vh - 60px);
+      background: white;
+      border-left: 1px solid #e0e0e0;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 200;
+    }
+
+    .node-panel.open {
+      transform: translateX(0);
+    }
+
+    .node-panel-header {
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .node-panel-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 16px;
+    }
+
+    .node-search {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .node-search:focus {
+      outline: none;
+      border-color: #007acc;
+    }
+
+    .node-categories {
+      padding: 20px;
+      overflow-y: auto;
+      height: calc(100% - 120px);
+    }
+
+    .node-category {
+      margin-bottom: 24px;
+    }
+
+    .node-category-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .node-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 8px;
+    }
+
+    .node-item:hover {
+      background: #f5f5f5;
+    }
+
+    .node-item-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+
+    .node-item-content {
+      flex: 1;
+    }
+
+    .node-item-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .node-item-description {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Execute Panel */
+    .execute-panel {
+      position: fixed;
+      bottom: 0;
+      left: 65px;
+      right: 0;
+      height: 200px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 50;
+    }
+
+    .execute-panel.open {
+      transform: translateY(0);
+    }
+
+    .execute-panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: between;
+      align-items: center;
+    }
+
+    .execute-panel-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .execute-panel-content {
+      padding: 20px;
+      overflow-y: auto;
+      height: calc(100% - 60px);
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    /* Utilities */
+    .hidden {
+      display: none;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .ml-auto {
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Sidebar -->
+  <div class="left-sidebar" id="leftSidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <span id="sidebarToggleIcon">≡</span>
+    </button>
+    
+    <div class="sidebar-menu">
+      <div class="sidebar-item active">
+        <div class="sidebar-item-icon">🏠</div>
+        <div class="sidebar-item-text">Overview</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">📁</div>
+        <div class="sidebar-item-text">Projects</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">⚙️</div>
+        <div class="sidebar-item-text">Admin Panel</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">📋</div>
+        <div class="sidebar-item-text">Templates</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">🔧</div>
+        <div class="sidebar-item-text">Variables</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">📊</div>
+        <div class="sidebar-item-text">All executions</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-item-icon">❓</div>
+        <div class="sidebar-item-text">Help</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <input type="text" class="workflow-name" value="My workflow" placeholder="Workflow name">
+    <button class="tag-button">+ Add Tag</button>
+    
+    <div class="top-bar-controls">
+      <div class="toggle-switch" id="activeToggle" onclick="toggleWorkflow()">
+        <span style="font-size: 12px; color: #666; margin-right: 10px;">Inactive</span>
+      </div>
+      <button class="top-bar-button">Share</button>
+      <button class="top-bar-button primary">Save</button>
+      <button class="top-bar-button">History</button>
+    </div>
+  </div>
+
+  <!-- Canvas Container -->
+  <div class="canvas-container">
+    <div class="canvas" id="canvas">
+      <!-- SVG for connections -->
+      <svg class="connections-svg" id="connectionsSvg">
+        <!-- Connection paths will be added here -->
+      </svg>
+      
+      <!-- Initial "Add first step" node -->
+      <div class="initial-node" id="initialNode" onclick="openNodePanel()">
+        <span>Add first step</span>
+      </div>
+      
+      <!-- Nodes will be added here dynamically -->
+    </div>
+
+    <!-- Canvas Controls -->
+    <div class="canvas-controls">
+      <button class="canvas-control" onclick="fitToView()" title="Fit to view">⌐</button>
+      <button class="canvas-control" onclick="zoomIn()" title="Zoom in">+</button>
+      <button class="canvas-control" onclick="zoomOut()" title="Zoom out">-</button>
+      <button class="canvas-control" onclick="tidyUp()" title="Tidy up">⋈</button>
+    </div>
+
+    <!-- Add Node Button -->
+    <button class="add-node-btn" onclick="openNodePanel()">+</button>
+  </div>
+
+  <!-- Node Panel -->
+  <div class="node-panel" id="nodePanel">
+    <div class="node-panel-header">
+      <div class="node-panel-title">Add nodes</div>
+      <input type="text" class="node-search" placeholder="Search nodes..." id="nodeSearch">
+    </div>
+    
+    <div class="node-categories">
+      <div class="node-category">
+        <div class="node-category-title">Trigger</div>
+        <div class="node-item" onclick="addNode('webhook')">
+          <div class="node-item-icon" style="background: #007acc;">🔗</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Webhook</div>
+            <div class="node-item-description">Receives HTTP requests</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('schedule')">
+          <div class="node-item-icon" style="background: #ff9800;">⏰</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Schedule Trigger</div>
+            <div class="node-item-description">Triggers on schedule</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('email')">
+          <div class="node-item-icon" style="background: #4caf50;">📧</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Email Trigger</div>
+            <div class="node-item-description">Triggers on email</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="node-category">
+        <div class="node-category-title">Actions</div>
+        <div class="node-item" onclick="addNode('http')">
+          <div class="node-item-icon" style="background: #9c27b0;">🌐</div>
+          <div class="node-item-content">
+            <div class="node-item-title">HTTP Request</div>
+            <div class="node-item-description">Makes HTTP requests</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('gmail')">
+          <div class="node-item-icon" style="background: #f44336;">📮</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Gmail</div>
+            <div class="node-item-description">Send and receive emails</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('slack')">
+          <div class="node-item-icon" style="background: #673ab7;">💬</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Slack</div>
+            <div class="node-item-description">Send messages to Slack</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="node-category">
+        <div class="node-category-title">Core</div>
+        <div class="node-item" onclick="addNode('if')">
+          <div class="node-item-icon" style="background: #607d8b;">🔀</div>
+          <div class="node-item-content">
+            <div class="node-item-title">IF</div>
+            <div class="node-item-description">Conditional logic</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('set')">
+          <div class="node-item-icon" style="background: #795548;">⚙️</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Set</div>
+            <div class="node-item-description">Set data values</div>
+          </div>
+        </div>
+        <div class="node-item" onclick="addNode('code')">
+          <div class="node-item-icon" style="background: #000;">💻</div>
+          <div class="node-item-content">
+            <div class="node-item-title">Code</div>
+            <div class="node-item-description">Run custom JavaScript</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Execute Panel -->
+  <div class="execute-panel" id="executePanel">
+    <div class="execute-panel-header">
+      <div class="execute-panel-title">Execution</div>
+      <button class="top-bar-button" onclick="closeExecutePanel()">×</button>
+    </div>
+    <div class="execute-panel-content" id="executionLog">
+      <!-- Execution logs will appear here -->
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let nodes = [];
+    let connections = [];
+    let nodeIdCounter = 0;
+    let isConnecting = false;
+    let connectionStart = null;
+    let draggedNode = null;
+    let dragOffset = { x: 0, y: 0 };
+    let canvasOffset = { x: 0, y: 0 };
+    let zoomLevel = 1;
+    let isExecuting = false;
+
+    // Node type configurations
+    const nodeTypes = {
+      webhook: { icon: '🔗', color: '#007acc', title: 'Webhook' },
+      schedule: { icon: '⏰', color: '#ff9800', title: 'Schedule Trigger' },
+      email: { icon: '📧', color: '#4caf50', title: 'Email Trigger' },
+      http: { icon: '🌐', color: '#9c27b0', title: 'HTTP Request' },
+      gmail: { icon: '📮', color: '#f44336', title: 'Gmail' },
+      slack: { icon: '💬', color: '#673ab7', title: 'Slack' },
+      if: { icon: '🔀', color: '#607d8b', title: 'IF' },
+      set: { icon: '⚙️', color: '#795548', title: 'Set' },
+      code: { icon: '💻', color: '#000', title: 'Code' }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      setupCanvasInteraction();
+    });
+
+    function setupEventListeners() {
+      // Close node panel when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.node-panel') && !e.target.closest('.add-node-btn') && !e.target.closest('.initial-node')) {
+          closeNodePanel();
+        }
+      });
+
+      // Search functionality
+      document.getElementById('nodeSearch').addEventListener('input', function(e) {
+        filterNodes(e.target.value);
+      });
+    }
+
+    function setupCanvasInteraction() {
+      const canvas = document.getElementById('canvas');
+      
+      // Canvas panning
+      let isPanning = false;
+      let panStart = { x: 0, y: 0 };
+      
+      canvas.addEventListener('mousedown', function(e) {
+        if (e.target === canvas || e.target.closest('.connections-svg')) {
+          isPanning = true;
+          panStart = { x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y };
+          canvas.classList.add('dragging');
+        }
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (isPanning) {
+          canvasOffset.x = e.clientX - panStart.x;
+          canvasOffset.y = e.clientY - panStart.y;
+          updateCanvasTransform();
+        }
+        
+        if (draggedNode) {
+          moveNode(draggedNode, e.clientX - dragOffset.x, e.clientY - dragOffset.y);
+        }
+      });
+
+      document.addEventListener('mouseup', function() {
+        isPanning = false;
+        canvas.classList.remove('dragging');
+        draggedNode = null;
+      });
+
+      // Zoom functionality
+      canvas.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        zoomLevel *= delta;
+        zoomLevel = Math.min(Math.max(zoomLevel, 0.1), 3);
+        updateCanvasTransform();
+      });
+    }
+
+    function updateCanvasTransform() {
+      const canvas = document.getElementById('canvas');
+      canvas.style.transform = `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoomLevel})`;
+    }
+
+    // Sidebar functions
+    function toggleSidebar() {
+      const sidebar = document.getElementById('leftSidebar');
+      const icon = document.getElementById('sidebarToggleIcon');
+      sidebar.classList.toggle('expanded');
+      icon.textContent = sidebar.classList.contains('expanded') ? '×' : '≡';
+    }
+
+    function toggleWorkflow() {
+      const toggle = document.getElementById('activeToggle');
+      toggle.classList.toggle('active');
+      const text = toggle.querySelector('span');
+      text.textContent = toggle.classList.contains('active') ? 'Active' : 'Inactive';
+    }
+
+    // Node panel functions
+    function openNodePanel() {
+      document.getElementById('nodePanel').classList.add('open');
+      document.getElementById('initialNode').style.display = 'none';
+    }
+
+    function closeNodePanel() {
+      document.getElementById('nodePanel').classList.remove('open');
+      if (nodes.length === 0) {
+        document.getElementById('initialNode').style.display = 'flex';
+      }
+    }
+
+    function filterNodes(searchTerm) {
+      const items = document.querySelectorAll('.node-<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boss AI – Enhanced Canvas</title>
