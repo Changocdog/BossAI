@@ -2,212 +2,698 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Boss AI – Visual Automation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boss AI – Enhanced Canvas</title>
   <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to right, #000000, #0a0a2a);
-      color: #00bfff;
-      overflow: hidden;
+    body { margin: 0; overflow: hidden; font-family: sans-serif; }
+    
+    .sidebar { 
+      position: absolute; 
+      top: 0; 
+      bottom: 0; 
+      width: 220px; 
+      background: #1e1e2e; 
+      color: #fff; 
+      padding: 10px; 
+      overflow-y: auto;
     }
-    .glow { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff; }
-    #toolbar {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
+    
+    .sidebar h2 { margin-top: 20px; font-size: 16px; color: #aaf; }
+    
+    .node-template { 
+      padding: 8px; 
+      margin: 5px 0; 
+      background: #27293d; 
+      border: 1px solid #444; 
+      border-radius: 4px; 
+      cursor: grab; 
+      user-select: none;
     }
-    #toolbar button {
-      background: #001f33;
-      color: #00bfff;
-      border: 1px solid #00bfff;
-      padding: 6px 12px;
-      margin-right: 8px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
+    
+    .node-template:hover { background: #2d2f45; }
+    
+    .controls { 
+      margin-top: 20px; 
+      padding-top: 15px; 
+      border-top: 1px solid #444; 
     }
-    #canvas {
-      width: 100%;
-      height: 100%;
-      position: relative;
+    
+    .btn { 
+      display: block; 
+      width: 100%; 
+      padding: 8px; 
+      margin: 5px 0; 
+      background: #5af; 
+      color: #000; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-weight: bold;
     }
-    .node {
-      position: absolute;
-      width: 180px;
-      padding: 10px;
-      background: #0c0c0c;
-      border: 1px solid #00bfff;
-      color: #00bfff;
-      cursor: move;
-      text-align: center;
+    
+    .btn:hover { background: #7bf; }
+    .btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+    
+    .canvas-container { 
+      position: absolute; 
+      left: 220px; 
+      right: 0; 
+      top: 0; 
+      bottom: 0; 
+      background: #0f0f1a; 
     }
-    .active { border: 2px solid yellow; }
-    .success { border: 2px solid lime; }
-    .error { border: 2px solid red; }
+    
+    .node { 
+      position: absolute; 
+      width: 160px; 
+      padding: 10px; 
+      background: #27293d; 
+      border: 1px solid #444; 
+      border-radius: 4px; 
+      cursor: move; 
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    
+    .node:hover { border-color: #5af; }
+    .node.selected { border-color: #5af; box-shadow: 0 0 10px rgba(90, 175, 255, 0.3); }
+    .node.executing { border-color: #fa5; background: #2d2a20; }
+    .node.success { border-color: #5a5; background: #1a2d1a; }
+    .node.error { border-color: #a55; background: #2d1a1a; }
+    
+    .node .title { 
+      font-weight: bold; 
+      margin-bottom: 8px; 
+      color: #aaf; 
+    }
+    
+    .node .status { 
+      font-size: 12px; 
+      color: #888; 
+      margin-top: 5px; 
+    }
+    
+    .node .delete-btn { 
+      position: absolute; 
+      top: -5px; 
+      right: -5px; 
+      width: 20px; 
+      height: 20px; 
+      background: #a55; 
+      color: white; 
+      border: none; 
+      border-radius: 50%; 
+      cursor: pointer; 
+      font-size: 12px; 
+      display: none;
+    }
+    
+    .node:hover .delete-btn { display: block; }
+    
+    .svg-connections { 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      pointer-events: none; 
+    }
+    
+    .connection { 
+      stroke: #5af; 
+      stroke-width: 2; 
+      fill: none; 
+      opacity: 0.7;
+    }
+    
+    .connection.active { 
+      stroke: #fa5; 
+      stroke-width: 3; 
+      opacity: 1;
+    }
+    
+    .log-panel { 
+      position: absolute; 
+      bottom: 0; 
+      left: 220px; 
+      right: 0; 
+      height: 150px; 
+      background: #1a1a2e; 
+      border-top: 1px solid #444; 
+      color: #fff; 
+      padding: 10px; 
+      overflow-y: auto; 
+      font-family: monospace; 
+      font-size: 12px; 
+      display: none;
+    }
+    
+    .log-panel.visible { display: block; }
+    
+    .log-entry { 
+      margin: 2px 0; 
+      padding: 2px 0; 
+    }
+    
+    .log-entry.info { color: #5af; }
+    .log-entry.success { color: #5a5; }
+    .log-entry.error { color: #a55; }
+    .log-entry.warning { color: #fa5; }
+    
+    .toast { 
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      padding: 10px 20px; 
+      background: #27293d; 
+      color: #fff; 
+      border-radius: 4px; 
+      border-left: 4px solid #5af; 
+      z-index: 1000; 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    
+    .toast.show { opacity: 1; }
+    .toast.error { border-left-color: #a55; }
+    .toast.success { border-left-color: #5a5; }
   </style>
 </head>
 <body>
-  <div id="toolbar">
-    <button onclick="addNode('Script Writer')">Script Writer</button>
-    <button onclick="addNode('HTML Extract')">HTML Extract</button>
-    <button onclick="addNode('Logger')">Logger</button>
-    <button onclick="runFlow()">Run</button>
-    <button onclick="clearFlow()">Clear</button>
-    <button onclick="exportFlow()">Export</button>
-    <button onclick="importFlow()">Import</button>
+  <div class="sidebar">
+    <h2>Node Types</h2>
+    <div draggable="true" class="node-template" data-type="script">📝 Script Writer</div>
+    <div draggable="true" class="node-template" data-type="voice">🎤 Voiceover</div>
+    <div draggable="true" class="node-template" data-type="log">📊 Logger</div>
+    <div draggable="true" class="node-template" data-type="api">🌐 API Call</div>
+    <div draggable="true" class="node-template" data-type="transform">🔄 Transform</div>
+    
+    <div class="controls">
+      <h2>Actions</h2>
+      <button class="btn" onclick="executeWorkflow()">▶️ Execute</button>
+      <button class="btn" onclick="stopExecution()">⏹️ Stop</button>
+      <button class="btn" onclick="clearCanvas()">🗑️ Clear</button>
+      <button class="btn" onclick="exportWorkflow()">💾 Export</button>
+      <button class="btn" onclick="importWorkflow()">📁 Import</button>
+      <button class="btn" onclick="toggleLogs()">📋 Logs</button>
+      <input type="file" id="fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+    </div>
+    
+    <div class="controls">
+      <h2>Settings</h2>
+      <label style="display: block; margin: 10px 0;">
+        <input type="checkbox" id="autoSave" checked> Auto-save
+      </label>
+      <label style="display: block; margin: 10px 0;">
+        <input type="checkbox" id="showGrid"> Show Grid
+      </label>
+    </div>
   </div>
-  <div id="canvas"></div>
+  
+  <div class="canvas-container" id="canvasContainer">
+    <svg class="svg-connections" id="svgConnections"></svg>
+  </div>
+  
+  <div class="log-panel" id="logPanel">
+    <div id="logContent"></div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
 
   <script>
+    const canvas = document.getElementById('canvasContainer');
+    const svg = document.getElementById('svgConnections');
+    const logPanel = document.getElementById('logPanel');
+    const logContent = document.getElementById('logContent');
+    const toast = document.getElementById('toast');
+    
     let nodes = [];
     let connections = [];
-    let nodeId = 0;
-
-    function addNode(type) {
-      const div = document.createElement('div');
-      div.className = 'node';
-      div.innerText = type + " (ID: " + nodeId + ")";
-      div.style.left = Math.random() * 600 + 'px';
-      div.style.top = Math.random() * 400 + 'px';
-      div.setAttribute('data-id', nodeId);
-      div.setAttribute('data-type', type);
-      div.onclick = () => {
-        const targetId = prompt("Connect to node ID:");
-        if (targetId !== null) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
-      };
-      makeDraggable(div);
-      document.getElementById('canvas').appendChild(div);
-      nodes.push({ id: nodeId, type, el: div });
-      nodeId++;
+    let nodeCount = 0;
+    let dragNode = null, offsetX, offsetY;
+    let isExecuting = false;
+    let executionQueue = [];
+    
+    // Auto-save functionality
+    function autoSave() {
+      if (document.getElementById('autoSave').checked) {
+        localStorage.setItem('workflow_autosave', JSON.stringify({
+          nodes: nodes.map(n => ({
+            id: n.id,
+            type: n.type,
+            x: parseInt(n.el.style.left),
+            y: parseInt(n.el.style.top)
+          })),
+          connections: connections
+        }));
+      }
     }
-
-    function makeDraggable(el) {
-      let offsetX = 0, offsetY = 0, isDown = false;
-      el.onmousedown = function(e) {
-        isDown = true;
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-      };
-      document.onmouseup = () => isDown = false;
-      document.onmousemove = (e) => {
-        if (!isDown) return;
-        el.style.left = (e.pageX - offsetX) + 'px';
-        el.style.top = (e.pageY - offsetY) + 'px';
-      };
-    }
-
-    function clearFlow() {
-      document.getElementById('canvas').innerHTML = '';
-      nodes = [];
-      connections = [];
-      nodeId = 0;
-    }
-
-    function exportFlow() {
-      const data = {
-        nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.el.style.left, y: n.el.style.top })),
-        connections
-      };
-      navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
-        alert("Flow exported to clipboard!");
-      });
-    }
-
-    function importFlow() {
-      const input = prompt("Paste your flow JSON:");
-      if (!input) return;
-      const data = JSON.parse(input);
-      clearFlow();
-      data.nodes.forEach(n => {
-        const div = document.createElement('div');
-        div.className = 'node';
-        div.innerText = n.type + " (ID: " + n.id + ")";
-        div.style.left = n.x;
-        div.style.top = n.y;
-        div.setAttribute('data-id', n.id);
-        div.setAttribute('data-type', n.type);
-        div.onclick = () => {
-          const targetId = prompt("Connect to node ID:");
-          if (targetId !== null) connections.push([parseInt(div.dataset.id), parseInt(targetId)]);
-        };
-        makeDraggable(div);
-        document.getElementById('canvas').appendChild(div);
-        nodes.push({ id: n.id, type: n.type, el: div });
-        nodeId = Math.max(nodeId, n.id + 1);
-      });
-      connections = data.connections;
-    }
-
-    async function runFlow() {
-      const context = {};
-      const sorted = topologicalSort(nodes.map(n => n.id), connections);
-      for (let id of sorted) {
-        const node = nodes.find(n => n.id === id);
-        if (!node) continue;
+    
+    // Load auto-saved workflow
+    function loadAutoSave() {
+      const saved = localStorage.getItem('workflow_autosave');
+      if (saved) {
         try {
-          node.el.classList.remove('success', 'error');
-          node.el.classList.add('active');
-          await runNode(node, context);
-          node.el.classList.remove('active');
-          node.el.classList.add('success');
+          const data = JSON.parse(saved);
+          data.nodes.forEach(n => {
+            createNode(n.type, n.x, n.y);
+            nodes[nodes.length - 1].id = n.id;
+            nodes[nodes.length - 1].el.id = n.id;
+          });
+          connections = data.connections;
+          connections.forEach(c => drawConnection(c));
+          showToast('Auto-saved workflow loaded', 'success');
         } catch (e) {
-          node.el.classList.remove('active');
-          node.el.classList.add('error');
-          console.error("Node error:", e);
-          break;
+          console.error('Failed to load auto-save:', e);
         }
       }
     }
+    
+    // Toast notifications
+    function showToast(message, type = 'info') {
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // Logging system
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logContent.appendChild(entry);
+      logContent.scrollTop = logContent.scrollHeight;
+      console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+    
+    function toggleLogs() {
+      logPanel.classList.toggle('visible');
+    }
+    
+    // Node creation and management
+    document.querySelectorAll('.node-template').forEach(tpl => {
+      tpl.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('type', tpl.dataset.type);
+      });
+    });
 
-    async function runNode(node, context) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          const type = node.type;
-          if (type === 'Script Writer') {
-            context.output = `<html><head><title>Hello BossAI</title></head><body><h1>Welcome</h1></body></html>`;
-          } else if (type === 'HTML Extract') {
-            try {
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(context.output, 'text/html');
-              const title = doc.querySelector('title')?.innerText || 'No title found';
-              context.output = title;
-            } catch (e) {
-              reject(e);
-              return;
-            }
-          } else if (type === 'Logger') {
-            alert("Logger Output: " + context.output);
-            console.log("Logger:", context.output);
+    canvas.addEventListener('dragover', e => e.preventDefault());
+    canvas.addEventListener('drop', e => {
+      const type = e.dataTransfer.getData('type');
+      if (!type) return;
+      const rect = canvas.getBoundingClientRect();
+      createNode(type, e.clientX - rect.left, e.clientY - rect.top);
+      autoSave();
+    });
+
+    function createNode(type, x, y) {
+      const id = 'node' + (nodeCount++);
+      const el = document.createElement('div');
+      el.className = 'node';
+      el.id = id;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      
+      const icons = {
+        script: '📝',
+        voice: '🎤',
+        log: '📊',
+        api: '🌐',
+        transform: '🔄'
+      };
+      
+      el.innerHTML = `
+        <div class="title">${icons[type] || '⚙️'} ${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+        <div class="status">Ready</div>
+        <button class="delete-btn" onclick="deleteNode('${id}')">×</button>
+      `;
+      
+      el.addEventListener('mousedown', startDrag);
+      canvas.appendChild(el);
+      
+      const node = { id, type, el, status: 'ready', data: {} };
+      nodes.push(node);
+      
+      log(`Created ${type} node: ${id}`, 'info');
+      return node;
+    }
+    
+    function deleteNode(nodeId) {
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node) return;
+      
+      // Remove connections
+      connections = connections.filter(c => c.from !== nodeId && c.to !== nodeId);
+      
+      // Remove SVG paths
+      svg.querySelectorAll(`[data-from="${nodeId}"], [data-to="${nodeId}"]`).forEach(path => {
+        path.remove();
+      });
+      
+      // Remove node element
+      node.el.remove();
+      
+      // Remove from nodes array
+      nodes = nodes.filter(n => n.id !== nodeId);
+      
+      log(`Deleted node: ${nodeId}`, 'info');
+      autoSave();
+    }
+    
+    function startDrag(e) {
+      if (e.target.classList.contains('delete-btn')) return;
+      
+      dragNode = e.currentTarget;
+      const rect = dragNode.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDrag);
+    }
+
+    function drag(e) {
+      if (!dragNode) return;
+      const rect = canvas.getBoundingClientRect();
+      dragNode.style.left = Math.max(0, e.clientX - rect.left - offsetX) + 'px';
+      dragNode.style.top = Math.max(0, e.clientY - rect.top - offsetY) + 'px';
+      updateConnections(dragNode.id);
+    }
+
+    function stopDrag() {
+      dragNode = null;
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+      autoSave();
+    }
+
+    // Connection management
+    canvas.addEventListener('click', e => {
+      if (e.ctrlKey && e.target.closest('.node')) {
+        const node = e.target.closest('.node');
+        const selected = document.querySelector('.node.selected');
+        
+        if (selected && selected !== node) {
+          const connection = { from: selected.id, to: node.id };
+          if (!connections.some(c => c.from === connection.from && c.to === connection.to)) {
+            connections.push(connection);
+            drawConnection(connection);
+            log(`Connected ${selected.id} → ${node.id}`, 'info');
+            autoSave();
           }
-          resolve();
-        }, 600);
+          selected.classList.remove('selected');
+        } else {
+          document.querySelectorAll('.node.selected').forEach(n => n.classList.remove('selected'));
+          node.classList.add('selected');
+        }
+      } else {
+        document.querySelectorAll('.node.selected').forEach(n => n.classList.remove('selected'));
+      }
+    });
+
+    function updateConnections(nodeId) {
+      connections.forEach(c => {
+        if (c.from === nodeId || c.to === nodeId) {
+          drawConnection(c);
+        }
       });
     }
 
-    function topologicalSort(nodes, edges) {
-      const adj = {}, inDegree = {}, result = [];
-      nodes.forEach(n => { adj[n] = []; inDegree[n] = 0; });
-      edges.forEach(([from, to]) => {
-        adj[from].push(to);
-        inDegree[to]++;
-      });
-      const queue = nodes.filter(n => inDegree[n] === 0);
-      while (queue.length) {
-        const node = queue.shift();
-        result.push(node);
-        adj[node].forEach(neigh => {
-          inDegree[neigh]--;
-          if (inDegree[neigh] === 0) queue.push(neigh);
-        });
+    function drawConnection({from, to}) {
+      let path = svg.querySelector(`[data-from="${from}"][data-to="${to}"]`);
+      if (!path) {
+        path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('class', 'connection');
+        path.dataset.from = from;
+        path.dataset.to = to;
+        svg.appendChild(path);
       }
-      return result;
+      
+      const fromNode = nodes.find(n => n.id === from);
+      const toNode = nodes.find(n => n.id === to);
+      
+      if (!fromNode || !toNode) return;
+      
+      const fromRect = fromNode.el.getBoundingClientRect();
+      const toRect = toNode.el.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      
+      const x1 = fromRect.right - canvasRect.left;
+      const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top;
+      const x2 = toRect.left - canvasRect.left;
+      const y2 = toRect.top + toRect.height / 2 - canvasRect.top;
+      
+      const dx = x2 - x1;
+      const curve = Math.abs(dx) / 2;
+      
+      path.setAttribute('d', `M${x1},${y1} C${x1 + curve},${y1} ${x2 - curve},${y2} ${x2},${y2}`);
     }
+    
+    // Workflow execution
+    async function executeWorkflow() {
+      if (isExecuting) {
+        showToast('Workflow is already executing', 'warning');
+        return;
+      }
+      
+      isExecuting = true;
+      log('Starting workflow execution', 'info');
+      
+      // Find root nodes (nodes with no incoming connections)
+      const rootNodes = nodes.filter(node => 
+        !connections.some(c => c.to === node.id)
+      );
+      
+      if (rootNodes.length === 0) {
+        showToast('No root nodes found', 'error');
+        isExecuting = false;
+        return;
+      }
+      
+      // Execute nodes in topological order
+      const visited = new Set();
+      const executing = new Set();
+      
+      for (const rootNode of rootNodes) {
+        await executeNode(rootNode, visited, executing);
+      }
+      
+      isExecuting = false;
+      log('Workflow execution completed', 'success');
+      showToast('Workflow executed successfully', 'success');
+    }
+    
+    async function executeNode(node, visited, executing) {
+      if (visited.has(node.id)) return;
+      if (executing.has(node.id)) {
+        log(`Circular dependency detected: ${node.id}`, 'error');
+        return;
+      }
+      
+      executing.add(node.id);
+      
+      // Execute dependencies first
+      const dependencies = connections
+        .filter(c => c.to === node.id)
+        .map(c => nodes.find(n => n.id === c.from))
+        .filter(Boolean);
+      
+      for (const dep of dependencies) {
+        await executeNode(dep, visited, executing);
+      }
+      
+      // Execute this node
+      await runNode(node);
+      
+      executing.delete(node.id);
+      visited.add(node.id);
+    }
+    
+    async function runNode(node) {
+      updateNodeStatus(node, 'executing');
+      highlightConnections(node.id, true);
+      
+      log(`Executing node: ${node.id} (${node.type})`, 'info');
+      
+      try {
+        // Simulate different node types
+        switch (node.type) {
+          case 'script':
+            await simulateScriptGeneration(node);
+            break;
+          case 'voice':
+            await simulateVoiceGeneration(node);
+            break;
+          case 'log':
+            await simulateLogging(node);
+            break;
+          case 'api':
+            await simulateApiCall(node);
+            break;
+          case 'transform':
+            await simulateTransform(node);
+            break;
+          default:
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        updateNodeStatus(node, 'success');
+        log(`Node ${node.id} completed successfully`, 'success');
+      } catch (error) {
+        updateNodeStatus(node, 'error');
+        log(`Node ${node.id} failed: ${error.message}`, 'error');
+      }
+      
+      highlightConnections(node.id, false);
+    }
+    
+    function updateNodeStatus(node, status) {
+      node.status = status;
+      const statusEl = node.el.querySelector('.status');
+      const statusText = {
+        ready: 'Ready',
+        executing: 'Executing...',
+        success: 'Complete',
+        error: 'Error'
+      };
+      
+      statusEl.textContent = statusText[status] || status;
+      node.el.className = `node ${status}`;
+    }
+    
+    function highlightConnections(nodeId, highlight) {
+      const paths = svg.querySelectorAll(`[data-from="${nodeId}"], [data-to="${nodeId}"]`);
+      paths.forEach(path => {
+        if (highlight) {
+          path.classList.add('active');
+        } else {
+          path.classList.remove('active');
+        }
+      });
+    }
+    
+    // Simulation functions for different node types
+    async function simulateScriptGeneration(node) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      node.data.script = "Generated script content...";
+    }
+    
+    async function simulateVoiceGeneration(node) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      node.data.audioFile = "generated_voice.mp3";
+    }
+    
+    async function simulateLogging(node) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      log(`Custom log from ${node.id}: Processing data...`, 'info');
+    }
+    
+    async function simulateApiCall(node) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      node.data.response = { status: 'success', data: 'API response data' };
+    }
+    
+    async function simulateTransform(node) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      node.data.transformed = "Data transformed successfully";
+    }
+    
+    function stopExecution() {
+      isExecuting = false;
+      nodes.forEach(node => {
+        if (node.status === 'executing') {
+          updateNodeStatus(node, 'ready');
+        }
+      });
+      log('Execution stopped by user', 'warning');
+      showToast('Execution stopped', 'warning');
+    }
+    
+    // Export/Import functionality
+    function exportWorkflow() {
+      const workflow = {
+        nodes: nodes.map(n => ({
+          id: n.id,
+          type: n.type,
+          x: parseInt(n.el.style.left),
+          y: parseInt(n.el.style.top),
+          data: n.data
+        })),
+        connections: connections,
+        metadata: {
+          name: 'Workflow',
+          created: new Date().toISOString(),
+          version: '1.0.0'
+        }
+      };
+      
+      const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'workflow.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Workflow exported successfully', 'success');
+      log('Workflow exported', 'info');
+    }
+    
+    function importWorkflow() {
+      document.getElementById('fileInput').click();
+    }
+    
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const workflow = JSON.parse(e.target.result);
+          clearCanvas();
+          
+          // Restore nodes
+          workflow.nodes.forEach(n => {
+            const node = createNode(n.type, n.x, n.y);
+            node.id = n.id;
+            node.el.id = n.id;
+            node.data = n.data || {};
+            nodeCount = Math.max(nodeCount, parseInt(n.id.replace('node', '')) + 1);
+          });
+          
+          // Restore connections
+          connections = workflow.connections || [];
+          connections.forEach(c => drawConnection(c));
+          
+          showToast('Workflow imported successfully', 'success');
+          log('Workflow imported', 'info');
+        } catch (error) {
+          showToast('Failed to import workflow', 'error');
+          log(`Import error: ${error.message}`, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    function clearCanvas() {
+      nodes.forEach(node => node.el.remove());
+      svg.innerHTML = '';
+      nodes = [];
+      connections = [];
+      nodeCount = 0;
+      log('Canvas cleared', 'info');
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAutoSave();
+      log('Canvas initialized', 'info');
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      connections.forEach(c => drawConnection(c));
+    });
   </script>
 </body>
 </html>
