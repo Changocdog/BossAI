@@ -1,0 +1,271 @@
+/* BOSS AI THEME OVERRIDE FOR n8n - Enhanced Version */
+/* Import futuristic fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@300;400;500&display=swap');
+
+/* CSS Custom Properties for easier maintenance */
+:root {
+  --boss-primary: #00bfff;
+  --boss-secondary: #1e90ff;
+  --boss-accent: #00ffff;
+  --boss-bg-dark: #000000;
+  --boss-bg-panel: #0a0a2a;
+  --boss-bg-card: #111111;
+  --boss-border: #00bfff;
+  --boss-text: #00bfff;
+  --boss-text-muted: #66d9ff;
+  --boss-shadow: 0 0 8px var(--boss-primary);
+  --boss-glow: 0 0 15px var(--boss-primary);
+  --boss-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base styling with improved performance */
+* {
+  transition: var(--boss-transition);
+}
+
+body,
+html {
+  font-family: 'Rajdhani', 'Orbitron', sans-serif !important;
+  background: 
+    radial-gradient(ellipse at top, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, var(--boss-bg-dark) 0%, #0a0a0a 100%) !important;
+  color: var(--boss-text) !important;
+  font-weight: 400;
+}
+
+/* Typography hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', sans-serif !important;
+  color: var(--boss-text) !important;
+  text-shadow: var(--boss-shadow);
+  font-weight: 600;
+}
+
+p, span, div, label {
+  color: var(--boss-text) !important;
+  font-weight: 300;
+}
+
+/* Enhanced form controls with better UX */
+button,
+input,
+select,
+textarea {
+  background: linear-gradient(135deg, var(--boss-bg-panel) 0%, var(--boss-bg-card) 100%) !important;
+  color: var(--boss-text) !important;
+  border: 1px solid var(--boss-border) !important;
+  border-radius: 4px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 400;
+  transition: var(--boss-transition);
+}
+
+button:hover,
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: var(--boss-glow) !important;
+  border-color: var(--boss-accent) !important;
+  transform: translateY(-1px);
+}
+
+/* Enhanced links with better interaction */
+a {
+  color: var(--boss-text) !important;
+  text-decoration: none !important;
+  position: relative;
+  transition: var(--boss-transition);
+}
+
+a:hover {
+  color: var(--boss-secondary) !important;
+  text-shadow: var(--boss-shadow);
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--boss-primary);
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* Main layout components - More specific selectors */
+[class*="header"],
+[class*="sidebar"],
+[class*="navigation"],
+nav {
+  background: linear-gradient(135deg, var(--boss-bg-panel) 0%, var(--boss-bg-card) 100%) !important;
+  border-color: var(--boss-border) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Logo replacement with better fallback */
+img[alt*="logo" i],
+img[src*="logo"],
+[class*="logo"] img {
+  filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(180deg) brightness(1.2) contrast(1.2);
+  transition: var(--boss-transition);
+}
+
+/* If you have a custom logo, use this instead */
+.boss-logo-override {
+  background: url("https://changocdog.github.io/n8n/docs/bossai-logo.png") no-repeat center !important;
+  background-size: contain !important;
+  text-indent: -9999px;
+  overflow: hidden;
+  width: auto;
+  height: 32px;
+}
+
+/* Enhanced workflow canvas */
+[class*="canvas"],
+[class*="node"],
+.workflow-canvas {
+  background: radial-gradient(circle at 50% 50%, rgba(0, 191, 255, 0.05) 0%, transparent 70%) !important;
+}
+
+/* Node styling with cyber aesthetic */
+[class*="node-"],
+[class*="canvas-node"] {
+  background: linear-gradient(135deg, var(--boss-bg-card) 0%, var(--boss-bg-panel) 100%) !important;
+  border: 1px solid var(--boss-border) !important;
+  color: var(--boss-text) !important;
+  box-shadow: var(--boss-shadow);
+  border-radius: 8px !important;
+  transition: var(--boss-transition);
+}
+
+[class*="node-"]:hover,
+[class*="canvas-node"]:hover {
+  box-shadow: var(--boss-glow) !important;
+  transform: translateY(-2px);
+  border-color: var(--boss-accent) !important;
+}
+
+/* Enhanced run button with pulsing effect */
+[data-test-id*="run"],
+button[class*="run"] {
+  background: linear-gradient(45deg, var(--boss-primary), var(--boss-secondary)) !important;
+  color: var(--boss-bg-dark) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 191, 255, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 191, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 191, 255, 0); }
+}
+
+/* Enhanced notifications and modals */
+[class*="toast"],
+[class*="notification"],
+[class*="modal"],
+[class*="dropdown"],
+footer {
+  background: linear-gradient(135deg, var(--boss-bg-panel) 0%, var(--boss-bg-card) 100%) !important;
+  color: var(--boss-text) !important;
+  border: 1px solid var(--boss-border) !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(15px);
+  box-shadow: var(--boss-glow);
+}
+
+/* Code editor styling */
+[class*="monaco"],
+[class*="editor"],
+.code-editor {
+  background: var(--boss-bg-card) !important;
+  color: var(--boss-text) !important;
+  border: 1px solid var(--boss-border) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--boss-bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--boss-primary), var(--boss-secondary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--boss-secondary), var(--boss-accent));
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(0, 191, 255, 0.3);
+  color: var(--boss-text);
+}
+
+/* Loading animations */
+@keyframes cyber-loading {
+  0% { 
+    border-color: var(--boss-primary);
+    box-shadow: 0 0 5px var(--boss-primary);
+  }
+  50% { 
+    border-color: var(--boss-accent);
+    box-shadow: 0 0 15px var(--boss-accent);
+  }
+  100% { 
+    border-color: var(--boss-primary);
+    box-shadow: 0 0 5px var(--boss-primary);
+  }
+}
+
+[class*="loading"],
+[class*="spinner"] {
+  animation: cyber-loading 1.5s infinite;
+}
+
+/* Status indicators */
+[class*="success"] {
+  color: #00ff88 !important;
+  text-shadow: 0 0 5px #00ff88;
+}
+
+[class*="error"] {
+  color: #ff4444 !important;
+  text-shadow: 0 0 5px #ff4444;
+}
+
+[class*="warning"] {
+  color: #ffaa00 !important;
+  text-shadow: 0 0 5px #ffaa00;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  :root {
+    --boss-shadow: 0 0 4px var(--boss-primary);
+    --boss-glow: 0 0 8px var(--boss-primary);
+  }
+  
+  body {
+    font-size: 14px;
+  }
+  
+  [class*="node-"],
+  [class*="canvas-node"] {
+    border-radius: 6px !important;
+  }
+}
+Improve
+Explain
